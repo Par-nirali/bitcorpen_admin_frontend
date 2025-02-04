@@ -1,0 +1,267 @@
+.loginMainDiv {
+  width: 100%;
+  height: 100%;
+}
+
+.loginContainer {
+  background-color: #000000ab;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  position: fixed;
+  top: 0px;
+  // left: 0px;
+  z-index: 111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  transition: 0.9s ease-in-out;
+  -webkit-user-select: none;
+  user-select: none;
+  //   background-color: #0e0c0d;
+}
+
+.loginSubDiv {
+  width: 600px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  margin-top: 50px;
+  padding: 84px 82px;
+  border-radius: 16px;
+  background: #fff;
+  // background-color: #0e0c0d;
+  border: 1px solid #464646;
+  animation: fadeInAnimation ease 1s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  position: relative;
+
+  .loginClose {
+    top: 15px;
+    right: 15px;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    z-index: 111;
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
+
+    &:hover {
+      transition: 0.3s all ease-in-out;
+      transform: scale(1.05);
+    }
+  }
+}
+
+.loginHead {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.loginContent {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.loginTitle {
+  color: #1c4728;
+  font-family: "SF Pro";
+  font-size: 44px;
+  font-style: normal;
+  font-weight: 274;
+  line-height: normal;
+}
+
+.loginSubtitle {
+  color: #676666;
+  font-family: "SF Pro";
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 32px;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+  width: 100%;
+}
+
+.loginFieldsMain {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.coolinput {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  position: static;
+  width: 100%;
+}
+.text {
+  position: relative;
+  top: 0.5rem;
+  margin: 0 0 0 15px;
+  padding: 0 10px;
+  background: #fff;
+  width: fit-content;
+  color: #313131;
+  font-family: "SF Pro";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.input {
+  padding: 18px;
+  border: 1px #b5b5b5 solid;
+  border-radius: 10px;
+  background: #fff;
+  color: #b5b5b5;
+  font-family: "SF Pro";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+.input::placeholder {
+  color: #b5b5b5;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.errMes {
+  font-size: 14px;
+  color: red;
+  margin-top: 5px;
+  margin-left: 5px;
+}
+
+.formFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.forgotPassword {
+  color: #00a389;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: "SF Pro";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.signInButton {
+  border-radius: 64px;
+  border: 2px solid #1c4728;
+  background: #1c4728;
+  color: #fff;
+  text-align: center;
+  font-family: "SF Pro";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding: 16px 28px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: #e1f5e6;
+    color: #1c4728;
+  }
+}
+
+.termsText {
+  margin: 0;
+  color: #8e8e8e;
+  font-family: "SF Pro";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+@keyframes fadeInAnimation {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 1550px) {
+  .loginSubDiv {
+    width: 560px;
+    padding: 49px 44px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .loginContent {
+    gap: 25px;
+  }
+  .loginHead {
+    gap: 3px;
+  }
+  .formFooter {
+    margin-top: 0px;
+  }
+  .signInButton {
+    padding: 14px 28px;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .loginSubDiv {
+    padding: 49px 22px;
+  }
+  .loginTitle {
+    font-size: 34px;
+  }
+  .loginSubtitle {
+    font-size: 15px;
+  }
+  .loginContent {
+    gap: 15px;
+  }
+  .signInButton {
+    padding: 7px 24px;
+  }
+  .loginForm {
+    gap: 32px;
+  }
+}
