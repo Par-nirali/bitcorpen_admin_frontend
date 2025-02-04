@@ -4,7 +4,7 @@
 }
 
 .loginContainer {
-  background-color: #000000ab;
+  background: #F5F5F5;
   max-width: 100%;
   width: 100%;
   height: 100%;
@@ -31,11 +31,9 @@
   align-items: center;
   gap: 32px;
   margin-top: 50px;
-  padding: 84px 82px;
-  border-radius: 16px;
-  background: #fff;
-  // background-color: #0e0c0d;
-  border: 1px solid #464646;
+  padding: 82px;
+  border-radius: 8px;
+  background: #FFF;
   animation: fadeInAnimation ease 1s;
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
@@ -78,18 +76,28 @@
   gap: 40px;
 }
 
+.logoImg {
+  max-width: 107px;
+  height: auto;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .loginTitle {
-  color: #1c4728;
-  font-family: "SF Pro";
-  font-size: 44px;
+  color: #313131;
+  // font-family: "SF Pro";
+  font-size: 24px;
   font-style: normal;
-  font-weight: 274;
+  font-weight: 590;
   line-height: normal;
 }
 
 .loginSubtitle {
   color: #676666;
-  font-family: "SF Pro";
+  // font-family: "SF Pro";
   font-size: 18px;
   font-style: normal;
   font-weight: 400;
@@ -99,7 +107,7 @@
 .loginForm {
   display: flex;
   flex-direction: column;
-  gap: 42px;
+  gap: 21px;
   width: 100%;
 }
 
@@ -117,15 +125,16 @@
   position: static;
   width: 100%;
 }
+
 .text {
   position: relative;
   top: 0.5rem;
-  margin: 0 0 0 15px;
-  padding: 0 10px;
+  margin: 0 0 0 13px;
+  padding: 0 5px;
   background: #fff;
   width: fit-content;
   color: #313131;
-  font-family: "SF Pro";
+  // font-family: "SF Pro";
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
@@ -137,13 +146,14 @@
   border: 1px #b5b5b5 solid;
   border-radius: 10px;
   background: #fff;
-  color: #b5b5b5;
-  font-family: "SF Pro";
+  color: #313131;
+  // font-family: "SF Pro";
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
 }
+
 .input::placeholder {
   color: #b5b5b5;
 }
@@ -168,26 +178,30 @@
 
 .forgotPassword {
   color: #00a389;
-  text-decoration: none;
+  text-decoration: underline;
   font-size: 14px;
-  font-family: "SF Pro";
+  // font-family: "SF Pro";
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 
   &:hover {
-    text-decoration: underline;
+    transition: all 0.2s ease-in-out;
+    transform: scale(1.01);
   }
 }
 
 .signInButton {
+  width: 100%;
   border-radius: 64px;
   border: 2px solid #1c4728;
   background: #1c4728;
   color: #fff;
   text-align: center;
-  font-family: "SF Pro";
+  // font-family: "SF Pro";
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
@@ -197,7 +211,8 @@
   transition: all 0.2s ease-in-out;
 
   &:hover {
-    background-color: #e1f5e6;
+    transition: all 0.2s ease-in-out;
+    background-color: #1c472819;
     color: #1c4728;
   }
 }
@@ -205,7 +220,7 @@
 .termsText {
   margin: 0;
   color: #8e8e8e;
-  font-family: "SF Pro";
+  // font-family: "SF Pro";
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
@@ -231,15 +246,19 @@
     max-height: 85vh;
     overflow-y: auto;
   }
+
   .loginContent {
     gap: 25px;
   }
+
   .loginHead {
     gap: 3px;
   }
+
   .formFooter {
     margin-top: 0px;
   }
+
   .signInButton {
     padding: 14px 28px;
   }
@@ -249,18 +268,23 @@
   .loginSubDiv {
     padding: 49px 22px;
   }
+
   .loginTitle {
     font-size: 34px;
   }
+
   .loginSubtitle {
     font-size: 15px;
   }
+
   .loginContent {
     gap: 15px;
   }
+
   .signInButton {
     padding: 7px 24px;
   }
+
   .loginForm {
     gap: 32px;
   }

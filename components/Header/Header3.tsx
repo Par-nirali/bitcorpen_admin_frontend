@@ -157,8 +157,8 @@ const Header3 = () => {
       <div className={style.headerSubDiv}>
         <nav className={style.nav}>
           <Link href="/">
-            <div className={style.logo}>
-              <p>Par Solutions</p>
+            <div className={style.headingDivImg}>
+              <img src="/logo.svg" alt="Logo" />
             </div>
           </Link>
           {/* {(selectedproject === "my projects" ||
@@ -261,8 +261,14 @@ const Header3 = () => {
 
           <div className={style.upgradeMainDiv}>
             <div className={style.profileDiv}>
+              <div className={style.headNotifImg}>
+                <img
+                  src={"/icons/notificationheader.svg"}
+                  alt="notificationheader"
+                />
+              </div>
               <div className={style.headProDetailImg}>
-                <img src={"/usercirclepro.png"} alt="profile" />
+                <img src={"/userprofile.svg"} alt="profile" />
               </div>
               <div>
                 {userDetail && (
@@ -299,14 +305,14 @@ const Header3 = () => {
                         className={style.empProfileDiv}
                         onClick={() => {
                           // dispatch(setSelectedEmpl(data));
-                          dispatch(setSelectedEmpl([data])); // Ensure it's stored as an array if you plan to use .length
+                          dispatch(setSelectedEmpl([data]));
 
                           setShow(false);
                           setEmpSearch("");
                           dispatch(setShowEmp(true));
                         }}
                       >
-                        <img src="/usercirclepro.png" alt="profile" />
+                        <img src="/userprofile.svg" alt="profile" />
                         <p>
                           {data?.firstName} {data?.lastName}
                         </p>

@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import * as Yup from "yup";
 import setAuthHeader from "../../utils/setAuth";
 import styles from "./login.module.scss";
-import NotificationHandler from "../NotificationInbox/NotificationInbox";
+// import NotificationHandler from "../NotificationInbox/NotificationInbox";
 import Link from "next/link";
 import { io, Socket } from "socket.io-client";
 import SocketIOClient from "socket.io-client";
@@ -287,9 +287,9 @@ const Login = () => {
         // notification();
         // createEventSource();
         setLogg(true);
-        setTimeout(() => {
-          router.push("/");
-        }, 1000);
+        // setTimeout(() => {
+        //   router.push("/");
+        // }, 1000);
         // setIsSubmitting(false);
       })
       .catch((error) => {
@@ -370,25 +370,37 @@ const Login = () => {
     <>
       <div className={styles.loginMainDiv}>
         <div className={styles.loginContainer}>
-          <div className={styles.loginSubDiv} 
-          // ref={closeRef}
+          <div
+            className={styles.loginSubDiv}
+            // ref={closeRef}
           >
-            <div className={styles.loginClose} onClick={onClose}>
+            {/* <div
+              className={styles.loginClose}
+              // onClick={onClose}
+            >
               <img src="/icons/close.svg" alt="close" />
-            </div>
+            </div> */}
 
             <div className={styles.loginContent}>
               <div className={styles.loginHead}>
-                <h1 className={styles.loginTitle}>Welcome Back, (Name)</h1>
+                <div className={styles.logoImg}>
+                  <img src="/logo.svg" alt="logo" />
+                </div>
+                <h1 className={styles.loginTitle}>Sign in</h1>
                 <p className={styles.loginSubtitle}>
                   Please enter your credentials to log in.
                 </p>
               </div>
 
               <Formik
-                initialValues={initialValues}
-                validationSchema={LoginSchema}
-                onSubmit={handleSubmit}
+                initialValues={{
+                  email: "",
+                  password: "",
+                }}
+                // initialValues={initialValues}
+                // validationSchema={LoginSchema}
+                onSubmit={loginMail}
+                // onSubmit={handleSubmit}
               >
                 {({ isSubmitting, touched, errors }) => (
                   <Form className={styles.loginForm}>
@@ -438,8 +450,8 @@ const Login = () => {
                       </div>
                     </div>
 
+                    <p className={styles.forgotPassword}>Forgot Password?</p>
                     <div className={styles.formFooter}>
-                      <p className={styles.forgotPassword}>Forgot Password?</p>
                       <button
                         type="submit"
                         className={styles.signInButton}
@@ -448,11 +460,6 @@ const Login = () => {
                         {isSubmitting ? "Signing in..." : "Sign in"}
                       </button>
                     </div>
-
-                    <p className={styles.termsText}>
-                      By clicking Continue, you agree to EN Communities User
-                      Agreement, Privacy Policy, and Cookie Policy.
-                    </p>
                   </Form>
                 )}
               </Formik>

@@ -1,5 +1,5 @@
 .wSpaceLeftMain {
-  width: 255px;
+  width: 355px;
   height: 100%;
   padding: 24px;
   border-right: 1px solid #fff;
@@ -22,15 +22,39 @@
   gap: 10px;
 }
 
+.headingDivImg {
+  max-width: 77px;
+  height: auto;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// .headingDiv {
+//   color: #585863;
+//   font-family: Poppins;
+//   font-size: 16px;
+//   font-style: normal;
+//   font-weight: 600;
+//   line-height: 20px;
+//   /* 125% */
+//   letter-spacing: -0.48px;
+// }
+
 .headingDiv {
-  color: #585863;
-  font-family: Poppins;
+  color: #8E8E8E;
+  // font-family: "SF Pro";
   font-size: 16px;
   font-style: normal;
-  font-weight: 600;
-  line-height: 20px;
-  /* 125% */
-  letter-spacing: -0.48px;
+  font-weight: 510;
+  line-height: normal;
+  margin: 12px 0px;
+
+  &:first-child {
+    margin-top: 0;
+  }
 }
 
 .slidebarRoutes {
@@ -81,8 +105,8 @@
     }
 
     p {
-      color: #585863;
-      font-family: Poppins;
+      color: #7F7E7E;
+      // font-family: Poppins;
       font-size: 16px;
       font-style: normal;
       font-weight: 400;
@@ -92,174 +116,20 @@
 
     &.selected {
       transition: 0.5s all ease;
-      background: #0c8ce9;
+      background: #D9F2EF;
 
       p {
-        color: #fff;
-      }
-    }
-
-    &.selectedhome {
-      transition: 0.5s all ease;
-      background: #0c8ce9;
-
-      img {
-        content: url("/rstarw.svg");
-      }
-
-      p {
-        color: #fff;
-      }
-    }
-
-    &.selectedhomeCEO {
-      transition: 0.5s all ease;
-      background: #0c8ce9;
-
-      img {
-        content: url("/homew.svg");
-      }
-
-      p {
-        color: #fff;
-      }
-    }
-
-    &.selectedallemployee {
-      transition: 0.5s all ease;
-      background: #0c8ce9;
-
-      img {
-        content: url("/managerw.svg");
-      }
-
-      p {
-        color: #fff;
-      }
-    }
-
-    &.selectedmyprojects {
-      transition: 0.5s all ease;
-      background: #0c8ce9;
-
-      img {
-        content: url("/myprojectsw.svg");
-      }
-
-      p {
-        color: #fff;
-      }
-    }
-
-    &.selectedreviewed {
-      transition: 0.5s all ease;
-      background: #0c8ce9;
-
-      img {
-        content: url("/rprojectsw.svg");
-      }
-
-      p {
-        color: #fff;
-      }
-    }
-
-    &.selectedmanagers {
-      transition: 0.5s all ease;
-      background: #0c8ce9;
-
-      img {
-        content: url("/managerw.svg");
-      }
-
-      p {
-        color: #fff;
-      }
-    }
-
-    &.selectedstar {
-      transition: 0.5s all ease;
-      background: #0c8ce9;
-
-      img {
-        content: url("/rstarw.svg");
-      }
-
-      p {
-        color: #fff;
-      }
-    }
-
-    &.selectedcprojects {
-      transition: 0.5s all ease;
-      background: #0c8ce9;
-
-      img {
-        content: url("/cancelpw.svg");
-      }
-
-      p {
-        color: #fff;
-      }
-    }
-
-    &.selectedInbox {
-      transition: 0.5s all ease;
-      background: #0c8ce9;
-
-      img {
-        content: url("/inboxw.svg");
-      }
-
-      p {
-        color: #fff;
+        color: #1C4728;
+        font-weight: 500;
       }
     }
 
     &:hover {
       transition: 0.5s all ease;
-      background: #0c8ce9;
+      background: #D9F2EF;
 
-      p {
-        color: #fff;
-      }
     }
 
-    &[data-button-type="home"]:hover img {
-      content: url("/homew.svg");
-    }
-
-    &[data-button-type="allemployee"]:hover img {
-      content: url("/managerw.svg");
-    }
-
-    &[data-button-type="myprojects"]:hover img {
-      content: url("/myprojectsw.svg");
-    }
-
-    &[data-button-type="allprojects"]:hover img {
-      content: url("/myprojectsw.svg");
-    }
-
-    &[data-button-type="rprojects"]:hover img {
-      content: url("/rprojectsw.svg");
-    }
-
-    &[data-button-type="cprojects"]:hover img {
-      content: url("/cancelpw.svg");
-    }
-
-    &[data-button-type="managers"]:hover img {
-      content: url("/managerw.svg");
-    }
-
-    &[data-button-type="star"]:hover img {
-      content: url("/rstarw.svg");
-    }
-
-    &[data-button-type="inbox"]:hover img {
-      content: url("/inboxw.svg");
-    }
   }
 
   .wSpaceOptMain {
