@@ -159,7 +159,7 @@ const Affiliation = () => {
       key: "operate",
       render: () => (
         <div style={{ display: "flex", gap: "8px" }}>
-          <a onClick={() => dispatch(selectedProjects("userdetails"))}>
+          <a onClick={() => dispatch(selectedProjects("affiliateuserdetail"))}>
             <img src="/icons/eye.svg" alt="eye" />
           </a>
           {/* {status === "Validated" ? ( */}
@@ -233,7 +233,7 @@ const Affiliation = () => {
     <>
       <div className={styles.pSubRightDiv}>
         <div className={styles.pHeadingDiv}>
-          <p className={styles.tabTitle}>Users</p>
+          <p className={styles.tabTitle}>Affiliation</p>
         </div>
 
         <div className={styles.dashboardScroll}>

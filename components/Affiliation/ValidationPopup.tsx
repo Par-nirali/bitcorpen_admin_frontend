@@ -9,7 +9,9 @@ interface ValidationPopupProps {
 }
 
 const ValidationPopup: React.FC<ValidationPopupProps> = ({ onClose }) => {
-  const [status, setStatus] = useState<"Validate" | "Invalid">("Validate");
+  const [status, setStatus] = useState<
+    "Validate" | "Invalid" | "Invalide & Fraud"
+  >("Validate");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const handleStatusChange = (e: any) => {
@@ -26,10 +28,11 @@ const ValidationPopup: React.FC<ValidationPopupProps> = ({ onClose }) => {
         <div className={styles1.modifyContainer}>
           <div className={styles1.modifySubDiv}>
             <div className={styles1.modifyHead}>
-              <h5>User {status === "Validate" ? " Activated" : " Invalid"} </h5>
+              <h5>Validation Submited </h5>
               <p className={styles1.modifyLinkDiv}>
-                <span className={styles1.enid}>ENID5666959</span> User Account
-                {status === "Validate" ? " Activated" : " Invalid"}
+                {/* <span className={styles1.enid}>ENID5666959</span> User Account */}
+                {/* {status === "Validate" ? " Activated" : " Invalid"} */}
+                user will receive this message in notification
               </p>
             </div>
             <button
@@ -60,7 +63,6 @@ const ValidationPopup: React.FC<ValidationPopupProps> = ({ onClose }) => {
               <h4>Update User Status</h4>
               <div className={styles.connectReqBody}>
                 <div className={styles.statusOptions}>
-                  <label className={styles.statusLable}>Status:</label>
                   <Radio.Group onChange={handleStatusChange}>
                     <div className={styles.connectBtns}>
                       <button
@@ -108,15 +110,17 @@ const ValidationPopup: React.FC<ValidationPopupProps> = ({ onClose }) => {
                       <button
                         type="button"
                         className={`${styles.deactiveBtn} ${
-                          status === "Invalid_&_Fraud" ? styles.deactivated : ""
+                          status === "Invalide & Fraud"
+                            ? styles.deactivated
+                            : ""
                         }`}
-                        onClick={() => setStatus("Invalid_&_Fraud")}
+                        onClick={() => setStatus("Invalide & Fraud")}
                       >
                         <Radio
                           value="Invalid & Fraud"
                           className={
-                            status === "Invalid & Fraud"
-                              ? "Invalid & Fraud-radio"
+                            status === "Invalide & Fraud"
+                              ? "invalidandfraud-radio"
                               : ""
                           }
                         >
