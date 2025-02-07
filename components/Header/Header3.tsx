@@ -261,6 +261,30 @@ const Header3 = () => {
 
           <div className={style.upgradeMainDiv}>
             <div className={style.profileDiv}>
+              <div
+                className={style.inputMainDiv}
+                // style={{
+                //   display:
+                //     selectedproject === "ceo dashboard" ||
+                //     selectedproject === "ceoempreview" ||
+                //     selectedproject === "ceoempprojects"
+                //       ? ""
+                //       : "none",
+                // }}
+              >
+                <p>
+                  {/* <CiSearch /> */}
+                  <img src={"/icons/searchnormal.svg"} alt="search" />
+                </p>
+                <div className={style.inputDiv}>
+                  <input
+                    type="text"
+                    placeholder="Search Here"
+                    value={empsearch}
+                    onChange={handleempSearchChange}
+                  />
+                </div>
+              </div>
               <div className={style.headNotifImg}>
                 <img
                   src={"/icons/notificationheader.svg"}
@@ -270,14 +294,14 @@ const Header3 = () => {
               <div className={style.headProDetailImg}>
                 <img src={"/userprofile.svg"} alt="profile" />
               </div>
-              <div>
+              {/* <div>
                 {userDetail && (
                   <p>
                     {userDetail?.firstName} {userDetail?.lastName}
                   </p>
                 )}
                 {userDetail && <p>{userDetail?.designation?.name}</p>}
-              </div>
+              </div> */}
               {/* <div className={style.arrow}>
                 <RiArrowDropDownLine />
               </div> */}

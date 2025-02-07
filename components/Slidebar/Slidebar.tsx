@@ -45,7 +45,11 @@ const Slidebar = ({
                 </div> */}
               <div
                 className={`${styles.wSpaceLeftHead} ${
-                  selectedproject === "dashboard" ? styles.selected : ""
+                  selectedproject === "dashboard" ||
+                  selectedproject === "recenetallsubscribed" ||
+                  selectedproject === "recenetalljoin"
+                    ? styles.selected
+                    : ""
                 }`}
                 onClick={() => dispatch(selectedProjects("dashboard"))}
               >
@@ -54,7 +58,10 @@ const Slidebar = ({
               </div>
               <div
                 className={`${styles.wSpaceLeftHead} ${
-                  selectedproject === "users" ? styles.selected : ""
+                  selectedproject === "userdetails" ||
+                  selectedproject === "users"
+                    ? styles.selected
+                    : ""
                 }`}
                 onClick={() => dispatch(selectedProjects("users"))}
               >
@@ -83,11 +90,12 @@ const Slidebar = ({
               <p className={styles.headingDiv}>Support</p>
               <div
                 className={`${styles.wSpaceLeftHead} ${
-                  selectedproject === "cancelled_projects"
+                  selectedproject === "issuehelpdetails" ||
+                  selectedproject === "help_support_admin"
                     ? styles.selected
                     : ""
                 }`}
-                onClick={() => dispatch(selectedProjects("help_support"))}
+                onClick={() => dispatch(selectedProjects("help_support_admin"))}
               >
                 <img src="/icons/help.svg" alt="Help & Support" />
                 <p>Help & Support</p>

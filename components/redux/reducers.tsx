@@ -1,5 +1,5 @@
 import {
-  SET_PROJECTS,
+  SET_QUESTIONS,
   SELECTED_PROJECTS,
   All_PROJECTS,
   SET_SEARCH_TERM,
@@ -17,7 +17,7 @@ import {
 } from "./actions";
 
 interface State {
-  projectss: any[];
+  selectedQuestion: any[];
   selectedproject: "";
   allprojects: [];
   searchTerm: "";
@@ -35,7 +35,7 @@ interface State {
 }
 
 const initialState: State = {
-  projectss: [],
+  selectedQuestion: [],
   selectedproject: "",
   allprojects: [],
   searchTerm: "",
@@ -54,10 +54,10 @@ const initialState: State = {
 
 const reducer = (state = initialState, action: any): State => {
   switch (action.type) {
-    case SET_PROJECTS:
+    case SET_QUESTIONS:
       return {
         ...state,
-        projectss: action.payload,
+        selectedQuestion: action.payload,
       };
     case SELECTED_PROJECTS:
       return {

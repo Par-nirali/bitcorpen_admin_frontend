@@ -1,0 +1,211 @@
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.pSubRightDiv {
+    // width: 83%;
+    width: calc(100% - 355px);
+    height: calc(100vh - 90px);
+    padding: 40px 24px;
+    animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    animation-iteration-count: 1;
+}
+
+.backMainDiv {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: fit-content;
+    margin-top: 10px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+
+    p {
+        color: #313131;
+        // font-family: "SF Pro";
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
+
+    img {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+.dashboardScroll {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    // max-height: 77vh;
+    margin-top: 22px;
+    padding: 20px 0;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.graphTableDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 40px;
+    border-radius: 12px;
+    background: #fff;
+    margin-top: 20px;
+    flex: 1;
+
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #b5b5b5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #313131;
+        border-radius: 4px;
+    }
+}
+
+.issueDetailDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.userDiv {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.username {
+    color: #0B0B0B;
+    // font-family: "SF Pro";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.status {
+    color: #007F6D;
+    text-align: right;
+    // font-family: "SF Pro";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.unresolvedStatus {
+    color: #FF4B4E;
+}
+
+.issueInfoDiv {
+    width: 100%;
+    height: 30vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.queTag {
+    color: #0B0B0B;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.questionText {
+    color: #676666;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.date {
+    color: #676666;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+    margin-bottom: 4px;
+}
+
+.submitButton {
+    width: fit-content;
+    align-self: flex-start;
+    border-radius: 64px;
+    border: 2px solid #1c4728;
+    background: #1c4728;
+    color: #fff;
+    text-align: center;
+    // font-family: "SF Pro";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    padding: 16px 28px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        background-color: rgba(28, 71, 40, 0.10);
+        color: #1c4728;
+    }
+}
+
+@media only screen and (max-width: 1599px) {
+    .pSubRightDiv {
+        width: calc(100% - 340px);
+        padding: 30px 22px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 20px;
+        }
+    }
+}
+
+@media only screen and (max-width: 1366px) {
+    .pSubRightDiv {
+        width: calc(100% - 320px);
+        padding: 20px 18px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 18px;
+        }
+    }
+}

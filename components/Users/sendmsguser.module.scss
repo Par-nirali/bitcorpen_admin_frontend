@@ -1,0 +1,219 @@
+.connectMainDiv {
+    width: 100%;
+    height: 100%;
+}
+
+.connectContainer {
+    background-color: #000000ab;
+    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    position: fixed;
+    top: 0px;
+    // left: 0px;
+    z-index: 111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // padding: 52px;
+    transition: 0.9s ease-in-out;
+    -webkit-user-select: none;
+    user-select: none;
+    //   background-color: #0e0c0d;
+}
+
+.connectSubDiv {
+    width: 1024px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    margin-top: 50px;
+    border-radius: 16px;
+    background: #fff;
+    padding: 40px;
+    // background-color: #0e0c0d;
+    border: 1px solid #464646;
+    animation: fadeInAnimation ease 1s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    position: relative;
+
+    .connectClose {
+        top: 15px;
+        right: 15px;
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
+        z-index: 111;
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+
+        &:hover {
+            transition: 0.3s all ease-in-out;
+            transform: scale(1.05);
+        }
+    }
+}
+
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+        // transform: translateY(-20px);
+    }
+
+    100% {
+        opacity: 1;
+        // transform: translateY(0);
+    }
+}
+
+.connectContent {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.connectHeadDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 20px;
+
+    h4 {
+        color: #313131;
+        // font-family: "SF  Pro";
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
+}
+
+.connectSearchInputDiv {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
+    padding: 15px 14px;
+    background-color: transparent;
+    border-radius: 8px;
+    border: 1px solid #B5B5B5;
+    // cursor: pointer;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+        border-color: #1C4728;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #999;
+    }
+
+    img {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+.connectSearchInput {
+    width: auto;
+    background: transparent;
+    border: none;
+    color: #000;
+    font-family: "SF Pro";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+
+    &:focus {
+        outline: none;
+    }
+
+    &::placeholder {
+        color: #7F7E7E;
+    }
+}
+
+.connectReqBody {
+    width: 100%;
+
+    textarea {
+        width: 100%;
+        border: none;
+        padding: 20px;
+        border-radius: 4px;
+        background: #F5F5F5;
+        outline: none;
+        color: #1c4728;
+        // font-family: "SF Pro";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+        resize: none;
+
+        ::placeholder {
+            color: #7F7E7E;
+        }
+    }
+}
+
+.submitButton {
+    width: fit-content;
+    align-self: flex-end;
+    border-radius: 64px;
+    border: 2px solid #1c4728;
+    background: #1c4728;
+    color: #fff;
+    text-align: center;
+    // font-family: "SF Pro";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    padding: 16px 28px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        background-color: rgba(28, 71, 40, 0.10);
+        color: #1c4728;
+    }
+}
+
+
+@media screen and (max-width: 1550px) {
+    .connectSubDiv {
+        // width: 560px;
+        // padding: 49px 44px;
+        // max-height: 85vh;
+        // overflow-y: auto;
+    }
+
+    .connectContent {
+        gap: 25px;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .connectSubDiv {
+        // padding: 49px 22px;
+    }
+
+    .connectContent {
+        gap: 15px;
+    }
+}

@@ -25,8 +25,9 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { FiDownload, FiCheck } from "react-icons/fi";
 import * as XLSX from "xlsx";
-import RecentJoin from "./RecentJoin";
-import RecentSubscribed from "./RecentSubscribed";
+import RecentJoin from "./RecentJoinTable";
+import RecentSubscribed from "./RecentSubscribedTable";
+import { ConfigProvider } from "antd";
 // import NotificationHandler from "../../NotificationInbox/NotificationInbox";
 
 const CustomTooltip = ({
@@ -816,11 +817,10 @@ const Dashboard = () => {
             </div>
           </div>
           {/* <div className={styles.graphMainDiv}> */}
+
           <RecentJoin />
           {/* </div> */}
-          <div className={styles.graphMainDiv}>
-            <RecentSubscribed />
-          </div>
+          <RecentSubscribed />
         </div>
       </div>
     </>

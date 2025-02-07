@@ -1,7 +1,7 @@
-export const SET_PROJECTS = "SET_PROJECTS";
+export const SET_QUESTIONS = "SET_QUESTIONS";
 
-export const setProjectss = (value: any) => ({
-  type: SET_PROJECTS,
+export const selectedQuestion = (value: any) => ({
+  type: SET_QUESTIONS,
   payload: value,
 });
 
@@ -114,7 +114,9 @@ export const setNotificationStatus = (hasNotifications: boolean) => ({
 export const SET_NOTIFICATION_STATUS_BACKEND =
   "SET_NOTIFICATION_STATUS_BACKEND";
 
-export const setNotificationStatusBackend = (hasNotificationsBackend: boolean) => ({
+export const setNotificationStatusBackend = (
+  hasNotificationsBackend: boolean
+) => ({
   type: SET_NOTIFICATION_STATUS_BACKEND,
   payload: hasNotificationsBackend,
 });

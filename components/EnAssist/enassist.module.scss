@@ -1,0 +1,136 @@
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.pSubRightDiv {
+    width: calc(100% - 355px);
+    height: calc(100vh - 90px);
+    padding: 40px 24px;
+    animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    animation-iteration-count: 1;
+}
+
+.exc .dropdownMainDiv {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: fit-content;
+    // width: fit-content;
+    margin-top: 10px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+}
+
+.skelMargin {
+    margin-left: 5px;
+}
+
+.pHeadingDiv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+        color: #292933;
+        font-family: Poppins;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        letter-spacing: -0.72px;
+    }
+
+    h2 {
+        margin-top: 8px;
+        color: #292933;
+        font-family: Poppins;
+        font-size: 22px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+        letter-spacing: -0.66px;
+    }
+}
+
+.tabTitle {
+    width: 100%;
+    color: #313131;
+    font-family: "SF Pro";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.dashboardScroll {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    // max-height: 77vh;
+    margin-top: 22px;
+    padding: 20px 0;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+
+@media only screen and (max-width: 1599px) {
+
+    .dropdownHeader {
+        gap: 10px;
+        font-size: 22px;
+    }
+
+    .dropdownItem {
+        font-size: 13px;
+        padding: 10px 16px;
+    }
+
+    .dashboardScroll {
+        max-height: 77vh;
+        margin-top: 14px;
+    }
+
+    .pSubRightDiv {
+        width: calc(100% - 340px);
+        padding: 30px 22px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 20px;
+        }
+    }
+
+}
+
+@media only screen and (max-width: 1366px) {
+
+    .pSubRightDiv {
+        width: calc(100% - 320px);
+        padding: 20px 22px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 18px;
+        }
+    }
+
+}
+
+@media only screen and (max-width: 1199px) {}
+
+@media only screen and (max-width: 1160px) {}
+
+@media only screen and (max-width: 1111px) {}

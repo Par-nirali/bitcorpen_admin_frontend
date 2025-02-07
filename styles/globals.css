@@ -59,3 +59,23 @@ a {
   overflow-y: auto;
   width: calc(100% - 330px);
 }
+.PrivateSwitchBase-input .css-1m9pwf3 {
+  display: none !important;
+}
+.active-radio .ant-radio-inner {
+  border-color: #009883 !important;
+}
+
+.active-radio .ant-radio-checked .ant-radio-inner {
+  border-color: #009883 !important;
+  background-color: #009883 !important;
+}
+
+.deactivated-radio .ant-radio-inner {
+  border-color: #ff4b4e !important;
+}
+
+.deactivated-radio .ant-radio-checked .ant-radio-inner {
+  border-color: #ff4b4e !important;
+  background-color: #ff4b4e !important;
+}
