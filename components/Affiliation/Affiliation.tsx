@@ -3,7 +3,7 @@ import styles from "./affiliation.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { selectedProjects } from "../redux/actions";
+import { selectedDetails, selectedProjects } from "../redux/actions";
 import { createPortal } from "react-dom";
 import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
@@ -157,25 +157,31 @@ const Affiliation = () => {
       title: "Operate",
       dataIndex: "operate",
       key: "operate",
-      render: () => (
-        <div style={{ display: "flex", gap: "8px" }}>
-          <a onClick={() => dispatch(selectedProjects("affiliateuserdetail"))}>
+      render: (_: any, record: any) => (
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <a
+            onClick={() => {
+              dispatch(selectedDetails(record));
+              dispatch(selectedProjects("affiliateuserdetail"));
+            }}
+            className={styles.eyeIcon}
+          >
             <img src="/icons/eye.svg" alt="eye" />
           </a>
-          {/* {status === "Validated" ? ( */}
-          <Dropdown
-            menu={{ items: getValidationItem("") }}
-            trigger={["hover"]}
-            placement="bottomRight"
-            // style={{ width: "100%" }}
-          >
-            <a>
-              <img src="/icons/more.svg" alt="edit" />
-            </a>
-          </Dropdown>
-          {/* ) : (
+          {record.status === "Under Validation" ? (
+            <Dropdown
+              menu={{ items: getValidationItem("") }}
+              trigger={["hover"]}
+              placement="bottomRight"
+              // style={{ width: "100%" }}
+            >
+              <a style={{ width: "24px", height: "24px" }}>
+                <img src="/icons/more.svg" alt="edit" />
+              </a>
+            </Dropdown>
+          ) : (
             ""
-          )} */}
+          )}
         </div>
       ),
     },
@@ -191,6 +197,9 @@ const Affiliation = () => {
       status: "Validated",
       joinedDate: "Jan, 07, 2025",
       referrallink: "encolunyty/dummy-referral-spam.html",
+      email: "dummyemail@email.com",
+      phone: "+1 3656 5566 55",
+      subscription: "Influencer",
     },
     {
       key: "2",
@@ -201,6 +210,9 @@ const Affiliation = () => {
       status: "Invalid",
       joinedDate: "Jan, 07, 2025",
       referrallink: "encolunyty/dummy-referral-spam.html",
+      email: "dummyemail@email.com",
+      phone: "+1 3656 5566 55",
+      subscription: "recruiter",
     },
     {
       key: "3",
@@ -211,6 +223,9 @@ const Affiliation = () => {
       status: "Under Validation",
       joinedDate: "Jan, 07, 2025",
       referrallink: "encolunyty/dummy-referral-spam.html",
+      email: "dummyemail@email.com",
+      phone: "+1 3656 5566 55",
+      subscription: "Influencer",
     },
     {
       key: "4",
@@ -221,6 +236,9 @@ const Affiliation = () => {
       status: "Fraud",
       joinedDate: "Jan, 07, 2025",
       referrallink: "encolunyty/dummy-referral-spam.html",
+      email: "dummyemail@email.com",
+      phone: "+1 3656 5566 55",
+      subscription: "Influencer",
     },
   ];
 
@@ -429,7 +447,7 @@ const Affiliation = () => {
                 rowKey="key"
                 bordered={true}
                 columns={columns}
-                dataSource={data}
+                dataSource={filteredData}
                 pagination={false}
                 className={styles.recentJoinTable}
               />

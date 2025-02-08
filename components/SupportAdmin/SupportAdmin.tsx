@@ -3,7 +3,7 @@ import styles from "./supportadmin.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { selectedProjects, selectedQuestion } from "../redux/actions";
+import { selectedProjects, selectedDetails } from "../redux/actions";
 import { createPortal } from "react-dom";
 
 const supportQuestions = [
@@ -39,9 +39,11 @@ const SupportAdmin = () => {
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
   const [activeFilter, setActiveFilter] = useState<any>("All");
+
   const handleFilterClick = (filter: any) => {
     setActiveFilter(filter);
   };
+
   const filteredSubscribers = supportQuestions.filter((supportQue) => {
     if (activeFilter === "All") return true;
     return supportQue.status === activeFilter;
@@ -187,7 +189,7 @@ const SupportAdmin = () => {
                     item.status === "Resolved" ? "" : styles.unresolvedQueItem
                   }`}
                   onClick={() => {
-                    dispatch(selectedQuestion(item));
+                    dispatch(selectedDetails(item));
                     dispatch(selectedProjects("issuehelpdetails"));
                   }}
                 >

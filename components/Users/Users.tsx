@@ -3,7 +3,7 @@ import styles from "./users.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { selectedProjects } from "../redux/actions";
+import { selectedProjects, selectedDetails } from "../redux/actions";
 import { createPortal } from "react-dom";
 import UpdateUserPopup from "./UpdateUserPopup";
 
@@ -100,12 +100,18 @@ const Users = () => {
       title: "Operate",
       dataIndex: "operate",
       key: "operate",
-      render: () => (
-        <div style={{ display: "flex", gap: "8px" }}>
-          <a onClick={() => setShowPopup(true)}>
+      render: (_: any, record: any) => (
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <a onClick={() => setShowPopup(true)} className={styles.editIcon}>
             <img src="/icons/edit.svg" alt="edit" />
           </a>
-          <a onClick={() => dispatch(selectedProjects("userdetails"))}>
+          <a
+            onClick={() => {
+              dispatch(selectedDetails(record));
+              dispatch(selectedProjects("userdetails"));
+            }}
+            className={styles.eyeIcon}
+          >
             <img src="/icons/eye.svg" alt="eye" />
           </a>
         </div>
@@ -168,34 +174,9 @@ const Users = () => {
         <div className={styles.dashboardScroll}>
           <div className={styles.pScoreDiv}>
             <div className={styles.pScoreLeftinnerDiv}>
-              {/* <div className={styles.pleftHead}> */}
               <h3>Total Users Joined</h3>
-              {/* </div> */}
 
               <div className={styles.leftPercentScore}>
-                {/* <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${
-                      departmentdata?.[0]?.total_target_amount?.toFixed(0) ?? 0
-                    }`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_target_amount ?? 0)
-
-                        .toFixed(0)
-                        .toString().length || 0
-                    )
-                  )}
-                </p> */}
                 <p>$000</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
@@ -204,32 +185,6 @@ const Users = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Active Users</h3>
               <div className={styles.leftPercentScore}>
-                {/* <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${(
-                      (departmentdata?.[0]?.total_target_amount ?? 0) -
-                      (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                    ).toFixed(0)}`
-                  ) : (
-                    "*".repeat(
-                      (
-                        (departmentdata?.[0]?.total_target_amount ?? 0) -
-                        (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                      )
-                        .toFixed(0)
-                        .toString().length || 0
-                    )
-                  )}
-                </p> */}
                 <p>7888</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
@@ -238,29 +193,6 @@ const Users = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Inactive Users </h3>
               <div className={styles.leftPercentScore}>
-                {/* <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${
-                      departmentdata?.[0]?.total_thisMonthRevenue.toFixed(2) ??
-                      0
-                    }`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                        .toFixed(2)
-                        .toString().length || 0
-                    )
-                  )}
-                </p> */}
                 <p>756</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
@@ -269,28 +201,6 @@ const Users = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Suspended </h3>
               <div className={styles.leftPercentScore}>
-                {/* <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${
-                      departmentdata?.[0]?.total_preMonthRevenue.toFixed(2) ?? 0
-                    }`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_preMonthRevenue ?? 0)
-                        .toFixed(2)
-                        .toString().length || 0
-                    )
-                  )}
-                </p> */}
                 <p>754684</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
@@ -315,7 +225,6 @@ const Users = () => {
               // }}
             >
               <p>
-                {/* <CiSearch /> */}
                 <img src={"/icons/searchnormal.svg"} alt="search" />
               </p>
               <div className={styles.inputDiv}>
@@ -333,7 +242,9 @@ const Users = () => {
               <p className={styles.dollarsTitle}>Users Details</p>
               <div className={styles.editUserDiv}>
                 <p>Edit Multiple</p>
-                <img src={"/icons/edit.svg"} alt="edit" />
+                <a className={styles.editIcon}>
+                  <img src={"/icons/edit.svg"} alt="edit" />
+                </a>
               </div>
             </div>
 
@@ -351,15 +262,7 @@ const Users = () => {
           </div>
         </div>
       </div>
-      {/* {modifyPopup &&
-        createPortal(
-          <ModifyPopup
-            setModifyPopup={setModifyPopup}
-            setShowSuccessModify={setShowSuccessModify}
-            setCurrentView={setCurrentView}
-          />,
-          document.getElementById("modals")!
-        )} */}
+
       {showPopup &&
         createPortal(
           <UpdateUserPopup onClose={() => setShowPopup(false)} />,

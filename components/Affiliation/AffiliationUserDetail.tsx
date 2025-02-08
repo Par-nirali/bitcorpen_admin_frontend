@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "./affiliationuserdetail.module.scss";
+import styles1 from "./finalvalidationpopup.module.scss";
 import { IoIosArrowBack } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { selectedProjects } from "../redux/actions";
@@ -8,15 +9,33 @@ import { createPortal } from "react-dom";
 import { Radio } from "antd";
 // import UpdateUserPopup from "./UpdateUserPopup";
 
-const AffiliationUserDetail = ({ setSelectedProject, warningpopup }: any) => {
+const AffiliationUserDetail = ({
+  setSelectedProject,
+  warningpopup,
+  onClose,
+}: any) => {
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
   const [status, setStatus] = useState<
     "Validate" | "Invalid" | "Invalide & Fraud"
   >("Validate");
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const selectedUserDetails = useSelector(
+    (state: any) => state.selectedDetails
+  );
+  console.log(selectedUserDetails, "selectedUserDetails");
+  if (!selectedUserDetails) {
+    return null;
+  }
+  const isUnderValidation = selectedUserDetails?.status === "Under Validation";
   const handleStatusChange = (e: any) => {
     setStatus(e.target.value);
   };
+
+  const handleSubmit = () => {
+    setShowSuccessPopup(true);
+  };
+
   const usercolumns = [
     {
       title: "ENID",
@@ -65,8 +84,18 @@ const AffiliationUserDetail = ({ setSelectedProject, warningpopup }: any) => {
           style={{
             padding: "4px 8px",
             borderRadius: "64px",
-            backgroundColor: status === "Active" ? "#E8F7F7" : "#FFE9E9",
-            color: status === "Active" ? "#00A3B1" : "#FF4D4F",
+            backgroundColor:
+              status === "Validated"
+                ? "#E8F7F7"
+                : status === "Under Validation"
+                ? "#FFF7E6"
+                : "#FFE9E9",
+            color:
+              status === "Validated"
+                ? "#00A3B1"
+                : status === "Under Validation"
+                ? "#D48806"
+                : "#FF4D4F",
           }}
         >
           {status}
@@ -104,7 +133,7 @@ const AffiliationUserDetail = ({ setSelectedProject, warningpopup }: any) => {
         <button
           className={styles.backMainDiv}
           // onClick={() => setSelectedProject("sales projects")}
-          onClick={() => dispatch(selectedProjects("users"))}
+          onClick={() => dispatch(selectedProjects("affiliation"))}
         >
           {/* <div className={styles.backArrow}> */}
           <img src="/icons/back.svg" alt="back" />
@@ -133,7 +162,9 @@ const AffiliationUserDetail = ({ setSelectedProject, warningpopup }: any) => {
                 bordered={true}
                 // border={"1px solid #000"}
                 columns={usercolumns}
-                dataSource={userdata}
+                dataSource={
+                  selectedUserDetails ? [selectedUserDetails] : userdata
+                }
                 pagination={false}
                 className={styles.recentJoinTable}
               />
@@ -190,96 +221,132 @@ const AffiliationUserDetail = ({ setSelectedProject, warningpopup }: any) => {
                 </div>
                 <div className={styles.pointsDiv}>
                   <span>Status </span>
-                  <p className={styles.statusDiv}>Not Eligible </p>
+                  <p
+                    className={`${styles.statusDiv} ${
+                      selectedUserDetails?.eligibility === "Not Eligible"
+                        ? styles.noteligible
+                        : ""
+                    }`}
+                  >
+                    Not Eligible{" "}
+                  </p>
                 </div>
               </div>
             </div>
-            <div className={styles.statusOptions}>
-              <Radio.Group onChange={handleStatusChange}>
-                <div className={styles.connectBtns}>
-                  <button
-                    type="button"
-                    className={`${styles.activeBtn} ${
-                      status === "Validate" ? styles.active : ""
-                    }`}
-                    onClick={() => setStatus("Validate")}
-                  >
-                    <Radio
-                      value="Validate"
-                      className={status === "Validate" ? "valid-radio" : ""}
+            {isUnderValidation && (
+              <div className={styles.statusOptions}>
+                <Radio.Group onChange={handleStatusChange}>
+                  <div className={styles.connectBtns}>
+                    <button
+                      type="button"
+                      className={`${styles.activeBtn} ${
+                        status === "Validate" ? styles.active : ""
+                      }`}
+                      onClick={() => setStatus("Validate")}
                     >
-                      <span
-                        style={{
-                          color: "#009883",
-                        }}
+                      <Radio
+                        value="Validate"
+                        className={status === "Validate" ? "valid-radio" : ""}
                       >
-                        Validate
-                      </span>
-                    </Radio>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.deactiveBtn} ${
-                      status === "Invalid" ? styles.deactivated : ""
-                    }`}
-                    onClick={() => setStatus("Invalid")}
-                  >
-                    <Radio
-                      value="Invalid"
-                      className={status === "Invalid" ? "invalid-radio" : ""}
+                        <span
+                          style={{
+                            color: "#009883",
+                          }}
+                        >
+                          Validate
+                        </span>
+                      </Radio>
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.deactiveBtn} ${
+                        status === "Invalid" ? styles.deactivated : ""
+                      }`}
+                      onClick={() => setStatus("Invalid")}
                     >
-                      <span
-                        style={{
-                          color: "#FF4B4E",
-                        }}
+                      <Radio
+                        value="Invalid"
+                        className={status === "Invalid" ? "invalid-radio" : ""}
                       >
-                        Invalid
-                      </span>
-                    </Radio>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.deactiveBtn} ${
-                      status === "Invalide & Fraud" ? styles.deactivated : ""
-                    }`}
-                    onClick={() => setStatus("Invalide & Fraud")}
-                  >
-                    <Radio
-                      value="Invalid & Fraud"
-                      className={
-                        status === "Invalide & Fraud"
-                          ? "invalidandfraud-radio"
-                          : ""
-                      }
+                        <span
+                          style={{
+                            color: "#FF4B4E",
+                          }}
+                        >
+                          Invalid
+                        </span>
+                      </Radio>
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.deactiveBtn} ${
+                        status === "Invalide & Fraud" ? styles.deactivated : ""
+                      }`}
+                      onClick={() => setStatus("Invalide & Fraud")}
                     >
-                      <span
-                        style={{
-                          color: "#FF4B4E",
-                        }}
+                      <Radio
+                        value="Invalid & Fraud"
+                        className={
+                          status === "Invalide & Fraud"
+                            ? "invalidandfraud-radio"
+                            : ""
+                        }
                       >
-                        Invalid & Fraud
-                      </span>
-                    </Radio>
-                  </button>
-                </div>
-              </Radio.Group>
-            </div>
-
-            <button
-              className={styles.messageBtn}
-              onClick={() => setShowPopup(true)}
-              type="button"
-            >
-              Send a Message
-            </button>
+                        <span
+                          style={{
+                            color: "#FF4B4E",
+                          }}
+                        >
+                          Invalid & Fraud
+                        </span>
+                      </Radio>
+                    </button>
+                  </div>
+                </Radio.Group>
+              </div>
+            )}
+            {isUnderValidation && (
+              <button
+                className={styles.messageBtn}
+                onClick={handleSubmit}
+                type="button"
+              >
+                Submit
+              </button>
+            )}
           </div>
         </div>
       </div>
-      {/* {showPopup &&
+      {showSuccessPopup &&
         createPortal(
-          <SendMsgUser onClose={() => setShowPopup(false)} />,
+          <>
+            <div className={styles1.modifyMainDiv}>
+              <div className={styles1.modifyContainer}>
+                <div className={styles1.modifySubDiv}>
+                  <div className={styles1.modifyHead}>
+                    <h5>Validation Submited </h5>
+                    <p className={styles1.modifyLinkDiv}>
+                      {/* <span className={styles1.enid}>ENID5666959</span> User Account */}
+                      {/* {status === "Validate" ? " Activated" : " Invalid"} */}
+                      user will receive this message in notification
+                    </p>
+                  </div>
+                  <button
+                    className={styles1.closeButton}
+                    onClick={() => {
+                      setShowSuccessPopup(false);
+                      // onClose();
+                      dispatch(selectedProjects("affiliation"));
+                    }}
+                  >
+                    Okay
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>,
           document.getElementById("modals")!
-        )} */}
+        )}
     </>
   );
 };

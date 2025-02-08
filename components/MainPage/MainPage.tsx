@@ -17,6 +17,7 @@ import { ConfigProvider } from "antd";
 import ShowUserDetail from "../Users/ShowUserDetail";
 import IssueHelpedDetail from "../SupportAdmin/IssueHelpedDetail";
 import AffiliationUserDetail from "../Affiliation/AffiliationUserDetail";
+import Team from "../Teams/Team";
 
 const Performance = () => {
   const [userDetail, setUserDetail] = useState<any>("");
@@ -97,6 +98,8 @@ const Performance = () => {
               <RecentAllSubscribed />
             ) : selectedproject === "affiliateuserdetail" ? (
               <AffiliationUserDetail />
+            ) : selectedproject === "team" ? (
+              <Team />
             ) : null}
           </div>
         </div>

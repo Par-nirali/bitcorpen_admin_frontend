@@ -11,6 +11,11 @@ import SendMsgUser from "./SendMsgUser";
 const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
+  const selectedUserDetails = useSelector(
+    (state: any) => state.selectedDetails
+  );
+  console.log(selectedUserDetails, "selectedUserDetails");
+
   const usercolumns = [
     {
       title: "ENID",

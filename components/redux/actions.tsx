@@ -1,7 +1,7 @@
-export const SET_QUESTIONS = "SET_QUESTIONS";
+export const SET_DETAILS = "SET_DETAILS";
 
-export const selectedQuestion = (value: any) => ({
-  type: SET_QUESTIONS,
+export const selectedDetails = (value: any) => ({
+  type: SET_DETAILS,
   payload: value,
 });
 

@@ -405,6 +405,23 @@
   line-height: normal;
 }
 
+.statusDiv {
+  padding: 4px 8px;
+  border-radius: 64px;
+  background: #E6F6F4;
+  color: #009883 !important;
+  // font-family: "SF Pro";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 510;
+  line-height: normal;
+
+  &.noteligible {
+    color: #FF4B4E !important;
+    background: rgba(255, 75, 78, 0.20);
+  }
+}
+
 @media only screen and (max-width: 1599px) {
   .pSubRightDiv {
     width: calc(100% - 340px);

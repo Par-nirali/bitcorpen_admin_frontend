@@ -10,7 +10,7 @@ import AnswerMsgUser from "./AnswerMsgUser";
 const IssueHelpedDetail = () => {
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
-  const selectedQuestion = useSelector((state: any) => state.selectedQuestion);
+  const selectedQuestion = useSelector((state: any) => state.selectedDetails);
   console.log(selectedQuestion, "selectedQuestion");
   if (!selectedQuestion) {
     return null;

@@ -11,32 +11,23 @@
 .pSubRightDiv {
     width: calc(100% - 355px);
     height: calc(100vh - 90px);
-    padding: 40px 24px;
+    padding: 40px 26px;
     animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
     animation-iteration-count: 1;
 }
 
-.eyeIcon {
+
+.dropdownMainDiv {
     display: flex;
-    padding: 4px;
     align-items: center;
-    gap: 10px;
-    border-radius: 8px;
-    transition: all 0.2s ease-in-out;
-
-    img {
-        width: 20px;
-        height: 20px;
-    }
-
-    &:hover {
-        transition: all 0.2s ease-in-out;
-        background: #1C4729;
-
-        img {
-            content: url('/icons/eyew.svg');
-        }
-    }
+    gap: 5px;
+    width: fit-content;
+    // width: fit-content;
+    margin-top: 10px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
 }
 
 .backArrow {
@@ -116,71 +107,7 @@
     gap: 20px;
 }
 
-.pScoreRightinnerDiv {
-    max-width: 378px;
-    min-width: 378px;
-    padding: 20px;
-    border-radius: 16px;
-    border: 2px solid #f5f5f5;
-    background: #fff;
-    backdrop-filter: blur(103px);
 
-    h3 {
-        color: #7f7f8a;
-        // font-family: Poppins;
-        font-size: 16px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 20px;
-        /* 125% */
-        letter-spacing: -0.32px;
-    }
-}
-
-.pScoreLeftinnerDiv {
-    padding: 20px;
-    border-radius: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.9);
-    background: #fff;
-    backdrop-filter: blur(103px);
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 100px;
-}
-
-.pScoreLeftinnerDiv h3 {
-    color: #7f7f8a;
-    // font-family: Poppins;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 20px;
-    letter-spacing: -0.28px;
-    margin-bottom: 12px;
-    flex-grow: 1;
-    display: flex;
-    align-items: flex-start;
-}
-
-.leftPercentScore {
-    width: 100%;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 3px;
-}
-
-.leftPercentScore p {
-    color: #009883;
-    // font-family: "SF Pro";
-    font-size: 32px;
-    font-style: normal;
-    font-weight: 590;
-    line-height: normal;
-    margin: 0;
-}
 
 .userTitle {
     color: #7F7E7E;
@@ -197,9 +124,9 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 52px;
+    // padding: 52px;
     border-radius: 12px;
-    background: #fff;
+    // background: #fff;
     margin-top: 20px;
     flex: 1;
     overflow-y: auto;
@@ -224,9 +151,9 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 24px;
-    padding: 26px;
+    // padding: 26px;
     border-radius: 12px;
-    background: #fff;
+    // background: #fff;
     // margin-top: 20px;
     flex: 1;
     overflow-y: auto;
@@ -283,7 +210,7 @@
     width: 70%;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-end;
     gap: 10px;
 
     p {
@@ -305,104 +232,35 @@
             background: #D9F2EF;
         }
 
-        &.activeFilter {
+        &.active {
+            background: #D9F2EF;
+        }
+
+        &.selected {
             background: #D9F2EF;
         }
     }
 }
 
+
+
 .inputMainDiv {
-    border-radius: 8px;
-    border: 1px solid #B5B5B5;
-    background: transparent;
-    // box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(32px);
-    padding: 13px 14px;
-    width: 320px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    // background-color: red;
 
     p {
-        display: flex;
-        align-items: center;
-
-        svg {
-            width: 20px;
-            height: 20px;
-        }
-    }
-
-    input {
-        width: 100%;
-        background: none;
-        outline: none;
-        border: none;
-        color: #7F7E7E;
+        color: #313131;
         // font-family: "SF Pro";
-        font-size: 16px;
+        font-size: 18px;
         font-style: normal;
         font-weight: 510;
         line-height: normal;
-        text-align: left;
     }
 
-    input::placeholder {
-        color: #bdbdbe;
-        // font-family: "SF Pro";
-        font-size: 16px;
-        font-style: normal;
-        font-weight: 510;
-        line-height: normal;
-        text-align: left;
-        /* Center placeholder text */
-    }
 }
 
 .inputDiv {
     width: 100%;
     display: flex;
     justify-content: center;
-}
-
-.amountsDropdown,
-.monthsDropdown {
-    padding: 4px 8px;
-    border-radius: 64px;
-    background: #fff;
-    cursor: pointer;
-}
-
-.dollarsTitle {
-    color: #313131;
-    // font-family: "SF Pro";
-    font-size: 18px;
-    font-style: normal;
-    font-weight: 510;
-    line-height: normal;
-}
-
-.dollarsLabel {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    p {
-        color: #313131;
-        // font-family: "SF Pro";
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 510;
-        line-height: normal;
-    }
-}
-
-.dropdownArrow {
-    img {
-        display: block;
-    }
 }
 
 .graphMonthsDiv {
@@ -430,6 +288,155 @@
 .graphDiv {
     margin-top: 52px;
     height: 300px;
+}
+
+.candMainDiv {
+    width: 100%;
+    // padding: 20px;
+    overflow-y: scroll;
+    border-radius: 10px;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+}
+
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    width: 100%;
+}
+
+.candCardMain {
+    width: 100%;
+    border-radius: 8px;
+    background: #FFF;
+    cursor: pointer;
+}
+
+.cardContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 24px;
+}
+
+.rankMianDiv {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.rankBadge {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 14px;
+}
+
+.rankProfileImg {
+    max-width: 98px;
+    height: auto;
+
+    img {
+        width: 100%;
+        height: 100%;
+        border-radius: 98px;
+    }
+}
+
+.rankBadgeText {
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    P {
+        color: #0B0B0B;
+        // font-family: "SF Pro";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
+
+    span {
+        color: #676666;
+        // font-family: "SF Pro";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
+}
+
+.rankBadgeMore {
+    width: 24px;
+    height: 24px;
+
+    img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.profileSection {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    align-self: stretch;
+
+    p {
+        color: #676666;
+        // font-family: "SF Pro";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+
+        span {
+            color: #0B0B0B;
+        }
+    }
+}
+
+.statusDiv {
+    padding: 4px 8px;
+    border-radius: 64px;
+    background-color: #E8F7F7;
+    color: #00A3B1;
+
+
+    &.deactivated {
+        background-color: rgba(255, 75, 78, 0.20);
+        color: #FF4B4E;
+    }
+}
+
+.cardBtn {
+    // width: fit-content;
+    margin-top: 8px;
+    padding: 16px 28px;
+    border-radius: 64px;
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    background: #fff;
+    color: #1C4728;
+    border: 2px solid #1C4728;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        background-color: #1c472819;
+    }
 }
 
 @media only screen and (max-width: 1599px) {
@@ -583,13 +590,6 @@
         }
     }
 
-    .pListHeadassigned,
-    .pListDataDivassigned {
-        grid-template-columns: 0.6fr 0.7fr 1fr 1fr 1.5fr 0.8fr;
-        gap: 5px;
-        padding: 0 10px;
-    }
-
     .graphMainDiv {
         padding: 40px;
         border-radius: 12px;
@@ -601,41 +601,19 @@
         height: 280px;
     }
 
-    // .pScoreLeftinnerDiv {
-    //   h3 {
-    //     font-size: 15px;
-    //   }
-    // }
-
-    // .leftPercentScore {
-    //   p {
-    //     font-size: 32px;
-    //   }
-    // }
-
-    .noResultlist {
-        font-size: 16px;
-    }
-
-    .pListHeadassigned h3,
-    .pListDataDivassigned h3 {
-        padding: 15px 0px;
-        // background: red;
-    }
-
-    .addReviewDivassigned {
-        padding: 17px 10px;
-        // background: blue;
-    }
-
-    .platformMainDiv {
-        padding: 17px 10px;
-        // background: green;
-    }
-
     .statusMainDiv {
         padding: 17px 7px;
         // background: yellow;
+    }
+
+    .cardsGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        width: 100%;
+    }
+
+    .cardBtn {
+        padding: 14px 24px;
     }
 }
 
@@ -645,18 +623,11 @@
         gap: 16px;
     }
 
-    // .leftPercentScore {
-    //   p {
-    //     font-size: 28px;
-    //   }
-    // }
-
-    .pListHeadassigned,
-    .pListDataDivassigned {
-        grid-template-columns: 0.6fr 0.7fr 1fr 1fr 1.5fr 0.8fr;
-        gap: 5px;
-        padding: 0 10px;
+    .cardBtn {
+        padding: 12px 20px;
+        font-size: 14px;
     }
+
 }
 
 @media only screen and (max-width: 1160px) {
@@ -698,6 +669,68 @@
         padding: 17px 0px;
         // background: yellow;
     }
+}
+
+@media only screen and (max-width: 1024px) {
+    .container {
+        max-width: 100% !important;
+        padding: 0 30px;
+    }
+
+
+    /* Check 768px and add css here */
+
+}
+
+@media only screen and (max-width: 1000px) {
+    .container {
+        max-width: 940px !important;
+    }
+
+    /* Check 1025px and add css here */
+
+}
+
+@media only screen and (max-width: 768px) {
+    .container {
+        padding: 0 20px;
+    }
+
+    /* Check 480px and add css here */
+
+
+}
+
+@media only screen and (max-width: 525px) {
+    .cardsGrid {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 16px;
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 479px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    /* Check 375px and add css here */
+
+    .cardContainer {
+        gap: 10px;
+        padding: 20px;
+    }
+
+    .profileSection {
+        gap: 10px;
+    }
+
+}
+
+@media only screen and (max-width: 374px) {
+    /* Check 320px and add css here */
+
+
 }
 
 .recentJoinTable {

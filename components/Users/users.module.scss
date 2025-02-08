@@ -98,6 +98,52 @@
     line-height: normal;
 }
 
+.eyeIcon {
+    display: flex;
+    padding: 4px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+
+    &:hover {
+        transition: all 0.2s ease-in-out;
+        background: #1C4729;
+
+        img {
+            content: url('/icons/eyew.svg');
+        }
+    }
+}
+
+.editIcon {
+    display: flex;
+    padding: 4px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+
+    &:hover {
+        transition: all 0.2s ease-in-out;
+        background: #1C4729;
+
+        img {
+            content: url('/icons/editw.svg');
+        }
+    }
+}
+
 .loadChart {
     width: 100%;
     display: flex;
@@ -578,7 +624,7 @@
 .editUserDiv {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
 
     p {
@@ -588,6 +634,10 @@
         font-style: normal;
         font-weight: 510;
         line-height: normal;
+    }
+
+    a {
+        cursor: pointer;
     }
 
     img {
