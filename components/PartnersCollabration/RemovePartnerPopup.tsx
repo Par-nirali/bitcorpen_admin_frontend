@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import styles from "./removeteammempopup.module.scss";
+import styles from "./removepartnerpopup.module.scss";
 import styles1 from "./finalremovepopup.module.scss";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
 
-interface RemoveTeamMemProps {
+interface RemovePartnerProps {
   onClose: () => void;
 }
-const RemoveTeamMemPopup: React.FC<RemoveTeamMemProps> = ({ onClose }) => {
+const RemovePartnerPopup: React.FC<RemovePartnerProps> = ({ onClose }) => {
   //   const isDeactivating = currentStatus === "Active";
   //   const actionText = isDeactivating ? "Deactivate" : "Activate";
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -24,10 +24,9 @@ const RemoveTeamMemPopup: React.FC<RemoveTeamMemProps> = ({ onClose }) => {
         <div className={styles1.modifyContainer}>
           <div className={styles1.modifySubDiv}>
             <div className={styles1.modifyHead}>
-              <h5>Team Member Removed</h5>
+              <h5>Partner Removed</h5>
               <p className={styles1.modifyLinkDiv}>
-                <span className={styles1.enid}>Rhonda Ortiz</span> as Founder &
-                Ceoremoved as team member
+                <span className={styles1.enid}>Dummy Name</span> Partner Removed
               </p>
             </div>
             <button
@@ -55,10 +54,10 @@ const RemoveTeamMemPopup: React.FC<RemoveTeamMemProps> = ({ onClose }) => {
 
           <div className={styles.connectContent}>
             <div className={styles.connectHeadDiv}>
-              <h4>Remove Team Member </h4>
+              <h4>Remove Partner</h4>
               <p>
-                Are you sure do you want to remove <span>Rhonda Ortiz</span> as
-                Founder & Ceo
+                Are you sure do you want to Remove Partner{" "}
+                <span>Dummy Name </span>
               </p>
             </div>
             <div className={styles.connectBtns}>
@@ -84,4 +83,4 @@ const RemoveTeamMemPopup: React.FC<RemoveTeamMemProps> = ({ onClose }) => {
   );
 };
 
-export default RemoveTeamMemPopup;
+export default RemovePartnerPopup;

@@ -18,6 +18,9 @@ import ShowUserDetail from "../Users/ShowUserDetail";
 import IssueHelpedDetail from "../SupportAdmin/IssueHelpedDetail";
 import AffiliationUserDetail from "../Affiliation/AffiliationUserDetail";
 import Team from "../Teams/Team";
+import AddMember from "../Teams/AddMember";
+import Partners from "../PartnersCollabration/Partners";
+import AddPartners from "../PartnersCollabration/AddPartners";
 
 const Performance = () => {
   const [userDetail, setUserDetail] = useState<any>("");
@@ -100,6 +103,12 @@ const Performance = () => {
               <AffiliationUserDetail />
             ) : selectedproject === "team" ? (
               <Team />
+            ) : selectedproject === "addmember" ? (
+              <AddMember />
+            ) : selectedproject === "partners" ? (
+              <Partners />
+            ) : selectedproject === "addpartners" ? (
+              <AddPartners />
             ) : null}
           </div>
         </div>

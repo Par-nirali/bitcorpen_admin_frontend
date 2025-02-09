@@ -55,6 +55,7 @@ const subscribersData = [
     paymentGateway: "Paypal",
   },
 ];
+
 const Subscribers = () => {
   const router = useRouter();
   const dispatch = useDispatch();

@@ -1,15 +1,19 @@
 import React, { useState } from "react";
-import styles from "./removeteammempopup.module.scss";
+import styles from "./removepartnerpopup.module.scss";
 import styles1 from "./finalremovepopup.module.scss";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
 
-interface RemoveTeamMemProps {
+interface StatusChangeProps {
   onClose: () => void;
+  currentStatus: "Active" | "Deactivated";
 }
-const RemoveTeamMemPopup: React.FC<RemoveTeamMemProps> = ({ onClose }) => {
-  //   const isDeactivating = currentStatus === "Active";
-  //   const actionText = isDeactivating ? "Deactivate" : "Activate";
+const StatusChangePopup: React.FC<StatusChangeProps> = ({
+  onClose,
+  currentStatus,
+}) => {
+  const isDeactivating = currentStatus === "Active";
+  const actionText = isDeactivating ? "Deactivate" : "Activate";
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const handleSubmit = () => {
@@ -17,17 +21,17 @@ const RemoveTeamMemPopup: React.FC<RemoveTeamMemProps> = ({ onClose }) => {
   };
 
   if (showSuccessPopup) {
-    // const statusText = isDeactivating ? "Deactivated" : "Activated";
+    const statusText = isDeactivating ? "Deactivated" : "Activated";
 
     return (
       <div className={styles1.modifyMainDiv}>
         <div className={styles1.modifyContainer}>
           <div className={styles1.modifySubDiv}>
             <div className={styles1.modifyHead}>
-              <h5>Team Member Removed</h5>
+              <h5>Partner {statusText}</h5>
               <p className={styles1.modifyLinkDiv}>
-                <span className={styles1.enid}>Rhonda Ortiz</span> as Founder &
-                Ceoremoved as team member
+                <span className={styles1.enid}>Dummy Name</span>
+                Partner {statusText}
               </p>
             </div>
             <button
@@ -55,10 +59,10 @@ const RemoveTeamMemPopup: React.FC<RemoveTeamMemProps> = ({ onClose }) => {
 
           <div className={styles.connectContent}>
             <div className={styles.connectHeadDiv}>
-              <h4>Remove Team Member </h4>
+              <h4>{actionText} Partner</h4>
               <p>
-                Are you sure do you want to remove <span>Rhonda Ortiz</span> as
-                Founder & Ceo
+                Are you sure do you want to {actionText.toLowerCase()} of
+                <span>Dummy Name </span>
               </p>
             </div>
             <div className={styles.connectBtns}>
@@ -74,7 +78,7 @@ const RemoveTeamMemPopup: React.FC<RemoveTeamMemProps> = ({ onClose }) => {
                 onClick={handleSubmit}
                 type="submit"
               >
-                Remove
+                {actionText}
               </button>
             </div>
           </div>
@@ -84,4 +88,4 @@ const RemoveTeamMemPopup: React.FC<RemoveTeamMemProps> = ({ onClose }) => {
   );
 };
 
-export default RemoveTeamMemPopup;
+export default StatusChangePopup;

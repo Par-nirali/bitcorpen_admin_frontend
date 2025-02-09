@@ -8,6 +8,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
 import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
+import RemoveTeamMemPopup from "./RemoveTeamMemPopup";
 // import PlanDecisionPopup from "./PlanDecisionPopup";
 
 const teamData = [
@@ -118,7 +119,10 @@ const Team = () => {
             <div className={styles.inputMainDiv}>
               <p>{teamMembers.length} Subscribers</p>
             </div>
-            <div className={styles.userFilter}>
+            <div
+              className={styles.userFilter}
+              onClick={() => dispatch(selectedProjects("addmember"))}
+            >
               <p>Add Member</p>
             </div>
           </div>
@@ -176,17 +180,11 @@ const Team = () => {
           </div>
         </div>
       </div>
-      {/* {showPopup &&
-          createPortal(
-            <PlanDecisionPopup
-              currentStatus={selectedStatus!}
-              onClose={() => {
-                setShowPopup(false);
-                setSelectedStatus(undefined);
-              }}
-            />,
-            document.getElementById("modals")!
-          )} */}
+      {showPopup &&
+        createPortal(
+          <RemoveTeamMemPopup onClose={() => setShowPopup(false)} />,
+          document.getElementById("modals")!
+        )}
     </>
   );
 };

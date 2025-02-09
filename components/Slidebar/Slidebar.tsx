@@ -125,7 +125,9 @@ const Slidebar = ({
               </div>
               <div
                 className={`${styles.wSpaceLeftHead} ${
-                  selectedproject === "team" ? styles.selected : ""
+                  selectedproject === "addmember" || selectedproject === "team"
+                    ? styles.selected
+                    : ""
                 }`}
                 onClick={() => dispatch(selectedProjects("team"))}
               >
@@ -134,7 +136,10 @@ const Slidebar = ({
               </div>
               <div
                 className={`${styles.wSpaceLeftHead} ${
-                  selectedproject === "partners" ? styles.selected : ""
+                  selectedproject === "addpartners" ||
+                  selectedproject === "partners"
+                    ? styles.selected
+                    : ""
                 }`}
                 onClick={() => dispatch(selectedProjects("partners"))}
               >
