@@ -92,7 +92,7 @@ const EnAssist = () => {
       title: "Questions",
       dataIndex: "question",
       key: "question",
-      width: 600,
+      width: 500,
     },
     {
       title: "Status",
@@ -191,7 +191,7 @@ const EnAssist = () => {
       title: "Question",
       dataIndex: "question",
       key: "question",
-      width: 600,
+      width: 450,
     },
     {
       title: "Status",

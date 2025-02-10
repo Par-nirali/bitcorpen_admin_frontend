@@ -27,7 +27,7 @@ const AddAdControls = () => {
   const initialValue = useMemo(() => {
     if (selectedAdsDetail) {
       return {
-        adTitle: selectedAdsDetail?.adTitle,
+        adTitle: selectedAdsDetail?.title,
         adType: selectedAdsDetail?.adType,
         adUrl: selectedAdsDetail?.adUrl,
       };

@@ -17,7 +17,7 @@ const adsData = [
     adImage: "/adimage.png",
     name: "John Doe",
     position: "CEO",
-    accountType: "Professional",
+    title: "Professional",
     email: "john@gmail.com",
     phone: "+1 3656 5566 55",
     plan: {
@@ -28,7 +28,8 @@ const adsData = [
     status: "Active",
     subscriptionDate: "Jan, 08, 2025",
     expiryDate: "Jan, 08, 2026",
-    paymentGateway: "Paypal",
+    adType: "Banner",
+    adUrl: "encolunyty/dummy-referral-spam.html",
   },
   {
     id: 2,
@@ -36,7 +37,7 @@ const adsData = [
     adImage: "/adimage.png",
     name: "Sarah Johnson",
     position: "Founder",
-    accountType: "Professional",
+    title: "Professional",
     email: "sarah@gmail.com",
     phone: "+1 3656 5566 55",
     plan: {
@@ -47,7 +48,8 @@ const adsData = [
     status: "Deactivated",
     subscriptionDate: "Dec, 15, 2024",
     expiryDate: "Dec, 15, 2025",
-    paymentGateway: "Stripe",
+    adType: "Stripe",
+    adUrl: "encolunyty/dummy-referral-spam.html",
   },
   {
     id: 3,
@@ -55,7 +57,7 @@ const adsData = [
     adImage: "/adimage.png",
     name: "Michael Brown",
     position: "Product Manager",
-    accountType: "Professional",
+    title: "Professional",
     email: "michel@gmail.com",
     phone: "+1 3656 5566 55",
     plan: {
@@ -66,7 +68,8 @@ const adsData = [
     status: "Active",
     subscriptionDate: "Jan, 01, 2025",
     expiryDate: "Jan, 01, 2026",
-    paymentGateway: "Paypal",
+    adType: "Paypal",
+    adUrl: "encolunyty/dummy-referral-spam.html",
   },
 ];
 
@@ -78,7 +81,7 @@ const AdControls = () => {
     "Active" | "Deactivated"
   >();
   const [teamMembers, setTeamMembers] = useState(adsData);
-  const [activeFilter, setActiveFilter] = useState<any>("All AD’s");
+  const [activeFilter, setActiveFilter] = useState<any>("All AD's");
 
   const handleFilterClick = (filter: any) => {
     setActiveFilter(filter);
@@ -111,8 +114,11 @@ const AdControls = () => {
     },
   ];
   const filteredTeamMembers = teamMembers.filter((members) => {
-    if (activeFilter === "All") return true;
-    return members.status === activeFilter;
+    if (activeFilter === "All AD's") return true;
+    if (activeFilter === "Active AD's") return members.status === "Active";
+    if (activeFilter === "Deactivated AD's")
+      return members.status === "Deactivated";
+    return true;
   });
 
   return (
@@ -160,7 +166,7 @@ const AdControls = () => {
           </div>
           <div className={styles.tableFilterMainDiv}>
             <div className={styles.userFilter}>
-              {["All AD’s", "Active AD’s", "Deactivated AD’s"].map((filter) => (
+              {["All AD's", "Active AD's", "Deactivated AD's"].map((filter) => (
                 <p
                   key={filter}
                   className={activeFilter === filter ? styles.selected : ""}
@@ -174,7 +180,7 @@ const AdControls = () => {
           <div className={styles.graphUserTableDiv}>
             <div className={styles.candMainDiv}>
               <div className={styles.cardsGrid}>
-                {adsData?.map((ads) => (
+                {filteredTeamMembers?.map((ads) => (
                   <div className={styles.candCardMain} key={ads.id}>
                     <div className={styles.cardContainer}>
                       <div className={styles.rankMainDiv}>
@@ -199,15 +205,15 @@ const AdControls = () => {
                       <div className={styles.adsSection}>
                         <div className={styles.adsPointDiv}>
                           <p>AD ID</p>
-                          <span>{ads.phone}</span>
+                          <span>{ads.enid}</span>
                         </div>
                         <div className={styles.adsPointDiv}>
                           <p>AD Type</p>
-                          <span>{ads.phone}</span>
+                          <span>{ads.adType}</span>
                         </div>
                         <div className={styles.adsPointDiv}>
                           <p>AD Link</p>
-                          <a>{ads.phone}</a>
+                          <a>{ads.adUrl}</a>
                         </div>
                         <div className={styles.adsPointDiv}>
                           <p>AD Status</p>
