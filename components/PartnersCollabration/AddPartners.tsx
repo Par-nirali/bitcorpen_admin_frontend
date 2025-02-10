@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import styles from "./addpartners.module.scss";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { IoIosArrowBack } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { selectedProjects } from "../redux/actions";
-import { Table } from "antd";
+import { selectedDetails, selectedProjects } from "../redux/actions";
+import { Button, Input, Table } from "antd";
 import { createPortal } from "react-dom";
 
 const addMemValidationSchema = Yup.object().shape({
@@ -27,9 +27,52 @@ const addMemValidationSchema = Yup.object().shape({
 
 const AddPartners = () => {
   const dispatch = useDispatch();
+  const selectedPartnerDetail = useSelector(
+    (state: any) => state.selectedDetails
+  );
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  console.log(selectedPartnerDetail, "selectedPartnerDetail");
+
+  const initialValue = useMemo(() => {
+    if (selectedPartnerDetail) {
+      return {
+        companyName: selectedPartnerDetail?.companyName,
+        url: selectedPartnerDetail?.url,
+        partnerType: selectedPartnerDetail?.type,
+      };
+    }
+    return {
+      companyName: "",
+      url: "",
+      partnerType: "",
+      companyLogo: null,
+    };
+  }, [selectedPartnerDetail]);
+  const handleImageUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setFieldValue: (field: string, value: any) => void
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Create preview URL for the image
+      const imageUrl = URL.createObjectURL(file);
+      setPreviewImage(imageUrl);
+
+      // You can also store the file itself in Formik's values if needed
+      setFieldValue("companyLogo", file);
+
+      // If you need to upload to server immediately:
+      // const formData = new FormData();
+      // formData.append('image', file);
+      // await uploadToServer(formData);
+    }
+  };
   const handleSubmit = () => {
     console.log("clicked");
   };
+  // if (!selectedPartnerDetail) {
+  //   return "";
+  // }
   return (
     <>
       <div className={styles.pSubRightDiv}>
@@ -45,21 +88,40 @@ const AddPartners = () => {
         <div className={styles.dashboardScroll}>
           <div className={styles.graphTableDivMain}>
             <Formik
-              initialValues={{
-                companyName: "",
-                url: "",
-                partnerType: "",
-              }}
-              // initialValues={initialValues}
+              initialValues={initialValue}
               validationSchema={addMemValidationSchema}
               onSubmit={handleSubmit}
             >
-              {({ isSubmitting, touched, errors }) => (
+              {({ isSubmitting, touched, errors, setFieldValue }) => (
                 <Form className={styles.addMemForm}>
                   <div className={styles.addMemberDiv}>
-                    <div className={styles.addMemLeft}>
-                      <img src="/icons/add.svg" alt="add" />
+                    <div
+                      className={styles.addMemLeft}
+                      onClick={() =>
+                        document.getElementById("banner-upload")?.click()
+                      }
+                    >
+                      {previewImage ? (
+                        <img
+                          src={previewImage}
+                          alt="Company Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      ) : (
+                        <img src="/icons/add.svg" alt="add" />
+                      )}
                     </div>
+                    <Input
+                      id="banner-upload"
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => handleImageUpload(e, setFieldValue)}
+                    />
                     <p>Add Company Logo</p>
                   </div>
                   <div className={styles.addMemFieldsMain}>
@@ -130,30 +192,37 @@ const AddPartners = () => {
                             className={styles.errMes}
                           />
                         </div>
-                        <div
-                          className={styles.inputDiv}
-                          style={{ border: "none" }}
-                        >
-                          <label htmlFor="partnerType" className={styles.text}>
-                            Status
-                          </label>
-                          <p
-                            className={`${
-                              status === "activate"
-                                ? styles.deactivate
-                                : styles.activateDiv
-                            }`}
+                        {selectedPartnerDetail?.status ? (
+                          <div
+                            className={styles.inputDiv}
+                            style={{ border: "none" }}
                           >
-                            Active
-                          </p>
-                          {/* <Field
+                            <label
+                              htmlFor="partnerType"
+                              className={styles.text}
+                            >
+                              Status
+                            </label>
+                            <p
+                              className={`${
+                                selectedPartnerDetail?.status === "Active"
+                                  ? styles.activateDiv
+                                  : styles.deactivateDiv
+                              }`}
+                            >
+                              {selectedPartnerDetail?.status}
+                            </p>
+                            {/* <Field
                             type="text"
                             name="partnerType"
                             id="partnerType"
                             placeholder="Past partnerType account link here"
                             className={styles.input}
                           /> */}
-                        </div>
+                          </div>
+                        ) : (
+                          ""
+                        )}
                       </div>
                     </div>
 

@@ -109,6 +109,7 @@
   align-items: center;
   justify-content: flex-start;
   gap: 24px;
+
   p {
     color: #313131;
     // font-family: "SF Pro";
@@ -125,6 +126,7 @@
   background: #f5f5f5;
   border-radius: 42px;
   position: relative;
+
   img {
     position: absolute;
     top: 50%;
@@ -140,6 +142,7 @@
   gap: 52px;
   width: 100%;
 }
+
 .detailHeading {
   color: #313131;
   // font-family: "SF Pro";
@@ -148,6 +151,7 @@
   font-weight: 510;
   line-height: normal;
 }
+
 .addMemFirstDiv {
   width: 100%;
   display: flex;
@@ -164,12 +168,14 @@
   align-items: flex-start;
   gap: 0px;
 }
+
 .addMem2GridDiv {
   width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
+
 .inputDiv {
   display: flex;
   flex-direction: column;
@@ -246,6 +252,34 @@
   }
 }
 
+.activateDiv {
+  width: fit-content;
+  border-radius: 64px;
+  background: #E6F6F4;
+  padding: 4px 8px;
+  color: #009883;
+  // font-family: "SF Pro";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 510;
+  line-height: normal;
+  margin: 18px;
+}
+
+.deactivateDiv {
+  width: fit-content;
+  border-radius: 64px;
+  background: rgba(255, 75, 78, 0.20);
+  padding: 4px 8px;
+  color: #FF4B4E;
+  // font-family: "SF Pro";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 510;
+  line-height: normal;
+  margin: 18px;
+}
+
 .termsText {
   margin: 0;
   color: #8e8e8e;
@@ -301,6 +335,7 @@
     padding: 20px 18px;
   }
 }
+
 @media screen and (max-width: 900px) {
   .signInButton {
     padding: 7px 24px;

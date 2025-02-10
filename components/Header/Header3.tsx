@@ -190,7 +190,7 @@ const Header3 = () => {
             </div>
           )} */}
 
-          <div
+          {/* <div
             className={style.inputMainDiv}
             style={{
               visibility:
@@ -233,9 +233,9 @@ const Header3 = () => {
                 onChange={handleSearchChange}
               />
             </div>
-          </div>
+          </div> */}
 
-          <div
+          {/* <div
             className={style.inputMainDiv}
             style={{
               display:
@@ -257,7 +257,7 @@ const Header3 = () => {
                 onChange={handleempSearchChange}
               />
             </div>
-          </div>
+          </div> */}
 
           <div className={style.upgradeMainDiv}>
             <div className={style.profileDiv}>
@@ -309,7 +309,7 @@ const Header3 = () => {
           </div>
         </nav>
 
-        {show && (
+        {/* {show && (
           <div className={style.headProMainDiv}>
             <div className={style.headProContainer}>
               <div className={style.headProSubDiv} ref={popupRef}>
@@ -317,10 +317,6 @@ const Header3 = () => {
                   <h2>Top Employees</h2>
                 </div>
                 <div className={style.profileMainDiv}>
-                  {/* <div className={style.empProfileDiv}>
-                  <img src="/usercirclepro.png" alt="profile" />
-                  <p>punit vadhwani</p>
-                </div> */}
 
                   {empdetails.length > 0 ? (
                     empdetails.map((data: any) => (
@@ -349,7 +345,7 @@ const Header3 = () => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

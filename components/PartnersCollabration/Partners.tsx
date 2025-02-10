@@ -18,7 +18,9 @@ const Partners = () => {
     "Active" | "Deactivated"
   >();
 
-  const handlePlanStatusClick = (currentStatus: "Active" | "Deactivated") => {
+  const handlePartnerStatusClick = (
+    currentStatus: "Active" | "Deactivated"
+  ) => {
     setSelectedStatus(currentStatus);
     setShowStatusPopup(true);
   };
@@ -28,7 +30,8 @@ const Partners = () => {
       key: "edit",
       label: "Edit",
       onClick: () => {
-        setShowPopup(true);
+        dispatch(selectedDetails(record));
+        dispatch(selectedProjects("addpartners"));
       },
     },
     {
@@ -42,7 +45,7 @@ const Partners = () => {
       key: "status",
       label: record.status === "Active" ? "Deactivate" : "Activate",
       onClick: () => {
-        handlePlanStatusClick(record.status);
+        handlePartnerStatusClick(record.status);
       },
     },
   ];
@@ -182,7 +185,10 @@ const Partners = () => {
           <button
             className={styles.addPartnerBtn}
             type="button"
-            onClick={() => dispatch(selectedProjects("addpartners"))}
+            onClick={() => {
+              dispatch(selectedDetails(""));
+              dispatch(selectedProjects("addpartners"));
+            }}
           >
             Add Partner
           </button>

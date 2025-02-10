@@ -148,7 +148,10 @@ const Slidebar = ({
               </div>
               <div
                 className={`${styles.wSpaceLeftHead} ${
-                  selectedproject === "ad_controls" ? styles.selected : ""
+                  selectedproject === "addadcontrols" ||
+                  selectedproject === "ad_controls"
+                    ? styles.selected
+                    : ""
                 }`}
                 onClick={() => dispatch(selectedProjects("ad_controls"))}
               >

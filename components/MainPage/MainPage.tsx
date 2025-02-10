@@ -21,6 +21,8 @@ import Team from "../Teams/Team";
 import AddMember from "../Teams/AddMember";
 import Partners from "../PartnersCollabration/Partners";
 import AddPartners from "../PartnersCollabration/AddPartners";
+import AdControls from "../AdControls/AdControls";
+import AddAdControls from "../AdControls/AddAdControls";
 
 const Performance = () => {
   const [userDetail, setUserDetail] = useState<any>("");
@@ -109,6 +111,10 @@ const Performance = () => {
               <Partners />
             ) : selectedproject === "addpartners" ? (
               <AddPartners />
+            ) : selectedproject === "ad_controls" ? (
+              <AdControls />
+            ) : selectedproject === "addadcontrols" ? (
+              <AddAdControls />
             ) : null}
           </div>
         </div>
