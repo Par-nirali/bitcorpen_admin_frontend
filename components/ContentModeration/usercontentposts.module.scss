@@ -1,0 +1,872 @@
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.pSubRightDiv {
+    // width: 83%;
+    width: calc(100% - 355px);
+    height: calc(100vh - 90px);
+    padding: 40px 24px;
+    animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    animation-iteration-count: 1;
+}
+
+.backMainDiv {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: fit-content;
+    margin-top: 10px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+
+    p {
+        color: #313131;
+        // font-family: "SF Pro";
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
+
+    img {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+
+.skelMargin {
+    margin-left: 5px;
+}
+
+.pHeadingDiv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+        color: #292933;
+        // font-family: Poppins;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        letter-spacing: -0.72px;
+    }
+
+    h2 {
+        margin-top: 8px;
+        color: #292933;
+        // font-family: Poppins;
+        font-size: 22px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+        letter-spacing: -0.66px;
+    }
+}
+
+.tabTitle {
+    width: 100%;
+    color: #313131;
+    // font-family: "SF Pro";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.loadChart {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    // justify-content: flex-start;
+    gap: 20px;
+    margin: 20px 40px;
+}
+
+.gridDiv {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    button {
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+
+    button:nth-of-type(1) {
+        margin-right: 8px;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid #fff;
+        box-shadow: 0px -1px 1px 0px rgba(255, 255, 255, 0.08) inset,
+            0px 1px 3px 0px rgba(255, 255, 255, 0.04);
+        padding: 12px;
+
+        svg {
+            height: 20px;
+            width: 20px;
+            color: #353131;
+        }
+    }
+
+    button:nth-of-type(2) {
+        margin-right: 12px;
+        border-radius: 12px;
+        padding: 12px;
+        background: #fff;
+        border: 1px solid #fff;
+        box-shadow: 0px -1px 1px 0px rgba(255, 255, 255, 0.08) inset,
+            0px 1px 3px 0px rgba(255, 255, 255, 0.04);
+
+        svg {
+            height: 20px;
+            width: 20px;
+            color: #353131;
+        }
+    }
+}
+
+.selected {
+    background: #0c8ce9 !important;
+
+    svg {
+        color: #ffffff !important;
+    }
+}
+
+.dashboardScroll {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    // max-height: 77vh;
+    margin-top: 22px;
+    padding: 20px 0;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+
+.graphTableDivMain {
+    width: 100%;
+    max-width: 768px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 52px;
+    padding: 52px;
+    border-radius: 12px;
+    // background: #fff;
+    // margin-top: 20px;
+    flex: 1;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #b5b5b5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #313131;
+        border-radius: 4px;
+    }
+}
+
+.mPageLeftDwnSubDiv {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: flex-start;
+    // height: 90% !important;
+    // overflow: auto;
+    // margin: 20px 0px;
+    // overflow-y: auto;
+}
+
+.postMainDiv {
+    width: 100%;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.postUpDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px 32px 20px 32px;
+}
+
+.postCommentDiv {
+    width: 100%;
+    display: flex;
+    gap: 14px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #b5b5b5;
+
+    img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+    }
+
+    input {
+        flex: 1;
+        border: none;
+        color: #676666;
+        font-family: "SF Pro";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+        background: transparent;
+
+        &::placeholder {
+            color: #999999;
+        }
+
+        &:focus {
+            outline: none;
+        }
+    }
+}
+
+.postProfDiv {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 20px;
+    padding-top: 20px;
+}
+
+.postProfImgDiv {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.postProfDetailDiv {
+    flex: 1;
+}
+
+.postProfDetailUp {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.postProfDetailUpLeft {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+
+    p {
+        color: #313131;
+        font-family: "SF Pro";
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
+}
+
+.postProfDays {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    span {
+        color: #8e8e8e;
+        font-family: "SF Pro";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+    }
+
+    img {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+.moreMenu {
+    border: none;
+    background: transparent;
+
+}
+
+.moreMenuImg {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    transition: 0.3s all ease-in-out;
+
+    &:hover {
+        transition: 0.3s all ease-in-out;
+    }
+}
+
+.followDropdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.postProfFollowBtn {
+    background: transparent;
+    border: none;
+    color: #1c4728;
+    font-family: SF Pro;
+    font-weight: 510;
+    font-size: 20px;
+    line-height: 23.87px;
+    letter-spacing: 0%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+
+    //   &:hover {
+    //     transition: all 0.3s ease;
+    //     transform: scale(1.02);
+    //   }
+}
+
+.postProfDetailBtmText {
+    max-width: 490px;
+
+    p {
+        color: #313131;
+        font-family: "SF Pro";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+    }
+}
+
+.postPhotoDiv {
+    width: 100%;
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: auto;
+    }
+}
+
+.postBtmDiv {
+    width: 100%;
+    // border-top: 1px solid #E5E5E5;
+    padding: 20px 32px 32px 32px;
+}
+
+.postBtmLikesMainDiv {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #b5b5b5;
+
+    p {
+        color: #313131;
+        font-family: "SF Pro";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+
+        span {
+            color: #7f7e7e;
+        }
+    }
+}
+
+.postCmntShareDiv {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
+}
+
+.postBtmOtherDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 28px;
+    padding-top: 16px;
+}
+
+.postDiffOptionsDiv {
+    width: 100%;
+    display: flex;
+    gap: 40px;
+    // justify-content: space-between;
+}
+
+.postDiffOptions {
+    // width: 25%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+
+    img {
+        width: 24px;
+        height: 24px;
+    }
+
+    p {
+        color: #313131;
+        font-family: "SF Pro";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+    }
+
+    &:hover {
+        p {
+            color: #333333;
+        }
+    }
+}
+
+// .postBtmCommentMain {
+//   display: flex;
+//   gap: 12px;
+// }
+
+// .postCommentProImg {
+//   width: 52px;
+//   height: 52px;
+//   border-radius: 50%;
+//   overflow: hidden;
+
+//   img {
+//     width: 100%;
+//     height: 100%;
+//     object-fit: cover;
+//   }
+// }
+
+// .postCommentInputDiv {
+//   flex: 1;
+//   display: flex;
+//   gap: 12px;
+
+//   input {
+//     flex: 1;
+//     border-radius: 64px;
+//     border: 1px solid #b5b5b5;
+//     padding: 8px 16px;
+//     color: #b5b5b5;
+//     font-family: "SF Pro";
+//     font-size: 18px;
+//     font-style: normal;
+//     font-weight: 400;
+//     line-height: 32px;
+
+//     &::placeholder {
+//       color: #d4d3d3;
+//     }
+
+//     &:focus {
+//       outline: none;
+//     }
+//   }
+// }
+
+// .postCommentSendBtn {
+//   background: #0066cc;
+//   color: #ffffff;
+//   border: none;
+//   border-radius: 6px;
+//   padding: 8px 30px;
+//   font-size: 16px;
+//   font-weight: 500;
+//   cursor: pointer;
+
+//   &:hover {
+//     background: #0052a3;
+//   }
+// }
+
+.commentContainer {
+    // margin: 50px auto;
+    // padding: 30px 30px;
+    background-color: white;
+    border-radius: 15px;
+}
+
+.commentInputSection {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: white;
+    //   padding: 0.75rem;
+    border-radius: 10px;
+    //   margin-bottom: 1.5rem;
+}
+
+.avatar {
+    width: 52px;
+    height: 52px;
+
+    img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+}
+
+.inputWrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid grey;
+    border-radius: 30px;
+
+    input {
+        flex: 1;
+        border: none;
+        padding: 0px 20px;
+        font-family: SF Pro;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: 32px;
+        text-align: left;
+        text-underline-position: from-font;
+        text-decoration-skip-ink: none;
+        color: #b5b5b5;
+        background: transparent;
+
+        &:focus {
+            outline: none;
+        }
+    }
+}
+
+.actionButtons {
+    display: flex;
+}
+
+.iconButton {
+    background: none;
+    border: none;
+    padding: 0px 0.5rem;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.imageIcon,
+.emojiIcon {
+    width: 20px;
+    height: 20px;
+
+    img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+
+.doneButtonMain {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin: 30px 0px;
+}
+
+.commentDisplayMain {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 30px 0px;
+    border-radius: 0.5rem;
+}
+
+.avatar2 {
+    img {
+        width: 37px;
+        height: 37px;
+    }
+}
+
+.commentDisplay {
+    display: flex;
+    gap: 20px;
+}
+
+.commentContent {
+    flex: 1;
+    background-color: #e9e9e9;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.commentHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.moreRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.username {
+    font-family: SF Pro;
+    font-size: 20px;
+    font-weight: 510;
+    line-height: 23.87px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    color: #313131;
+    margin-bottom: 10px;
+}
+
+.timestamp {
+    // font-family: SF Pro;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 19.09px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    color: #8e8e8e;
+}
+
+.commentText {
+    font-family: SF Pro;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 19.09px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    color: #313131;
+    margin-bottom: 10px;
+}
+
+.showReplies {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    p {
+        font-family: SF Pro;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 16.71px;
+        text-align: left;
+        text-decoration-line: underline;
+        text-decoration-style: solid;
+        text-underline-position: from-font;
+        text-decoration-skip-ink: none;
+        color: #00a991;
+    }
+}
+
+.commentActions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 50px;
+}
+
+.commentActionsDiv {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.commentactionButton {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: none;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    color: #4b5563;
+    cursor: pointer;
+    font-size: 0.875rem;
+
+    img {
+        width: 24px;
+        height: 24px;
+    }
+
+    span {
+        font-family: SF Pro;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 19.09px;
+        text-align: left;
+        text-underline-position: from-font;
+        text-decoration-skip-ink: none;
+        color: #313131;
+    }
+}
+
+.viewMorebtn {
+    background: none;
+    border: none;
+    color: #0d9488;
+    cursor: pointer;
+    font-size: 0.875rem;
+    text-decoration: underline;
+    margin-left: auto;
+    font-family: SF Pro;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 16.71px;
+    text-align: left;
+    text-decoration-line: underline;
+    text-decoration-style: solid;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    color: #00a991;
+}
+
+.backUpMainDiv {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.statusTag {
+    width: fit-content;
+    padding: 4px 8px;
+    border-radius: 64px;
+    background: #E6F6F4;
+    color: #009883;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.yellow {
+    background: #ffe10033;
+    color: #968612;
+}
+
+.red {
+    background: #FFE9E9;
+    color: #FF4D4F;
+}
+
+@media only screen and (max-width: 1599px) {
+    .pSubRightDiv {
+        width: calc(100% - 340px);
+        padding: 30px 22px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 20px;
+        }
+    }
+
+    .postUpDiv {
+        padding: 26px 26px 20px 26px;
+    }
+
+    .postProfImgDiv {
+        width: 46px;
+        height: 46px;
+    }
+
+    .postProfDetailUpLeft {
+        p {
+            font-size: 18px;
+        }
+    }
+
+    .postProfFollowBtn {
+        font-size: 18px;
+    }
+
+    .postBtmDiv {
+        padding: 20px 26px 20px 26px;
+    }
+
+    .postBtmOtherDiv {
+        gap: 24px;
+    }
+
+    .postCommentProImg {
+        width: 48px;
+        height: 48px;
+    }
+
+    .postCommentInputDiv {
+        input {
+            padding: 8px 14px;
+            font-size: 16px;
+        }
+    }
+
+    .postCommentSendBtn {
+        padding: 8px 24px;
+        font-size: 16px;
+    }
+}
+
+@media only screen and (max-width: 1366px) {
+    .pSubRightDiv {
+        width: calc(100% - 320px);
+        padding: 20px 18px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 18px;
+        }
+    }
+}

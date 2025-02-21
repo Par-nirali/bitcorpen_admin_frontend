@@ -1,0 +1,673 @@
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.pSubRightDiv {
+    width: calc(100% - 355px);
+    height: calc(100vh - 90px);
+    padding: 40px 24px;
+    animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    animation-iteration-count: 1;
+}
+
+.eyeIcon {
+    display: flex;
+    padding: 4px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+
+    &:hover {
+        transition: all 0.2s ease-in-out;
+        background: #1c4729;
+
+        img {
+            content: url("/icons/eyew.svg");
+        }
+    }
+}
+
+.backArrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+        height: 100%;
+        margin-top: 2px;
+    }
+}
+
+.skelMargin {
+    margin-left: 5px;
+}
+
+.pHeadingDiv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+        color: #292933;
+        font-family: Poppins;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        letter-spacing: -0.72px;
+    }
+
+    h2 {
+        margin-top: 8px;
+        color: #292933;
+        font-family: Poppins;
+        font-size: 22px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+        letter-spacing: -0.66px;
+    }
+}
+
+.tabTitle {
+    width: 100%;
+    color: #313131;
+    // font-family: "SF Pro";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.dashboardScroll {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 40px;
+    overflow-y: scroll;
+    // max-height: 77vh;
+    margin-top: 22px;
+    padding: 20px 0;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.pScoreDiv {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    // grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.pScoreRightinnerDiv {
+    max-width: 378px;
+    min-width: 378px;
+    padding: 20px;
+    border-radius: 16px;
+    border: 2px solid #f5f5f5;
+    background: #fff;
+    backdrop-filter: blur(103px);
+
+    h3 {
+        color: #7f7f8a;
+        // font-family: Poppins;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px;
+        /* 125% */
+        letter-spacing: -0.32px;
+    }
+}
+
+.pScoreLeftinnerDiv {
+    padding: 20px;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    background: #fff;
+    backdrop-filter: blur(103px);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100px;
+}
+
+.pScoreLeftinnerDiv h3 {
+    color: #313131;
+    // font-family: Poppins;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.28px;
+    margin-bottom: 12px;
+    flex-grow: 1;
+    display: flex;
+    align-items: flex-start;
+}
+
+.leftPercentScore {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 3px;
+}
+
+.leftPercentScore p {
+    color: #009883;
+    // font-family: "SF Pro";
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 590;
+    line-height: normal;
+    margin: 0;
+}
+
+.userTitle {
+    color: #7f7e7e;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+    align-self: flex-end;
+}
+
+.graphMainDiv {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 52px;
+    border-radius: 12px;
+    background: #fff;
+    margin-top: 20px;
+    flex: 1;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #b5b5b5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #313131;
+        border-radius: 4px;
+    }
+}
+
+.graphUserTableDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 26px;
+    border-radius: 12px;
+    background: #fff;
+    // margin-top: 20px;
+    flex: 1;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #b5b5b5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #313131;
+        border-radius: 4px;
+    }
+}
+
+.enidTag {
+    color: #009883;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    // font-weight: 510;
+    line-height: normal;
+}
+
+.statusTag {
+    width: fit-content;
+    padding: 4px 8px;
+    border-radius: 64px;
+    background: #e6f6f4;
+    color: #009883;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.graphSectionMain {
+    width: 90%;
+}
+
+.tableFilterMainDiv {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.userFilter {
+    width: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+
+    p {
+        padding: 10px 14px;
+        border-radius: 64px;
+        border: 1px solid #b0e4dd;
+        background: #fff;
+        color: #007f6d;
+        // font-family: "SF Pro";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+
+        &:hover {
+            transition: all 0.3s ease-in-out;
+            background: #d9f2ef;
+        }
+
+        &.activeFilter {
+            background: #d9f2ef;
+        }
+    }
+}
+
+
+.inputMainDiv {
+
+    p {
+        color: #313131;
+        // font-family: "SF Pro";
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
+
+}
+
+.inputDiv {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.amountsDropdown,
+.monthsDropdown {
+    padding: 4px 8px;
+    border-radius: 64px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.dollarsTitle {
+    color: #313131;
+    // font-family: "SF Pro";
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.dollarsLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    p {
+        color: #313131;
+        // font-family: "SF Pro";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
+}
+
+.dropdownArrow {
+    img {
+        display: block;
+    }
+}
+
+.graphMonthsDiv {
+    display: flex;
+    width: 72px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 17px;
+    flex-shrink: 0;
+
+    p {
+        color: #00a991;
+        font-family: Inter;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+    }
+}
+
+.graphDivtable {
+    width: 100%;
+}
+
+.graphDiv {
+    margin-top: 52px;
+    height: 300px;
+}
+
+@media only screen and (max-width: 1599px) {
+    .pScoreDiv {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    .dropdownHeader {
+        gap: 10px;
+        font-size: 22px;
+    }
+
+    .gridDiv1 {
+        button:nth-of-type(1) {
+            margin-right: 8px;
+            padding: 10px;
+
+            svg {
+                height: 14px;
+                width: 20px;
+            }
+        }
+
+        button:nth-of-type(2) {
+            // margin-right: 12px;
+            padding: 10px;
+
+            svg {
+                height: 14px;
+                width: 14px;
+            }
+        }
+    }
+
+    .dropdownItem {
+        font-size: 13px;
+        padding: 10px 16px;
+    }
+
+    .dashboardScroll {
+        max-height: 77vh;
+        margin-top: 14px;
+    }
+
+    .pSubRightDiv {
+        width: calc(100% - 340px);
+        padding: 30px 22px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 20px;
+        }
+    }
+
+    // .pScoreDiv {
+    //   grid-template-columns: repeat(3, 1fr);
+    // }
+
+    // .leftPercentScore {
+    //   p {
+    //     font-size: 36px;
+    //   }
+    // }
+
+    .datePicker {
+        // margin-right: 12px;
+
+        .datePickerOpen {
+            padding: 10px 12px;
+            gap: 5px;
+
+            p {
+                font-size: 14px;
+                line-height: normal;
+            }
+
+            img {
+                max-width: 20px;
+                max-height: 20px;
+            }
+        }
+    }
+
+    .noResultlist {
+        font-size: 18px;
+    }
+
+    .pListMainDiv {
+        width: 100%;
+        // max-height: 700px;
+        max-height: 65vh;
+        overflow-y: scroll;
+        padding-bottom: 40px;
+    }
+
+    .pListHeadassigned,
+    .pListDataDivassigned {
+        grid-template-columns: 0.8fr 0.8fr 1fr 1fr 1.4fr 1fr;
+    }
+
+    .pListDataDivassigned h3 {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+
+        &:nth-last-child(5) {
+            white-space: wrap;
+            overflow: none;
+            text-overflow: none;
+            max-width: 100%;
+        }
+
+        &:nth-last-child(3) {
+            white-space: wrap;
+            overflow: none;
+            text-overflow: none;
+            max-width: 100%;
+        }
+    }
+
+    .addRInnerDivassigned p {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+    }
+}
+
+@media only screen and (max-width: 1366px) {
+
+    // .pScoreDiv {
+    //   grid-template-columns: repeat(2, 45%);
+    //   // justify-content: space-around;
+    // }
+    .pScoreDiv {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .pSubRightDiv {
+        width: calc(100% - 320px);
+        padding: 20px 22px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 18px;
+        }
+    }
+
+    .pListHeadassigned,
+    .pListDataDivassigned {
+        grid-template-columns: 0.6fr 0.7fr 1fr 1fr 1.5fr 0.8fr;
+        gap: 5px;
+        padding: 0 10px;
+    }
+
+    .graphMainDiv {
+        padding: 40px;
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    .graphDiv {
+        margin-top: 60px;
+        height: 280px;
+    }
+
+    // .pScoreLeftinnerDiv {
+    //   h3 {
+    //     font-size: 15px;
+    //   }
+    // }
+
+    // .leftPercentScore {
+    //   p {
+    //     font-size: 32px;
+    //   }
+    // }
+
+    .noResultlist {
+        font-size: 16px;
+    }
+
+    .pListHeadassigned h3,
+    .pListDataDivassigned h3 {
+        padding: 15px 0px;
+        // background: red;
+    }
+
+    .addReviewDivassigned {
+        padding: 17px 10px;
+        // background: blue;
+    }
+
+    .platformMainDiv {
+        padding: 17px 10px;
+        // background: green;
+    }
+
+    .statusMainDiv {
+        padding: 17px 7px;
+        // background: yellow;
+    }
+}
+
+@media only screen and (max-width: 1199px) {
+    .pScoreDiv {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    // .leftPercentScore {
+    //   p {
+    //     font-size: 28px;
+    //   }
+    // }
+
+    .pListHeadassigned,
+    .pListDataDivassigned {
+        grid-template-columns: 0.6fr 0.7fr 1fr 1fr 1.5fr 0.8fr;
+        gap: 5px;
+        padding: 0 10px;
+    }
+}
+
+@media only screen and (max-width: 1160px) {
+    .pListMainDiv {
+        padding-bottom: 30px;
+    }
+
+    .pListHeadassigned,
+    .pListDataDivassigned {
+        grid-template-columns: 0.6fr 0.7fr 1fr 1fr 1.5fr 0.8fr;
+        gap: 5px;
+        padding: 0 10px;
+    }
+
+    .graphHeadingDiv {
+        padding: 12px 10px;
+    }
+}
+
+@media only screen and (max-width: 1111px) {
+
+    .pListHeadassigned h3,
+    .pListDataDivassigned h3 {
+        padding: 17px 0px;
+        // background: red;
+    }
+
+    .addReviewDivassigned {
+        padding: 17px 0px;
+        // background: blue;
+    }
+
+    .platformMainDiv {
+        padding: 17px 0px;
+        // background: green;
+    }
+
+    .statusMainDiv {
+        padding: 17px 0px;
+        // background: yellow;
+    }
+}
+
+.recentJoinTable {
+    :global(.ant-checkbox-inner) {
+        border-radius: 50% !important;
+        // width: 20px !important;
+        // height: 20px !important;
+    }
+}

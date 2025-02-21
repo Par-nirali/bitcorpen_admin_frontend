@@ -1,0 +1,324 @@
+// .modifyMainDiv {
+//   width: 100%;
+//   height: 100%;
+// }
+
+// .modifyContainer {
+//   background-color: #000000ab;
+//   max-width: 100%;
+//   width: 100%;
+//   height: 100%;
+//   margin: 0 auto;
+//   position: fixed;
+//   top: 0px;
+//   // left: 0px;
+//   z-index: 111;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 30px;
+//   transition: 0.9s ease-in-out;
+//   -webkit-user-select: none;
+//   user-select: none;
+// }
+
+// .modifySubDiv {
+//   width: 493px;
+//   height: auto;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   gap: 40px;
+//   margin-top: 20px;
+//   padding: 40px;
+//   border-radius: 8px;
+//   background: #fff;
+//   // background-color: #0e0c0d;
+//   animation: fadeInAnimation ease 1s;
+//   animation-iteration-count: 1;
+//   animation-fill-mode: forwards;
+//   position: relative;
+
+//   .modifyClose {
+//     top: 15px;
+//     right: 15px;
+//     position: absolute;
+//     width: 25px;
+//     height: 25px;
+//     cursor: pointer;
+//     z-index: 111;
+
+//     img {
+//       width: 100%;
+//       height: 100%;
+//     }
+
+//     &:hover {
+//       transition: 0.3s all ease-in-out;
+//       transform: scale(1.05);
+//     }
+//   }
+// }
+
+// .modifyHead {
+//   width: 100%;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   gap: 18px;
+//   max-width: 327 px;
+//   margin: 0 auto;
+//   text-align: center;
+
+//   h5 {
+//     color: #313131;
+//     // font-family: "SF Pro";
+//     font-size: 20px;
+//     font-style: normal;
+//     font-weight: 510;
+//     line-height: normal;
+//   }
+// }
+
+// .modifyLinkDiv {
+//   //   align-self: center;
+//   text-align: center;
+//   color: #676666;
+//   // font-family: "SF Pro";
+//   font-size: 14px;
+//   font-style: normal;
+//   font-weight: 510;
+//   line-height: normal;
+//   transition: all 0.2s ease-in-out;
+
+//   span {
+//     font-weight: 700;
+//     // color: #009883;
+//     // text-decoration: underline;
+//     // cursor: pointer;
+//   }
+
+//   &:hover {
+//     span {
+//       transform: scale(1.05) !important;
+//     }
+//   }
+// }
+
+// .closeButton {
+//   width: fit-content;
+//   align-self: center;
+//   border-radius: 64px;
+//   border: 2px solid #1c4728;
+//   background: #1c4728;
+//   color: #fff;
+//   text-align: center;
+//   // font-family: "SF Pro";
+//   font-size: 16px;
+//   font-style: normal;
+//   font-weight: 400;
+//   line-height: normal;
+//   padding: 16px 28px;
+//   cursor: pointer;
+//   transition: all 0.2s ease-in-out;
+
+//   &:hover {
+//     background-color: rgba(28, 71, 40, 0.1);
+//     color: #1c4728;
+//   }
+// }
+
+.modifyMainDiv {
+  width: 100%;
+  height: 100%;
+}
+
+.modifyContainer {
+  background-color: #000000ab;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  position: fixed;
+  top: 0px;
+  // left: 0px;
+  z-index: 111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  transition: 0.9s ease-in-out;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.modifySubDiv {
+  width: 493px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 20px;
+  padding: 40px;
+  border-radius: 8px;
+  background: #fff;
+  // background-color: #0e0c0d;
+  animation: fadeInAnimation ease 1s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  position: relative;
+
+  .modifyClose {
+    top: 15px;
+    right: 15px;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    z-index: 111;
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
+
+    &:hover {
+      transition: 0.3s all ease-in-out;
+      transform: scale(1.05);
+    }
+  }
+}
+
+.modifySubReasonDiv {
+  width: 753px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 40px;
+  margin-top: 20px;
+  padding: 40px;
+  border-radius: 8px;
+  background: #fff;
+  // background-color: #0e0c0d;
+  animation: fadeInAnimation ease 1s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  position: relative;
+
+  .modifyClose {
+    top: 15px;
+    right: 15px;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    z-index: 111;
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
+
+    &:hover {
+      transition: 0.3s all ease-in-out;
+      transform: scale(1.05);
+    }
+  }
+}
+
+.modifyHead,
+.modifyReasonHead {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin: 0 auto;
+  text-align: center;
+
+  h5 {
+    color: #313131;
+    // font-family: "SF Pro";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+  }
+}
+
+.modifyReasonHead {
+  align-items: flex-start;
+
+  textarea {
+    width: 100%;
+    border-radius: 4px;
+    background: #F5F5F5;
+    padding: 20px;
+    border: none;
+    outline: none;
+    color: #7F7E7E;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+    resize: none;
+  }
+
+  ::placeholder {
+    color: #bdbbbb;
+  }
+}
+
+.modifyLinkDiv {
+  //   align-self: center;
+  text-align: center;
+  color: #676666;
+  // font-family: "SF Pro";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 510;
+  line-height: normal;
+  transition: all 0.2s ease-in-out;
+
+  span {
+    font-weight: 700;
+    // color: #009883;
+    // text-decoration: underline;
+    // cursor: pointer;
+  }
+
+  &:hover {
+    span {
+      transform: scale(1.05) !important;
+    }
+  }
+}
+
+.closeButton {
+  width: fit-content;
+  align-self: center;
+  border-radius: 64px;
+  border: 2px solid #1c4728;
+  background: #1c4728;
+  color: #fff;
+  text-align: center;
+  // font-family: "SF Pro";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding: 16px 28px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: rgba(28, 71, 40, 0.1);
+    color: #1c4728;
+  }
+}

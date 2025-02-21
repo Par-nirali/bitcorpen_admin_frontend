@@ -320,6 +320,7 @@
     &.active {
       background: #d9f2ef;
     }
+
     &.selected {
       background: #d9f2ef;
     }
@@ -556,5 +557,4 @@
   }
 }
 
-@media only screen and (max-width: 1111px) {
-}
+@media only screen and (max-width: 1111px) {}

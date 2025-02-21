@@ -9,19 +9,20 @@ const LoginPage: NextPage = () => {
   const [cookie, setCookie] = useState<any>("");
   const router = useRouter();
 
-  // useEffect(() => {
-  //   // const socket = SocketIOClient(URL);
-  //   const temp = Cookies.get("isLoggedIn");
-  //   setCookie(temp);
-  //   if (temp === "true" || temp) {
-  //     router.push("/");
-  //   }
-  // }, []);
+  useEffect(() => {
+    // const socket = SocketIOClient(URL);
+    const temp = Cookies.get("isLoggedIn");
+    setCookie(temp);
+    if (temp === "true" || temp) {
+      router.push("/");
+    }
+  }, []);
+
   return (
     <>
-      {/* {cookie !== "true" && <Login />} */}
+      {cookie !== "true" && <Login />}
       <Webpopup />
-      <Login />
+      {/* <Login /> */}
     </>
   );
 };

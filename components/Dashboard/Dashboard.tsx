@@ -169,14 +169,12 @@ const Dashboard = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedOption, setSelectedOption] = useState<any>("");
   const [ceodepartments, setCeoDepartments] = useState<any>([]);
-
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [departmentdata, setDepartmentData] = useState<any>([]);
   const [yearlygraph, setYearlyGraph] = useState([]);
   const [graphData, setGraphData] = useState<any[]>([]);
   const [thismonthrevenue, setThismonthrevenue] = useState("");
   const [prevmonthrevenue, setPrevmonthrevenue] = useState("");
-
   const [loading, setLoading] = useState(true);
   const [showValue, setShowValue] = useState(false);
   const [yearlyData, setYearlyData] = useState([]);
@@ -239,7 +237,7 @@ const Dashboard = () => {
     const fetchUserData = async () => {
       if (typeof window !== "undefined") {
         const userData = JSON.parse(
-          localStorage.getItem("prsuserData") || "{}"
+          localStorage.getItem("bitcorpenadminData") || "{}"
         );
         setUserDetail(userData);
       }
@@ -282,188 +280,188 @@ const Dashboard = () => {
     setIsOpen(false);
   };
 
-  useEffect(() => {
-    const ceoDepartments = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/department/getDepartment`
-        );
-        setCeoDepartments(res.data);
-      } catch (error) {
-        console.error("Error fetching managers:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const ceoDepartments = async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/department/getDepartment`
+  //       );
+  //       setCeoDepartments(res.data);
+  //     } catch (error) {
+  //       console.error("Error fetching managers:", error);
+  //     }
+  //   };
 
-    ceoDepartments();
-  }, [userDetail]);
+  //   ceoDepartments();
+  // }, [userDetail]);
 
-  useEffect(() => {
-    if (ceodepartments.length > 0) {
-      setSelectedOption(ceodepartments[0]._id);
-      setSelectedStatus(ceodepartments[0].departmentName);
-    }
-  }, [ceodepartments]);
+  // useEffect(() => {
+  //   if (ceodepartments.length > 0) {
+  //     setSelectedOption(ceodepartments[0]._id);
+  //     setSelectedStatus(ceodepartments[0].departmentName);
+  //   }
+  // }, [ceodepartments]);
 
-  useEffect(() => {
-    const getDepartmentData = async () => {
-      let tkn = localStorage.getItem("auth-token");
-      setLoading(true);
+  // useEffect(() => {
+  //   const getDepartmentData = async () => {
+  //     let tkn = localStorage.getItem("auth-token");
+  //     setLoading(true);
 
-      const selectedMonth = selectedDate
-        ? selectedDate.getMonth() + 1
-        : new Date().getMonth() + 1;
-      const selectedYear = selectedDate
-        ? selectedDate.getFullYear()
-        : new Date().getFullYear();
-      let data;
+  //     const selectedMonth = selectedDate
+  //       ? selectedDate.getMonth() + 1
+  //       : new Date().getMonth() + 1;
+  //     const selectedYear = selectedDate
+  //       ? selectedDate.getFullYear()
+  //       : new Date().getFullYear();
+  //     let data;
 
-      if (selectedOption === "All") {
-        data = {
-          month: selectedMonth,
-          year: selectedYear,
-        };
-      } else {
-        data = {
-          month: selectedMonth,
-          year: selectedYear,
-          departmentId: selectedOption,
-        };
-      }
+  //     if (selectedOption === "All") {
+  //       data = {
+  //         month: selectedMonth,
+  //         year: selectedYear,
+  //       };
+  //     } else {
+  //       data = {
+  //         month: selectedMonth,
+  //         year: selectedYear,
+  //         departmentId: selectedOption,
+  //       };
+  //     }
 
-      if (selectedOption) {
-        try {
-          const res = await axios.post(
-            `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/sales/getTotalSales`,
-            data,
-            {
-              headers: {
-                Authorization: `Bearer ${tkn}`,
-              },
-            }
-          );
-          setDepartmentData(res.data);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          setLoading(false);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-    getDepartmentData();
-  }, [selectedOption, selectedDate]);
+  //     if (selectedOption) {
+  //       try {
+  //         const res = await axios.post(
+  //           `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/sales/getTotalSales`,
+  //           data,
+  //           {
+  //             headers: {
+  //               Authorization: `Bearer ${tkn}`,
+  //             },
+  //           }
+  //         );
+  //         setDepartmentData(res.data);
+  //       } catch (error) {
+  //         console.error("Error fetching data:", error);
+  //         setLoading(false);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     }
+  //   };
+  //   getDepartmentData();
+  // }, [selectedOption, selectedDate]);
 
-  useEffect(() => {
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
+  // useEffect(() => {
+  //   const monthNames = [
+  //     "Jan",
+  //     "Feb",
+  //     "Mar",
+  //     "Apr",
+  //     "May",
+  //     "Jun",
+  //     "Jul",
+  //     "Aug",
+  //     "Sep",
+  //     "Oct",
+  //     "Nov",
+  //     "Dec",
+  //   ];
 
-    const emptyGraphData = monthNames.map((month) => ({
-      name: month,
-      thismonthrevenue: 0,
-      prevmonthrevenue: 0,
-      totalsales: 0,
-    }));
+  //   const emptyGraphData = monthNames.map((month) => ({
+  //     name: month,
+  //     thismonthrevenue: 0,
+  //     prevmonthrevenue: 0,
+  //     totalsales: 0,
+  //   }));
 
-    setGraphData(emptyGraphData);
+  //   setGraphData(emptyGraphData);
 
-    const getYearlyGraph = async () => {
-      const tkn = localStorage.getItem("auth-token");
-      const selectedYear = selectedDate
-        ? selectedDate.getFullYear()
-        : new Date().getFullYear();
+  //   const getYearlyGraph = async () => {
+  //     const tkn = localStorage.getItem("auth-token");
+  //     const selectedYear = selectedDate
+  //       ? selectedDate.getFullYear()
+  //       : new Date().getFullYear();
 
-      const data =
-        selectedOption === "All"
-          ? { year: selectedYear }
-          : { year: selectedYear, departmentId: selectedOption };
+  //     const data =
+  //       selectedOption === "All"
+  //         ? { year: selectedYear }
+  //         : { year: selectedYear, departmentId: selectedOption };
 
-      if (selectedOption) {
-        try {
-          const res = await axios.post(
-            `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/sales/getYearlySales`,
-            data,
-            {
-              headers: { Authorization: `Bearer ${tkn}` },
-            }
-          );
+  //     if (selectedOption) {
+  //       try {
+  //         const res = await axios.post(
+  //           `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/sales/getYearlySales`,
+  //           data,
+  //           {
+  //             headers: { Authorization: `Bearer ${tkn}` },
+  //           }
+  //         );
 
-          if (res.data && res.data.length > 0) {
-            const monthNames = [
-              "Jan",
-              "Feb",
-              "Mar",
-              "Apr",
-              "May",
-              "Jun",
-              "Jul",
-              "Aug",
-              "Sep",
-              "Oct",
-              "Nov",
-              "Dec",
-            ];
+  //         if (res.data && res.data.length > 0) {
+  //           const monthNames = [
+  //             "Jan",
+  //             "Feb",
+  //             "Mar",
+  //             "Apr",
+  //             "May",
+  //             "Jun",
+  //             "Jul",
+  //             "Aug",
+  //             "Sep",
+  //             "Oct",
+  //             "Nov",
+  //             "Dec",
+  //           ];
 
-            const initialGraphData = monthNames.map((month) => ({
-              name: month,
-              thisMonthRevenue: 0,
-              prevMonthRevenue: 0,
-              totalSales: 0,
-            }));
+  //           const initialGraphData = monthNames.map((month) => ({
+  //             name: month,
+  //             thisMonthRevenue: 0,
+  //             prevMonthRevenue: 0,
+  //             totalSales: 0,
+  //           }));
 
-            res.data.forEach((monthData: any) => {
-              const monthIndex = monthData.month - 1;
-              if (monthIndex >= 0 && monthIndex < 12) {
-                initialGraphData[monthIndex] = {
-                  name: monthNames[monthIndex],
-                  thisMonthRevenue: parseFloat(
-                    monthData.total_thisMonthRevenue
-                  ),
-                  prevMonthRevenue: parseFloat(monthData.total_preMonthRevenue),
-                  totalSales:
-                    parseFloat(monthData.total_thisMonthRevenue) +
-                    parseFloat(monthData.total_preMonthRevenue),
-                };
-              }
-            });
+  //           res.data.forEach((monthData: any) => {
+  //             const monthIndex = monthData.month - 1;
+  //             if (monthIndex >= 0 && monthIndex < 12) {
+  //               initialGraphData[monthIndex] = {
+  //                 name: monthNames[monthIndex],
+  //                 thisMonthRevenue: parseFloat(
+  //                   monthData.total_thisMonthRevenue
+  //                 ),
+  //                 prevMonthRevenue: parseFloat(monthData.total_preMonthRevenue),
+  //                 totalSales:
+  //                   parseFloat(monthData.total_thisMonthRevenue) +
+  //                   parseFloat(monthData.total_preMonthRevenue),
+  //               };
+  //             }
+  //           });
 
-            const processedData = initialGraphData.map((item) => ({
-              name: item.name,
-              totalsales: item.totalSales,
-              thismonthrevenue: item.thisMonthRevenue,
-              prevmonthrevenue: item.prevMonthRevenue,
-            }));
+  //           const processedData = initialGraphData.map((item) => ({
+  //             name: item.name,
+  //             totalsales: item.totalSales,
+  //             thismonthrevenue: item.thisMonthRevenue,
+  //             prevmonthrevenue: item.prevMonthRevenue,
+  //           }));
 
-            setGraphData(processedData);
-            setYearlyData(res.data);
+  //           setGraphData(processedData);
+  //           setYearlyData(res.data);
 
-            const latestMonth = res.data.reduce((latest: any, current: any) =>
-              current.month > latest.month ? current : latest
-            );
-            setPrevmonthrevenue(latestMonth.total_preMonthRevenue);
-            setThismonthrevenue(latestMonth.total_thisMonthRevenue);
-          } else {
-            console.log("no data found");
-          }
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
-    };
+  //           const latestMonth = res.data.reduce((latest: any, current: any) =>
+  //             current.month > latest.month ? current : latest
+  //           );
+  //           setPrevmonthrevenue(latestMonth.total_preMonthRevenue);
+  //           setThismonthrevenue(latestMonth.total_thisMonthRevenue);
+  //         } else {
+  //           console.log("no data found");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error fetching data:", error);
+  //       }
+  //     }
+  //   };
 
-    getYearlyGraph();
-  }, [selectedOption, selectedDate]);
+  //   getYearlyGraph();
+  // }, [selectedOption, selectedDate]);
 
   const handleDownload = () => {
     const wb = XLSX.utils.book_new();

@@ -8,7 +8,7 @@ const Headerdash = () => {
     const fetchUserData = async () => {
       if (typeof window !== "undefined") {
         const userData = JSON.parse(
-          localStorage.getItem("prsuserData") || "{}"
+          localStorage.getItem("bitcorpenadminData") || "{}"
         );
         setUserDetail(userData);
       }

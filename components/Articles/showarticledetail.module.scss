@@ -1,0 +1,444 @@
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.pSubRightDiv {
+    // width: 83%;
+    width: calc(100% - 355px);
+    height: calc(100vh - 90px);
+    padding: 40px 24px;
+    animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    animation-iteration-count: 1;
+}
+
+.backMainDiv {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: fit-content;
+    margin-top: 10px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+
+    p {
+        color: #313131;
+        // font-family: "SF Pro";
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
+
+    img {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+
+.skelMargin {
+    margin-left: 5px;
+}
+
+.pHeadingDiv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+        color: #292933;
+        // font-family: Poppins;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        letter-spacing: -0.72px;
+    }
+
+    h2 {
+        margin-top: 8px;
+        color: #292933;
+        // font-family: Poppins;
+        font-size: 22px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+        letter-spacing: -0.66px;
+    }
+}
+
+.backUpMainDiv {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+
+.tabTitle {
+    width: 100%;
+    color: #313131;
+    // font-family: "SF Pro";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.deleteBtn {
+    width: fit-content;
+    display: flex;
+    padding: 14px 19px;
+    align-items: flex-start;
+    gap: 10px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: #FCFCFC;
+    color: #7F7E7E;
+    // font-family: "SF Pro";
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+
+    &:hover {
+        transition: all 0.3s ease-in-out;
+        border: 1px solid #1c4728;
+    }
+}
+
+.dashboardScroll {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    // max-height: 77vh;
+    // margin-top: 22px;
+    padding: 10px 0px 20px 0px;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.graphTableDivMain {
+    width: 100%;
+    max-width: 1106px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 52px;
+    border-radius: 12px;
+    // background: #fff;
+    // margin-top: 20px;
+    flex: 1;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #b5b5b5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #313131;
+        border-radius: 4px;
+    }
+}
+
+.hrLine {
+    width: 100%;
+    height: 1px;
+    background: #B5B5B5;
+}
+
+.newsHeadDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.newsTitle {
+    color: #1C4728;
+    // font-family: "SF Pro";
+    font-size: 44px;
+    font-style: normal;
+    font-weight: 274;
+    line-height: normal;
+    margin-bottom: 6px;
+}
+
+.newsSubTitle {
+    color: #313131;
+    // font-family: "SF Pro";
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 32px;
+}
+
+.newsPublishTime {
+    color: #676666;
+    // font-family: "SF Pro";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+}
+
+.newsDetailDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px;
+}
+
+.newsDescText {
+    color: #676666;
+    // font-family: "SF Pro";
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 32px;
+}
+
+.newsPointsDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px;
+}
+
+.newsPointDetailDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.newsPointHeadText {
+    color: #313131;
+    // font-family: "SF Pro";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.newsExtraText {
+    color: #1C4728;
+    // font-family: "SF Pro";
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: 32px;
+}
+
+.newsPointImgDiv {
+    width: 100%;
+    height: auto;
+
+    img {
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+}
+
+.newsCommentDiv {
+    width: 100%;
+    display: flex;
+    padding: 42px 40px;
+    // flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    align-self: stretch;
+    border-radius: 8px;
+    background: #FFF;
+}
+
+.commnetUserProfImg {
+    max-width: 37px;
+    height: auto;
+
+    img {
+        width: 100%;
+        height: 100%;
+        border-radius: 37px;
+    }
+}
+
+.commentRightDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 20px;
+}
+
+.commentRightUpDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 16px;
+    padding: 18px 20px;
+    border-radius: 8px;
+    // opacity: 0.2;
+    background: #f0f0f0;
+}
+
+.commentUserDiv {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+
+    p {
+        color: #313131;
+        // font-family: "SF Pro";
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
+
+    span {
+        color: #8E8E8E;
+        // font-family: "SF Pro";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+    }
+}
+
+.commentTextDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+
+    p {
+        color: #313131;
+        // font-family: "SF Pro";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+    }
+
+    span {
+        align-self: flex-end;
+        color: #00A991;
+        // font-family: "SF Pro";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+        text-decoration: underline;
+    }
+}
+
+.commentActionsDiv {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px
+}
+
+.commentLeftDiv {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+.ationTextDiv {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    img {
+        width: 24px;
+        height: 24px;
+    }
+
+    p {
+        color: #313131;
+        // font-family: "SF Pro";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+    }
+}
+
+.viewMoreText {
+    color: #00A991;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-decoration: underline;
+
+}
+
+@media only screen and (max-width: 1599px) {
+    .pSubRightDiv {
+        width: calc(100% - 340px);
+        padding: 30px 22px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 20px;
+        }
+    }
+}
+
+@media only screen and (max-width: 1366px) {
+    .pSubRightDiv {
+        width: calc(100% - 320px);
+        padding: 20px 18px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 18px;
+        }
+    }
+}

@@ -14,28 +14,30 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="shortcut icon" href="/wibesFav1.jpg" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <Provider store={store}>
-        <ConfigProvider
-          theme={{
-            components: {
-              Table: {
-                borderColor: "#B5B5B5",
-                fontSizeHeading5: 16,
-                fontWeightStrong: 500,
-                headerBg: "#fff",
-                colorTextSecondary: "#0B0B0B",
-                // borderRadius: 90,
+      <ChakraProvider>
+        <Provider store={store}>
+          <ConfigProvider
+            theme={{
+              components: {
+                Table: {
+                  borderColor: "#B5B5B5",
+                  fontSizeHeading5: 16,
+                  fontWeightStrong: 500,
+                  headerBg: "#fff",
+                  colorTextSecondary: "#0B0B0B",
+                  // borderRadius: 90,
+                },
+                Checkbox: {
+                  borderRadius: 100,
+                  colorPrimary: "#00A991",
+                },
               },
-              Checkbox: {
-                borderRadius: 100,
-                colorPrimary: "#00A991",
-              },
-            },
-          }}
-        >
-          <Component {...pageProps} />
-        </ConfigProvider>
-      </Provider>
+            }}
+          >
+            <Component {...pageProps} />
+          </ConfigProvider>
+        </Provider>
+      </ChakraProvider>
       <div id="modals"></div>
     </>
   );

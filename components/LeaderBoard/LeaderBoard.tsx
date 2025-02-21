@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import styles from "./affiliation.module.scss";
+import styles from "./leaderboard.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,6 +7,7 @@ import { selectedDetails, selectedProjects } from "../redux/actions";
 import { createPortal } from "react-dom";
 import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
+import RemoveLeaderPopup from "./RemoveLeaderPopup";
 // import ValidationPopup from "./ValidationPopup";
 
 const LeaderBoard = () => {
@@ -74,10 +75,10 @@ const LeaderBoard = () => {
       },
     },
   ];
-  const getValidationItem = (record: any): MenuProps["items"] => [
+  const getMoreItem = (record: any): MenuProps["items"] => [
     {
-      key: "givevalidation",
-      label: "Give Validation",
+      key: "remove",
+      label: "Remove",
       onClick: () => {
         selectedDetails(record);
         setShowPopup(true);
@@ -92,6 +93,11 @@ const LeaderBoard = () => {
     //   width: 80,
     //   render: (_: any, __: any, index: number) => `#${index + 1}`,
     // },
+    {
+      title: "Rank",
+      dataIndex: "rank",
+      key: "rank",
+    },
     {
       title: "ENID",
       dataIndex: "enid",
@@ -109,71 +115,38 @@ const LeaderBoard = () => {
       key: "name",
     },
     {
-      title: "Joined date",
-      dataIndex: "joinedDate",
-      key: "joinedDate",
+      title: "ENR Points",
+      dataIndex: "enrpoints",
+      key: "enrpoints",
     },
     {
-      title: "Referral ENID",
-      dataIndex: "referralenid",
-      key: "referralenid",
-      render: (text: any) => <span style={{ color: "#00A3B1" }}>{text}</span>,
-    },
-    {
-      title: "Referral Link",
-      dataIndex: "referrallink",
-      key: "referrallink",
-      render: (text: any) => (
-        <a style={{ color: "#00A3B1", textDecoration: "underline" }}>{text}</a>
-      ),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status: any) => (
-        <span
-          style={{
-            padding: "4px 8px",
-            borderRadius: "64px",
-            backgroundColor:
-              status === "Validated"
-                ? "#E8F7F7"
-                : status === "Under Validation"
-                ? "#FFF7E6"
-                : "#FFE9E9",
-            color:
-              status === "Validated"
-                ? "#00A3B1"
-                : status === "Under Validation"
-                ? "#D48806"
-                : "#FF4D4F",
-          }}
-        >
-          {status}
-        </span>
-      ),
+      title: "Last Rank",
+      dataIndex: "lastrank",
+      key: "lastrank",
     },
     {
       title: "Operate",
       dataIndex: "operate",
       key: "operate",
       render: (_: any, record: any) => (
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          {record.status === "Under Validation" ? (
-            <Dropdown
-              menu={{ items: getValidationItem(record) }}
-              trigger={["hover"]}
-              placement="bottomRight"
-              // style={{ width: "100%" }}
-            >
-              <a style={{ width: "24px", height: "24px" }}>
-                <img src="/icons/more.svg" alt="edit" />
-              </a>
-            </Dropdown>
-          ) : (
-            ""
-          )}
+        <div
+          style={{
+            display: "flex",
+            gap: "8px",
+            alignItems: "center",
+            // width: "100%",
+          }}
+        >
+          <Dropdown
+            menu={{ items: getMoreItem(record) }}
+            trigger={["hover"]}
+            placement="bottomRight"
+            // style={{ width: "100%" }}
+          >
+            <a style={{ width: "24px", height: "24px" }}>
+              <img src="/icons/more.svg" alt="edit" />
+            </a>
+          </Dropdown>
         </div>
       ),
     },
@@ -295,11 +268,11 @@ const LeaderBoard = () => {
           </div>
         </div>
       </div>
-      {/* {showPopup &&
+      {showPopup &&
         createPortal(
-          <ValidationPopup onClose={() => setShowPopup(false)} />,
+          <RemoveLeaderPopup onClose={() => setShowPopup(false)} />,
           document.getElementById("modals")!
-        )} */}
+        )}
     </>
   );
 };

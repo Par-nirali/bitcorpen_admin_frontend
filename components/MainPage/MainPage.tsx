@@ -23,6 +23,21 @@ import Partners from "../PartnersCollabration/Partners";
 import AddPartners from "../PartnersCollabration/AddPartners";
 import AdControls from "../AdControls/AdControls";
 import AddAdControls from "../AdControls/AddAdControls";
+import LeaderBoard from "../LeaderBoard/LeaderBoard";
+import NotificationSetting from "../NotiifcationSetting/NotificationSetting";
+import SubAdmins from "../SubAdmins/SubAdmins";
+import AddSubAdmin from "../SubAdmins/AddSubAdmin";
+import FlagUser from "../FlagUsers/FlagUser";
+import ContentModeration from "../ContentModeration/ContentModeration";
+import UserContentPost from "../ContentModeration/UserContentPosts";
+import News from "../News/News";
+import Articles from "../Articles/Articles";
+import ShowNewsDetail from "../News/ShowNewsDetail";
+import WriteNews from "../News/WriteNews";
+import ShowArticleDetail from "../Articles/ShowArticleDetail";
+import AdminEditProfile from "../AdminEditProfile/AdminEditProfile";
+import HeaderNotification from "../HeaderNotification/HeaderNotification";
+import EditSubAdminProfile from "../EditSubAdminProfile/EditSubAdminProfile";
 
 const Performance = () => {
   const [userDetail, setUserDetail] = useState<any>("");
@@ -37,7 +52,7 @@ const Performance = () => {
     const fetchUserData = async () => {
       if (typeof window !== "undefined") {
         const userData = JSON.parse(
-          localStorage.getItem("prsuserData") || "{}"
+          localStorage.getItem("bitcorpenadminData") || "{}"
         );
         setUserDetail(userData);
       }
@@ -47,24 +62,17 @@ const Performance = () => {
   }, []);
 
   useEffect(() => {
-    if (userDetail?.designation?.name === "EMPLOYEE") {
-      setSelectedProject("myreview");
-      dispatch(selectedProjects("myreview"));
-    } else if (userDetail?.designation?.name === "BDE") {
-      setSelectedProject("my projects bde");
-      dispatch(selectedProjects("my projects bde"));
+    if (userDetail?.userRole === "ADMIN") {
+      setSelectedProject("dashboard");
+      dispatch(selectedProjects("dashboard"));
+    } else if (userDetail?.userRole === "SUB_ADMIN") {
+      setSelectedProject("help_support_admin");
+      dispatch(selectedProjects("help_support_admin"));
     } else {
       setSelectedProject("");
       dispatch(selectedProjects(""));
     }
   }, [userDetail]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const userData = JSON.parse(localStorage.getItem("prsuserData") || "{}");
-      setUserDetail(userData);
-    }
-  }, []);
 
   return (
     <>
@@ -115,6 +123,36 @@ const Performance = () => {
               <AdControls />
             ) : selectedproject === "addadcontrols" ? (
               <AddAdControls />
+            ) : selectedproject === "leader_board" ? (
+              <LeaderBoard />
+            ) : selectedproject === "notifications" ? (
+              <NotificationSetting />
+            ) : selectedproject === "sub_admins" ? (
+              <SubAdmins />
+            ) : selectedproject === "addaubadmins" ? (
+              <AddSubAdmin />
+            ) : selectedproject === "flag_user" ? (
+              <FlagUser />
+            ) : selectedproject === "content_moderation" ? (
+              <ContentModeration />
+            ) : selectedproject === "usercontentposts" ? (
+              <UserContentPost />
+            ) : selectedproject === "news" ? (
+              <News />
+            ) : selectedproject === "news_details" ? (
+              <ShowNewsDetail />
+            ) : selectedproject === "writenews" ? (
+              <WriteNews />
+            ) : selectedproject === "articles" ? (
+              <Articles />
+            ) : selectedproject === "article_details" ? (
+              <ShowArticleDetail />
+            ) : selectedproject === "edit_profile" ? (
+              <AdminEditProfile />
+            ) : selectedproject === "header_notification" ? (
+              <HeaderNotification />
+            ) : selectedproject === "editsubadminsprofile" ? (
+              <EditSubAdminProfile />
             ) : null}
           </div>
         </div>

@@ -109,6 +109,7 @@ const AddPartners = () => {
                             width: "100%",
                             height: "100%",
                             objectFit: "cover",
+                            borderRadius: "42px",
                           }}
                         />
                       ) : (

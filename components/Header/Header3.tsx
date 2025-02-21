@@ -4,21 +4,26 @@ import Link from "next/link";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { CiSearch } from "react-icons/ci";
 import { useDispatch, useSelector } from "react-redux";
+import { createPortal } from "react-dom";
 import {
   CEO_DEPARTMENT,
+  selectedProjects,
   setSearchTerm,
   setSelectedEmpl,
   setShowEmp,
 } from "../redux/actions";
 import axios from "axios";
+import SignOutPopup from "./SignOutPopup";
 
 const Header3 = () => {
+  const [showPopup, setShowPopup] = useState(false);
   const [userDetail, setUserDetail] = useState<any>("");
+
   useEffect(() => {
     const fetchUserData = async () => {
       if (typeof window !== "undefined") {
         const userData = JSON.parse(
-          localStorage.getItem("prsuserData") || "{}"
+          localStorage.getItem("bitcorpenadminData") || "{}"
         );
         setUserDetail(userData);
       }
@@ -60,63 +65,63 @@ const Header3 = () => {
   });
 
   // console.log("reduxemp is", selectedemp);
-  useEffect(() => {
-    const ceoDepartments = async () => {
-      if (userDetail?.designation?.name === "CEO") {
-        try {
-          const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/department/getDepartment`
-          );
-          setCeoDepartments(res.data);
-        } catch (error) {
-          console.error("Error fetching managers:", error);
-        }
-      }
-    };
-    ceoDepartments();
-  }, [userDetail]);
+  // useEffect(() => {
+  //   const ceoDepartments = async () => {
+  //     if (userDetail?.designation?.name === "CEO") {
+  //       try {
+  //         const res = await axios.get(
+  //           `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/department/getDepartment`
+  //         );
+  //         setCeoDepartments(res.data);
+  //       } catch (error) {
+  //         console.error("Error fetching managers:", error);
+  //       }
+  //     }
+  //   };
+  //   ceoDepartments();
+  // }, [userDetail]);
 
-  useEffect(() => {
-    let debounceTimer: any;
+  // useEffect(() => {
+  //   let debounceTimer: any;
 
-    const fetchempDetails = async () => {
-      let tkn = localStorage.getItem("auth-token");
+  //   const fetchempDetails = async () => {
+  //     let tkn = localStorage.getItem("auth-token");
 
-      const data = {
-        name: empsearch,
-      };
-      try {
-        const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/user/search`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${tkn}`,
-            },
-          }
-        );
+  //     const data = {
+  //       name: empsearch,
+  //     };
+  //     try {
+  //       const res = await axios.post(
+  //         `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/user/search`,
+  //         data,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${tkn}`,
+  //           },
+  //         }
+  //       );
 
-        setEmpDetails(res.data);
-      } catch (error) {
-        console.error("Error fetching submanager:", error);
-      }
-    };
+  //       setEmpDetails(res.data);
+  //     } catch (error) {
+  //       console.error("Error fetching submanager:", error);
+  //     }
+  //   };
 
-    if (empsearch !== "") {
-      clearTimeout(debounceTimer);
+  //   if (empsearch !== "") {
+  //     clearTimeout(debounceTimer);
 
-      debounceTimer = setTimeout(() => {
-        fetchempDetails();
-      }, 1000);
-    } else {
-      setShow(false);
-      setEmpDetails([]);
-    }
+  //     debounceTimer = setTimeout(() => {
+  //       fetchempDetails();
+  //     }, 1000);
+  //   } else {
+  //     setShow(false);
+  //     setEmpDetails([]);
+  //   }
 
-    return () => {
-      clearTimeout(debounceTimer);
-    };
-  }, [empsearch]);
+  //   return () => {
+  //     clearTimeout(debounceTimer);
+  //   };
+  // }, [empsearch]);
 
   // console.log("employee data is", empdetails);
 
@@ -129,39 +134,40 @@ const Header3 = () => {
     setShow(true);
   };
 
-  useEffect(() => {
-    const subManagerDepart = async () => {
-      if (userDetail && userDetail._id) {
-        try {
-          const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/user/getChildUser/${userDetail._id}`
-          );
-          // console.log(res.data, "Employees Data");
-          setSubManager(res.data);
-        } catch (error) {
-          console.error("Error fetching submanager:", error);
-        }
-      }
-    };
-    subManagerDepart();
-  }, [userDetail]);
+  // useEffect(() => {
+  //   const subManagerDepart = async () => {
+  //     if (userDetail && userDetail._id) {
+  //       try {
+  //         const res = await axios.get(
+  //           `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/user/getChildUser/${userDetail._id}`
+  //         );
+  //         // console.log(res.data, "Employees Data");
+  //         setSubManager(res.data);
+  //       } catch (error) {
+  //         console.error("Error fetching submanager:", error);
+  //       }
+  //     }
+  //   };
+  //   subManagerDepart();
+  // }, [userDetail]);
 
   // console.log("selectedprojects11111", selectedproject);
 
-  useEffect(() => {
-    dispatch(setSearchTerm(""));
-  }, [selectedproject]);
+  // useEffect(() => {
+  //   dispatch(setSearchTerm(""));
+  // }, [selectedproject]);
 
   return (
-    <div className={style.headerMainDiv}>
-      <div className={style.headerSubDiv}>
-        <nav className={style.nav}>
-          <Link href="/">
-            <div className={style.headingDivImg}>
-              <img src="/logo.svg" alt="Logo" />
-            </div>
-          </Link>
-          {/* {(selectedproject === "my projects" ||
+    <>
+      <div className={style.headerMainDiv}>
+        <div className={style.headerSubDiv}>
+          <nav className={style.nav}>
+            <Link href="/">
+              <div className={style.headingDivImg}>
+                <img src="/logo.svg" alt="Logo" />
+              </div>
+            </Link>
+            {/* {(selectedproject === "my projects" ||
             selectedproject === "all projects" ||
             selectedproject === "reviewed projects" ||
             selectedproject === "cancel projects" ||
@@ -190,7 +196,7 @@ const Header3 = () => {
             </div>
           )} */}
 
-          {/* <div
+            {/* <div
             className={style.inputMainDiv}
             style={{
               visibility:
@@ -235,7 +241,7 @@ const Header3 = () => {
             </div>
           </div> */}
 
-          {/* <div
+            {/* <div
             className={style.inputMainDiv}
             style={{
               display:
@@ -259,42 +265,74 @@ const Header3 = () => {
             </div>
           </div> */}
 
-          <div className={style.upgradeMainDiv}>
-            <div className={style.profileDiv}>
-              <div
-                className={style.inputMainDiv}
-                // style={{
-                //   display:
-                //     selectedproject === "ceo dashboard" ||
-                //     selectedproject === "ceoempreview" ||
-                //     selectedproject === "ceoempprojects"
-                //       ? ""
-                //       : "none",
-                // }}
-              >
-                <p>
-                  {/* <CiSearch /> */}
-                  <img src={"/icons/searchnormal.svg"} alt="search" />
-                </p>
-                <div className={style.inputDiv}>
-                  <input
-                    type="text"
-                    placeholder="Search Here"
-                    value={empsearch}
-                    onChange={handleempSearchChange}
+            <div className={style.upgradeMainDiv}>
+              <div className={style.profileDiv}>
+                <div
+                  className={style.inputMainDiv}
+                  // style={{
+                  //   display:
+                  //     selectedproject === "ceo dashboard" ||
+                  //     selectedproject === "ceoempreview" ||
+                  //     selectedproject === "ceoempprojects"
+                  //       ? ""
+                  //       : "none",
+                  // }}
+                >
+                  <p>
+                    {/* <CiSearch /> */}
+                    <img src={"/icons/searchnormal.svg"} alt="search" />
+                  </p>
+                  <div className={style.inputDiv}>
+                    <input
+                      type="text"
+                      placeholder="Search Here"
+                      value={empsearch}
+                      onChange={handleempSearchChange}
+                    />
+                  </div>
+                </div>
+                <div
+                  className={style.headNotifImg}
+                  onClick={() => {
+                    dispatch(selectedProjects("header_notification"));
+                  }}
+                >
+                  <img
+                    src={"/icons/notificationheader.svg"}
+                    alt="notificationheader"
                   />
                 </div>
-              </div>
-              <div className={style.headNotifImg}>
-                <img
-                  src={"/icons/notificationheader.svg"}
-                  alt="notificationheader"
-                />
-              </div>
-              <div className={style.headProDetailImg}>
-                <img src={"/userprofile.svg"} alt="profile" />
-              </div>
-              {/* <div>
+                <div
+                  className={`${style.menuSubItem} ${style.profileDropdown}`}
+                >
+                  <div className={style.headProDetailImg}>
+                    <img src={"/userprofile.svg"} alt="profile" />
+                  </div>
+                  <div className={style.dropdownPopup}>
+                    <div
+                      className={`${style.dropdownTabs} `}
+                      onClick={() => {
+                        dispatch(selectedProjects("edit_profile"));
+                      }}
+                    >
+                      <div className={style.tabsImg}>
+                        <img src="/icons/profileicon.svg" alt="profile" />
+                      </div>
+                      <p>Profile</p>
+                    </div>
+
+                    <div
+                      className={`${style.dropdownTabs} `}
+                      onClick={() => setShowPopup(true)}
+                    >
+                      <div className={style.tabsImg}>
+                        <img src="/icons/logout.svg" alt="profile" />
+                      </div>
+                      <p>Sign out</p>
+                    </div>
+                  </div>
+                </div>
+                {/* <div>
                 {userDetail && (
                   <p>
                     {userDetail?.firstName} {userDetail?.lastName}
@@ -302,14 +340,14 @@ const Header3 = () => {
                 )}
                 {userDetail && <p>{userDetail?.designation?.name}</p>}
               </div> */}
-              {/* <div className={style.arrow}>
+                {/* <div className={style.arrow}>
                 <RiArrowDropDownLine />
               </div> */}
+              </div>
             </div>
-          </div>
-        </nav>
+          </nav>
 
-        {/* {show && (
+          {/* {show && (
           <div className={style.headProMainDiv}>
             <div className={style.headProContainer}>
               <div className={style.headProSubDiv} ref={popupRef}>
@@ -346,8 +384,14 @@ const Header3 = () => {
             </div>
           </div>
         )} */}
+        </div>
       </div>
-    </div>
+      {showPopup &&
+        createPortal(
+          <SignOutPopup onClose={() => setShowPopup(false)} />,
+          document.getElementById("modals")!
+        )}
+    </>
   );
 };
 

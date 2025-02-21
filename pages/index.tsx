@@ -20,24 +20,24 @@ const Home: NextPage = () => {
   const [cookie, setCookie] = useState<any>("");
   const router = useRouter();
 
-  // useEffect(() => {
-  //   const temp = Cookies.get("isLoggedIn");
-  //   setCookie(temp);
-  //   if (temp === "false" || !temp) {
-  //     router.push("/login");
-  //   }
-  // }, []);
+  useEffect(() => {
+    const temp = Cookies.get("isLoggedIn");
+    setCookie(temp);
+    if (temp === "false" || !temp) {
+      router.push("/login");
+    }
+  }, []);
 
   return (
     <>
-      {/* <div className="mainCon">
+      <div className="mainCon">
         {cookie === "true" && <Header3 />}
         {cookie === "true" && <Landingpage />}
-      </div> */}
-      <div className="mainCon">
+      </div>
+      {/* <div className="mainCon">
         <Header3 />
         <Landingpage />
-      </div>
+      </div> */}
       <Webpopup />
       <div id="mainRealteDiv"></div>
     </>

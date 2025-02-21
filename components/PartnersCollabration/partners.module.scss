@@ -99,6 +99,7 @@
   font-weight: 510;
   line-height: normal;
 }
+
 .addPartnerBtn {
   width: fit-content;
   align-self: flex-end;
@@ -398,6 +399,7 @@
       font-size: 18px;
     }
   }
+
   .graphMainDiv {
     padding: 40px;
     border-radius: 12px;
@@ -416,5 +418,4 @@
   }
 }
 
-@media only screen and (max-width: 1111px) {
-}
+@media only screen and (max-width: 1111px) {}

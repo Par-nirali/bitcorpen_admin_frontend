@@ -11,6 +11,19 @@
   &::-webkit-scrollbar {
     display: none;
   }
+
+  // &::-webkit-scrollbar {
+  //   width: 3px;
+  // }
+
+  // &::-webkit-scrollbar-track {
+  //   background: #b5b5b5;
+  // }
+
+  // &::-webkit-scrollbar-thumb {
+  //   background: #313131;
+  //   border-radius: 4px;
+  // }
 }
 
 .wSpaceLeftSub {
@@ -65,9 +78,9 @@
   width: 100%;
   height: 100%;
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  // &::-webkit-scrollbar {
+  //   display: none;
+  // }
 }
 
 .wSpaceLeftUp {
@@ -80,8 +93,20 @@
   max-height: 750px;
   overflow-y: scroll;
 
+  // &::-webkit-scrollbar {
+  //   display: none;
+  // }
   &::-webkit-scrollbar {
-    display: none;
+    width: 3px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #b5b5b5;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #313131;
+    border-radius: 4px;
   }
 
   .wSpaceLeftHead {

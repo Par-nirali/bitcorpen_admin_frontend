@@ -112,13 +112,13 @@ const CreditLogs = () => {
               status === "Completed"
                 ? "#E8F7F7"
                 : status === "Pending"
-                ? "#FFF7E6"
+                ? "#ffe10033"
                 : "#FFE9E9",
             color:
               status === "Completed"
                 ? "#00A3B1"
                 : status === "Pending"
-                ? "#D48806"
+                ? "#968612"
                 : "#FF4D4F",
           }}
         >

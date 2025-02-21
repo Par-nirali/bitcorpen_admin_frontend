@@ -1,0 +1,309 @@
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.pSubRightDiv {
+    width: calc(100% - 355px);
+    height: calc(100vh - 90px);
+    padding: 40px 24px;
+    animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    animation-iteration-count: 1;
+}
+
+.eyeIcon {
+    display: flex;
+    padding: 4px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+
+    &:hover {
+        transition: all 0.2s ease-in-out;
+        background: #1c4729;
+
+        img {
+            content: url("/icons/eyew.svg");
+        }
+    }
+}
+
+.backArrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+        height: 100%;
+        margin-top: 2px;
+    }
+}
+
+.skelMargin {
+    margin-left: 5px;
+}
+
+.pHeadingDiv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+        color: #292933;
+        font-family: Poppins;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        letter-spacing: -0.72px;
+    }
+
+    h2 {
+        margin-top: 8px;
+        color: #292933;
+        font-family: Poppins;
+        font-size: 22px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+        letter-spacing: -0.66px;
+    }
+}
+
+.tabTitle {
+    width: 100%;
+    color: #313131;
+    // font-family: "SF Pro";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.dashboardScroll {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 40px;
+    overflow-y: scroll;
+    // max-height: 77vh;
+    margin-top: 22px;
+    padding: 20px 0;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.title {
+    font-size: 18px;
+    // font-family: "SF Pro";
+    font-style: normal;
+    line-height: normal;
+    font-weight: 510;
+    color: #0b0b0b;
+}
+
+.subTitle {
+    font-size: 16px;
+    color: #0b0b0b;
+    // font-family: "SF Pro";
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+    margin-top: 32px;
+}
+
+.graphUserTableDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 26px;
+    border-radius: 12px;
+    background: #fff;
+    // margin-top: 20px;
+    flex: 1;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #b5b5b5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #313131;
+        border-radius: 4px;
+    }
+}
+
+.graphDivtable {
+    width: 100%;
+}
+
+.notificationBoxMain {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.notificationBoxContainer {
+    width: 100%;
+}
+
+.Content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.notificationSetting {
+    width: 100%;
+    border: 1px solid #b5b5b5;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.notificationContent {
+    width: 100%;
+}
+
+.notificationBox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notificationTitle {
+    color: #313131;
+    // font-family: "SF Pro";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.notificationDesc {
+    max-width: 90%;
+    color: #676666;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+    margin-top: 12px;
+}
+
+.toggle {
+    position: relative;
+    width: 50px;
+    height: 25px;
+    color: black;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.4s ease-in-out;
+    border-radius: 61px;
+    padding: 2px;
+    background: #eceded;
+    box-shadow: 0px 0.625px 1.875px 0px rgba(0, 0, 0, 0.2) inset;
+
+    &:focus {
+        outline: none;
+    }
+
+    &.toggleActive {
+        background-color: #1ac065;
+        box-shadow: 0px 0.625px 1.875px 0px rgba(0, 0, 0, 0.2) inset,
+            0px 2.5px 5px 0px rgba(0, 206, 156, 0.4);
+    }
+}
+
+.toggleHandle {
+    position: absolute;
+    left: 3px;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    transition: transform 0.4s ease-in-out;
+    filter: drop-shadow(0px 0.625px 1.25px rgba(0, 0, 0, 0.2)) drop-shadow(0px 2.5px 2.5px rgba(0, 0, 0, 0.17)) drop-shadow(0px 6.25px 3.75px rgba(0, 0, 0, 0.1)) drop-shadow(0px 10.625px 4.375px rgba(0, 0, 0, 0.03)) drop-shadow(0px 16.875px 4.375px rgba(0, 0, 0, 0));
+    background: #373737;
+
+    .toggleActive & {
+        transform: translateX(115%);
+        background-color: white;
+    }
+}
+
+.notificationContentend {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.saveButton {
+    background: #1c4728;
+    color: white;
+    border: 2px solid #1c4728;
+    border-radius: 100px;
+    padding: 18px 28px;
+    // font-family: "SF Pro";
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 19.09px;
+    text-align: center;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    margin-top: 52px;
+
+    &:hover {
+        background-color: #f2f8f4;
+        color: #1c4728;
+        border: 2px solid #1c4728;
+    }
+}
+
+@media only screen and (max-width: 1450px) {
+    .container {
+        width: 90%;
+    }
+}
+
+@media only screen and (max-width: 1350px) {
+    .container {
+        width: 90%;
+    }
+
+    .Content {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .container {
+        width: 90%;
+    }
+
+    .Content {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}

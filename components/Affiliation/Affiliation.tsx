@@ -139,13 +139,13 @@ const Affiliation = () => {
               status === "Validated"
                 ? "#E8F7F7"
                 : status === "Under Validation"
-                ? "#FFF7E6"
+                ? "#ffe10033"
                 : "#FFE9E9",
             color:
               status === "Validated"
                 ? "#00A3B1"
                 : status === "Under Validation"
-                ? "#D48806"
+                ? "#968612"
                 : "#FF4D4F",
           }}
         >

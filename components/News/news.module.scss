@@ -1,0 +1,550 @@
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.pSubRightDiv {
+    width: calc(100% - 355px);
+    height: calc(100vh - 90px);
+    padding: 40px 24px;
+    animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    animation-iteration-count: 1;
+}
+
+.excelDownload {
+    background: #0c8ce9;
+    cursor: pointer;
+    margin-right: 12px;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #fff;
+    box-shadow: 0px -1px 1px 0px rgba(255, 255, 255, 0.08) inset,
+        0px 1px 3px 0px rgba(255, 255, 255, 0.04);
+
+    img {
+        display: block;
+        height: 20px;
+        width: 20px;
+    }
+}
+
+.dropdownMainDiv {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: fit-content;
+    // width: fit-content;
+    margin-top: 10px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+}
+
+.backArrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+        height: 100%;
+        margin-top: 2px;
+    }
+}
+
+.skelMargin {
+    margin-left: 5px;
+}
+
+.pHeadingDiv {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+
+    h3 {
+        color: #292933;
+        font-family: Poppins;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        letter-spacing: -0.72px;
+    }
+
+    h2 {
+        margin-top: 8px;
+        color: #292933;
+        font-family: Poppins;
+        font-size: 22px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+        letter-spacing: -0.66px;
+    }
+}
+
+.tabTitle {
+    width: fit-content;
+    color: #313131;
+    // font-family: "SF Pro";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.addPartnerBtn {
+    width: fit-content;
+    align-self: flex-end;
+    border-radius: 64px;
+    border: 2px solid #1c4728;
+    background: #1c4728;
+    color: #fff;
+    text-align: center;
+    // font-family: "SF Pro";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    padding: 18px 28px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        transition: all 0.2s ease-in-out;
+        background-color: #1c472819;
+        color: #1c4728;
+    }
+}
+
+.dashboardScroll {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 40px;
+    overflow-y: scroll;
+    // max-height: 77vh;
+    margin-top: 22px;
+    padding: 20px 0;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.pScoreDiv {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.pScoreLeftinnerDiv {
+    padding: 20px;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    background: #fff;
+    backdrop-filter: blur(103px);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100px;
+}
+
+.pScoreLeftinnerDiv h3 {
+    color: #313131;
+    // font-family: Poppins;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.28px;
+    margin-bottom: 12px;
+    flex-grow: 1;
+    display: flex;
+    align-items: flex-start;
+}
+
+.leftPercentScore {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 3px;
+}
+
+.leftPercentScore p {
+    color: #009883;
+    // font-family: "SF Pro";
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 590;
+    line-height: normal;
+    margin: 0;
+}
+
+.userTitle {
+    color: #7f7e7e;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+    align-self: flex-end;
+}
+
+.graphMainDiv {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 52px;
+    border-radius: 12px;
+    background: #fff;
+    margin-top: 20px;
+    flex: 1;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #b5b5b5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #313131;
+        border-radius: 4px;
+    }
+}
+
+.graphUserTableDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    // padding: 26px;
+    padding-bottom: 26px;
+    border-radius: 12px;
+    // background: #fff;
+    // margin-top: 20px;
+    flex: 1;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #b5b5b5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #313131;
+        border-radius: 4px;
+    }
+}
+
+.enidTag {
+    color: #009883;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    // font-weight: 510;
+    line-height: normal;
+}
+
+.statusTag {
+    width: fit-content;
+    padding: 4px 8px;
+    border-radius: 64px;
+    background: #e6f6f4;
+    color: #009883;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.graphSectionMain {
+    width: 90%;
+}
+
+.tableFilterMainDiv {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.userFilter {
+    width: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+
+    p {
+        padding: 10px 14px;
+        border-radius: 64px;
+        border: 1px solid #b0e4dd;
+        background: #fff;
+        color: #007f6d;
+        // font-family: "SF Pro";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+
+        &:hover {
+            transition: all 0.3s ease-in-out;
+            background: #d9f2ef;
+        }
+
+        &.active {
+            background: #d9f2ef;
+        }
+
+        &.selected {
+            background: #d9f2ef;
+        }
+    }
+}
+
+.graphMonthsDiv {
+    display: flex;
+    width: 72px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 17px;
+    flex-shrink: 0;
+
+    p {
+        color: #00a991;
+        font-family: Inter;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+    }
+}
+
+.candMainDiv {
+    width: 100%;
+    // padding: 20px;
+    overflow-y: scroll;
+    border-radius: 10px;
+
+    // &::-webkit-scrollbar {
+    //     display: none;
+    // }
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #b5b5b5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #313131;
+        border-radius: 4px;
+    }
+}
+
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    row-gap: 52px;
+    width: 100%;
+}
+
+.cardContainer {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    // background: #fff;
+    // padding: 20px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 40px;
+    align-self: stretch;
+}
+
+.cardUpDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-self: stretch;
+    gap: 20px;
+}
+
+.rankAdImg {
+    max-width: 700px;
+    height: auto;
+    width: 100%;
+    // height: 160px;
+    // align-self: stretch;
+
+    img {
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+}
+
+.cardDetailsDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    align-self: stretch;
+}
+
+.cardTitle {
+    color: #0B0B0B;
+    // font-family: "SF Pro";
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.cardSubTitle {
+    color: #545454;
+    // font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+
+    span {
+        color: #676666;
+    }
+}
+
+.cardDesc {
+    color: #676666;
+    // font-family: "SF Pro";
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 32px;
+}
+
+.statusDiv {
+    padding: 4px 8px;
+    border-radius: 64px;
+    background-color: #e8f7f7;
+    color: #00a3b1;
+
+    &.deactivated {
+        background-color: rgba(255, 75, 78, 0.2);
+        color: #ff4b4e;
+    }
+}
+
+.deleteBtn {
+    width: fit-content;
+    display: flex;
+    padding: 14px 19px;
+    align-items: flex-start;
+    gap: 10px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: #FCFCFC;
+    color: #7F7E7E;
+    // font-family: "SF Pro";
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+
+    &:hover {
+        transition: all 0.3s ease-in-out;
+        border: 1px solid #1c4728;
+    }
+}
+
+@media only screen and (max-width: 1599px) {
+    .pScoreDiv {
+        gap: 16px;
+    }
+
+    .dashboardScroll {
+        max-height: 77vh;
+        margin-top: 14px;
+    }
+
+    .pSubRightDiv {
+        width: calc(100% - 340px);
+        padding: 30px 22px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 20px;
+        }
+    }
+}
+
+@media only screen and (max-width: 1366px) {
+    .pSubRightDiv {
+        width: calc(100% - 320px);
+        padding: 20px 22px;
+    }
+
+    .pHeadingDiv {
+        h3 {
+            font-size: 18px;
+        }
+    }
+
+    .graphMainDiv {
+        padding: 40px;
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    .graphDiv {
+        margin-top: 60px;
+        height: 280px;
+    }
+}
+
+@media only screen and (max-width: 1199px) {
+    .graphHeadingDiv {
+        padding: 12px 10px;
+    }
+}
+
+@media only screen and (max-width: 1111px) {}

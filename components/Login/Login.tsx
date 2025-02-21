@@ -2,6 +2,7 @@ import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
+import { useToast } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { Slide, toast, ToastContainer } from "react-toastify";
@@ -63,6 +64,7 @@ export const sendNotificationMessage = (message: string) => {
 
 const Login = () => {
   const router = useRouter();
+  const toast = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // const [socket, setSocket] = useState<Socket | null>(null);
@@ -237,86 +239,83 @@ const Login = () => {
     };
     setIsSubmitting(true);
     // socket?.emit("login", payload);
-    // try {
-    axios({
-      method: "post",
-      url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/auth/login`,
-      data: payload,
-    })
-      .then((res) => {
-        // console.log("login", res.data);
-        let userData: any = {
-          firstName: res.data.firstName,
-          lastName: res.data.lastName,
-          email: res.data.email,
-          performanceScore: res.data.performanceScore,
-          contributionScore: res.data.contributionScore,
-          _id: res.data._id,
-          userType: res.data.userType,
-          designation: res.data.designation,
-          departmentId: res.data.departmentId,
-          group: res.data.group,
-        };
-        const authToken =
-          res.headers["X-Auth-Token"] || res.headers["x-auth-token"];
-
-        localStorage.setItem("prsuserData", JSON.stringify(userData));
-        localStorage.removeItem("visiter-token");
-        // localStorage.setItem(
-        //   "auth-token",
-        //   res.headers["X-Auth-Token"] || res.headers["x-auth-token"]
-        // );
-        localStorage.setItem("auth-token", authToken);
-        setAuthHeader(
-          res.headers["X-Auth-Token"] || res.headers["x-auth-token"]
-        );
-        Cookies.set("isLoggedIn", true as any, { expires: 365 });
-        // connectSocket(res.data._id);
-        const socket = initializeSocket(res.data._id);
-        socket.on("notification", (message: any) => {
-          // Handle global notifications if needed
-          console.log("Received message:", message);
-        });
-        toast.success("Login Successful!", {
-          position: "top-right",
-          hideProgressBar: true,
-          theme: "colored",
-          transition: Slide,
-          draggable: true,
-        });
-        // notification();
-        // createEventSource();
-        setLogg(true);
-        // setTimeout(() => {
-        //   router.push("/");
-        // }, 1000);
-        // setIsSubmitting(false);
+    try {
+      axios({
+        method: "post",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin-auth/login`,
+        data: payload,
       })
-      .catch((error) => {
-        // console.log(error, "errrrrrorrr");
-        toast.error(error.response?.data?.message, {
-          position: "top-right",
-          hideProgressBar: true,
-          theme: "colored",
-          transition: Slide,
-          draggable: true,
+        .then((res) => {
+          console.log("login admin responseeeeeeeeeeeeee", res.data);
+          let userData: any = {
+            firstName: res.data.data.firstName,
+            lastName: res.data.data.lastName,
+            email: res.data.data.email,
+            _id: res.data.data._id,
+            userType: res.data.data.userType,
+            userRole: res.data.data.userRole,
+            departmentId: res.data.data.departmentId,
+            group: res.data.data.group,
+          };
+
+          localStorage.setItem("bitcorpenadminData", JSON.stringify(userData));
+          localStorage.removeItem("visiter-token");
+          localStorage.setItem(
+            "auth-token",
+            res.headers["X-Auth-Token"] || res.headers["x-auth-token"]
+          );
+          // localStorage.setItem("auth-token", authToken);
+          setAuthHeader(
+            res.headers["X-Auth-Token"] || res.headers["x-auth-token"]
+          );
+          Cookies.set("isLoggedIn", true as any, { expires: 365 });
+          // connectSocket(res.data._id);
+          // const socket = initializeSocket(res.data._id);
+          // socket.on("notification", (message: any) => {
+          //   // Handle global notifications if needed
+          //   console.log("Received message:", message);
+          // });
+          toast({
+            title: "Login Successfull",
+            description: "Admin login successfully.",
+            status: "success",
+            position: "top-right",
+            isClosable: true,
+          });
+          // notification();
+          // createEventSource();
+          setLogg(true);
+          setTimeout(() => {
+            router.push("/");
+          }, 1000);
+          // setIsSubmitting(false);
+        })
+        .catch((error) => {
+          // console.log(error, "errrrrrorrr");
+          toast({
+            title: "Admin Login Error",
+            description:
+              error.response?.data?.message || "Failed to login for admin.",
+            status: "error",
+            position: "top-right",
+            isClosable: true,
+          });
+          setIsSubmitting(false);
         });
-        setIsSubmitting(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred please try agains",
+        status: "error",
+        position: "top-right",
+        isClosable: true,
       });
-    // } catch (error) {
-    //   toast.error("An error occurred please try again.", {
-    //     position: "top-right",
-    //     hideProgressBar: true,
-    //     theme: "colored",
-    //     transition: Slide,
-    //     draggable: true,
-    // });
-    // } finally {
-    //   setIsSubmitting(true);
-    // }
+    } finally {
+      // setIsSubmitting(true);
+    }
   };
   const handleForgotPassword = (values: any) => {
-    setIsSubmitting(true);
+    // setIsSubmitting(true);
     axios({
       method: "post",
       url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/user/sendFrogetPassLink`,
@@ -325,29 +324,28 @@ const Login = () => {
       },
     })
       .then((res) => {
-        toast.success("Password reset link sent to your email!", {
+        toast({
+          title: "Forgot Password Link",
+          description: "Password reset link sent to your email!.",
+          status: "success",
           position: "top-right",
-          hideProgressBar: true,
-          theme: "colored",
-          transition: Slide,
-          draggable: true,
+          isClosable: true,
         });
-        setIsSubmitting(false);
-        setIsForgotPassword(false);
+        // setIsSubmitting(false);
+        // setIsForgotPassword(false);
       })
       .catch((error) => {
-        toast.error(
-          error.response?.data?.message || "Failed to send reset link",
-          {
-            position: "top-right",
-            hideProgressBar: true,
-            theme: "colored",
-            transition: Slide,
-            draggable: true,
-          }
-        );
-        setIsSubmitting(false);
-        setIsForgotPassword(false);
+        toast({
+          title: "Admin Login Error",
+          description:
+            error.response?.data?.message ||
+            "Failed to send Password reset link.",
+          status: "error",
+          position: "top-right",
+          isClosable: true,
+        });
+        // setIsSubmitting(false);
+        // setIsForgotPassword(false);
       });
   };
   // useEffect(() => {
