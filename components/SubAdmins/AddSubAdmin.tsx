@@ -7,6 +7,8 @@ import { selectedProjects } from "../redux/actions";
 import styles from "./addsubadmin.module.scss";
 import axios from "axios";
 import { useToast } from "@chakra-ui/react";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
 
 const addSubAdminValidationSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -19,8 +21,8 @@ const addSubAdminValidationSchema = Yup.object().shape({
     .email("Please enter a valid email")
     .required("Email is required"),
   phoneNumber: Yup.string()
-    .matches(/^[0-9]+$/, "Please enter valid phoneNumber number")
-    .min(10, "phoneNumber number must be at least 10 digits")
+    // .matches(/^[0-9]+$/, "Please enter valid phoneNumber number")
+    // .min(10, "phoneNumber number must be at least 10 digits")
     .required("phoneNumber number is required"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
@@ -28,9 +30,6 @@ const addSubAdminValidationSchema = Yup.object().shape({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Confirm password is required"),
-  // userRole: Yup.array()
-  //   .min(1, "At least one role must be selected")
-  //   .required("Role selection is required"),
   userRole: Yup.string().required("Role selection is required"),
 });
 
@@ -44,7 +43,8 @@ const AddSubAdmin = () => {
   console.log(selectedSubAdminDetail, "selectedSubAdminDetail");
 
   const userRole = [
-    "Users",
+    "User",
+    "Dashboard",
     "Credit logs",
     "Help & Support",
     "Affiliation",
@@ -55,8 +55,8 @@ const AddSubAdmin = () => {
     "Flag User",
     "Content Moderation",
     "News",
-    "Articles",
   ];
+
   const initialValue = useMemo(() => {
     if (selectedSubAdminDetail) {
       return {
@@ -81,17 +81,6 @@ const AddSubAdmin = () => {
       profileImage: null,
     };
   }, [selectedSubAdminDetail]);
-  // const handleImageUpload = (
-  //   event: React.ChangeEvent<HTMLInputElement>,
-  //   setFieldValue: (field: string, value: any) => void
-  // ) => {
-  //   const file = event.target.files?.[0];
-  //   if (file) {
-  //     const imageUrl = URL.createObjectURL(file);
-  //     setPreviewImage(imageUrl);
-  //     setFieldValue("profileImage", file);
-  //   }
-  // };
 
   const handleImageUpload = async (file: File) => {
     const tkn = localStorage.getItem("auth-token");
@@ -159,12 +148,9 @@ const AddSubAdmin = () => {
         isClosable: true,
       });
     } finally {
-      // setIsCompletingProfile(false);
     }
   };
-  // if (!selectedSubAdminDetail) {
-  //   return "";
-  // }
+
   return (
     <>
       <div className={styles.pSubRightDiv}>
@@ -184,7 +170,14 @@ const AddSubAdmin = () => {
               validationSchema={addSubAdminValidationSchema}
               onSubmit={handleSubmit}
             >
-              {({ isSubmitting, touched, errors, setFieldValue, values }) => (
+              {({
+                isSubmitting,
+                touched,
+                errors,
+                setFieldValue,
+                values,
+                setFieldTouched,
+              }) => (
                 <Form className={styles.addMemForm}>
                   <div className={styles.addMemberDiv}>
                     <div
@@ -226,7 +219,6 @@ const AddSubAdmin = () => {
                           }
                         }
                       }}
-                      // onChange={(e) => handleImageUpload(e, setFieldValue)}
                     />
                     <p>Sub Admin Profile Image</p>
                   </div>
@@ -306,7 +298,7 @@ const AddSubAdmin = () => {
                           <label htmlFor="phoneNumber" className={styles.text}>
                             phoneNumber
                           </label>
-                          <Field
+                          {/*<Field
                             type="text"
                             name="phoneNumber"
                             id="phoneNumber"
@@ -317,6 +309,27 @@ const AddSubAdmin = () => {
                                 : ""
                             }`}
                           />
+                          */}
+                          <PhoneInput
+                            defaultCountry="us"
+                            value={values.phoneNumber || ""}
+                            onChange={(value: string) => {
+                              if (
+                                !value ||
+                                value.trim() === "" ||
+                                value === "+"
+                              ) {
+                                setFieldValue("phoneNumber", "");
+                                setFieldTouched("phoneNumber", true);
+                              } else {
+                                setFieldValue("phoneNumber", value);
+                                setFieldTouched("phoneNumber", false);
+                              }
+                            }}
+                            className={styles.input}
+                            inputClassName={styles.phoneInnerInput}
+                          />
+
                           <ErrorMessage
                             name="phoneNumber"
                             component="div"

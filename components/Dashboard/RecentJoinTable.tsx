@@ -1,11 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Table } from "antd";
 import styles from "./dashboard.module.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { selectedProjects } from "../redux/actions";
+import axios from "axios";
 
 const RecentJoin = () => {
   const dispatch = useDispatch();
+
+  const getRecentJoinUser = async () => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/dashboard/recentSubscribedUser`,
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching manager notifications:", error);
+    }
+  };
+
   const columns = [
     {
       title: "ENID",
@@ -58,6 +75,11 @@ const RecentJoin = () => {
       joinedThrough: "Ad",
     },
   ];
+
+  useEffect(() => {
+    getRecentJoinUser();
+  }, []);
+
   return (
     <>
       <div className={styles.graphTableDiv}>

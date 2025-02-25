@@ -1,33 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
-import styles from "./dashboard.module.scss";
-import axios from "axios";
-import { IoIosArrowDown } from "react-icons/io";
+import { useEffect, useRef, useState } from "react";
 import {
-  AreaChart,
-  Area,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
 } from "recharts";
+import styles from "./dashboard.module.scss";
 // import DatePicker from "react-datepicker";
-import { Console } from "console";
 // import useCloseOnClickOutside from "../../../hooks/useCloseOnClickOutside";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 // import { selectedProjects } from "../../redux/actions";
 // import { addYears } from "date-fns";
-import { MdOutlineFileDownload } from "react-icons/md";
-import { FiDownload, FiCheck } from "react-icons/fi";
 import * as XLSX from "xlsx";
 import RecentJoin from "./RecentJoinTable";
 import RecentSubscribed from "./RecentSubscribedTable";
-import { ConfigProvider } from "antd";
 // import NotificationHandler from "../../NotificationInbox/NotificationInbox";
 
 const CustomTooltip = ({
