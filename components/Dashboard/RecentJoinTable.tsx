@@ -7,6 +7,7 @@ import axios from "axios";
 
 const RecentJoin = () => {
   const dispatch = useDispatch();
+  const [showRecUser, setShowRecUser] = React.useState(false);
 
   const getRecentJoinUser = async () => {
     let token = localStorage.getItem("auth-token");
@@ -18,6 +19,8 @@ const RecentJoin = () => {
           Authorization: `${token}`,
         },
       });
+      console.log("Recent Subscribed User:", response.data);
+      setShowRecUser(response.data);
     } catch (error) {
       console.error("Error fetching manager notifications:", error);
     }
