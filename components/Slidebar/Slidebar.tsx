@@ -259,7 +259,7 @@ const Slidebar = ({
                 </div>
               </>
             )}
-            {userDetail?.userRole === "SUB_ADMIN" && (
+            {userDetail?.userRole === "SUBADMIN" && (
               <>
                 <p className={styles.headingDiv}>Support</p>
                 <div

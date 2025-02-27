@@ -9,16 +9,14 @@ import {
   YAxis,
 } from "recharts";
 import styles from "./dashboard.module.scss";
-// import DatePicker from "react-datepicker";
-// import useCloseOnClickOutside from "../../../hooks/useCloseOnClickOutside";
+
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-// import { selectedProjects } from "../../redux/actions";
-// import { addYears } from "date-fns";
+
 import * as XLSX from "xlsx";
 import RecentJoin from "./RecentJoinTable";
 import RecentSubscribed from "./RecentSubscribedTable";
-// import NotificationHandler from "../../NotificationInbox/NotificationInbox";
+import axios from "axios";
 
 const CustomTooltip = ({
   active,
@@ -155,23 +153,12 @@ const CustomCursor = ({ points, payload }: any) => {
 const Dashboard = () => {
   const [userDetail, setUserDetail] = useState<any>("");
   const [isOpen, setIsOpen] = useState(false);
-  const toggleDropdown = () => setIsOpen(!isOpen);
-  const [selectedStatus, setSelectedStatus] = useState("");
-  const [selectedOption, setSelectedOption] = useState<any>("");
-  const [ceodepartments, setCeoDepartments] = useState<any>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [departmentdata, setDepartmentData] = useState<any>([]);
-  const [yearlygraph, setYearlyGraph] = useState([]);
-  const [graphData, setGraphData] = useState<any[]>([]);
-  const [thismonthrevenue, setThismonthrevenue] = useState("");
-  const [prevmonthrevenue, setPrevmonthrevenue] = useState("");
   const [loading, setLoading] = useState(true);
   const [showValue, setShowValue] = useState(false);
-  const [yearlyData, setYearlyData] = useState([]);
-  const [selectedview, setSelectedView] = useState("table");
+  const [showRecUser, setShowRecUser] = useState([]);
   const timerRef: any = useRef(null);
   const closeDropDown = useRef<HTMLDivElement>(null);
-  const [isDownloaded, setIsDownloaded] = useState(false);
   const data = [
     { month: "Mar", value: 0 },
     { month: "Apr", value: 5 },
@@ -185,17 +172,60 @@ const Dashboard = () => {
     { month: "Dec", value: 40 },
   ];
 
-  const togglePasswordVisibility = () => {
-    if (showValue) {
-      setShowValue(false);
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (typeof window !== "undefined") {
+        const userData = JSON.parse(
+          localStorage.getItem("bitcorpenadminData") || "{}"
+        );
+        setUserDetail(userData);
       }
-    } else {
-      setShowValue(true);
-      timerRef.current = setTimeout(() => {
-        setShowValue(false);
-      }, 10000);
+    };
+
+    fetchUserData();
+  }, []);
+
+  const getRecentJoinUser = async () => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/dashboard/recentSubscribedUser`,
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+      console.log("Recent Subscribed User:", response.data);
+      // setShowRecUser(response.data);
+      if (
+        response.data &&
+        response.data.success &&
+        response.data.data.recentJoined
+      ) {
+        const formattedData = response.data.data.recentJoined.map(
+          (user: any, index: number) => ({
+            key: user._id || index.toString(),
+            enid: user.ENID || "ENID{NUMBER}",
+            userName: user.userName || "",
+            name: `${user.firstName || "Test"} ${
+              user.lastName || "User"
+            }`.trim(),
+            plan: user.userType || "",
+            status: user.status || "",
+            joinedDate: new Date(user.createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+            joinedThrough: user.userIS || "",
+          })
+        );
+        setShowRecUser(formattedData);
+      }
+    } catch (error) {
+      console.error("Error fetching manager notifications:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -222,260 +252,9 @@ const Dashboard = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (typeof window !== "undefined") {
-        const userData = JSON.parse(
-          localStorage.getItem("bitcorpenadminData") || "{}"
-        );
-        setUserDetail(userData);
-      }
-    };
-
-    fetchUserData();
+    getRecentJoinUser();
   }, []);
-
-  const today = new Date();
-
-  const datePickerRef = useRef(null);
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const handleDateChange = (date: Date | null) => {
-    setSelectedDate(date);
-    setIsDatePickerOpen(false);
-  };
-
-  const formatDate = (date: Date) => {
-    const options: Intl.DateTimeFormatOptions = {
-      month: "short",
-      year: "numeric",
-    };
-    return date.toLocaleDateString("en-US", options);
-  };
-
-  const options = [
-    { value: "staticValue1", label: "Static Label 1" },
-    { value: "staticValue2", label: "Static Label 2" },
-    { value: "staticValue3", label: "Static Label 3" },
-  ];
-
-  const handleOptionClick = (option: any) => {
-    if (option.departmentName === "All") {
-      setSelectedOption("All");
-      setSelectedStatus("All");
-    } else {
-      setSelectedOption(option._id);
-      setSelectedStatus(option.departmentName);
-    }
-    setIsOpen(false);
-  };
-
-  // useEffect(() => {
-  //   const ceoDepartments = async () => {
-  //     try {
-  //       const res = await axios.get(
-  //         `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/department/getDepartment`
-  //       );
-  //       setCeoDepartments(res.data);
-  //     } catch (error) {
-  //       console.error("Error fetching managers:", error);
-  //     }
-  //   };
-
-  //   ceoDepartments();
-  // }, [userDetail]);
-
-  // useEffect(() => {
-  //   if (ceodepartments.length > 0) {
-  //     setSelectedOption(ceodepartments[0]._id);
-  //     setSelectedStatus(ceodepartments[0].departmentName);
-  //   }
-  // }, [ceodepartments]);
-
-  // useEffect(() => {
-  //   const getDepartmentData = async () => {
-  //     let tkn = localStorage.getItem("auth-token");
-  //     setLoading(true);
-
-  //     const selectedMonth = selectedDate
-  //       ? selectedDate.getMonth() + 1
-  //       : new Date().getMonth() + 1;
-  //     const selectedYear = selectedDate
-  //       ? selectedDate.getFullYear()
-  //       : new Date().getFullYear();
-  //     let data;
-
-  //     if (selectedOption === "All") {
-  //       data = {
-  //         month: selectedMonth,
-  //         year: selectedYear,
-  //       };
-  //     } else {
-  //       data = {
-  //         month: selectedMonth,
-  //         year: selectedYear,
-  //         departmentId: selectedOption,
-  //       };
-  //     }
-
-  //     if (selectedOption) {
-  //       try {
-  //         const res = await axios.post(
-  //           `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/sales/getTotalSales`,
-  //           data,
-  //           {
-  //             headers: {
-  //               Authorization: `Bearer ${tkn}`,
-  //             },
-  //           }
-  //         );
-  //         setDepartmentData(res.data);
-  //       } catch (error) {
-  //         console.error("Error fetching data:", error);
-  //         setLoading(false);
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     }
-  //   };
-  //   getDepartmentData();
-  // }, [selectedOption, selectedDate]);
-
-  // useEffect(() => {
-  //   const monthNames = [
-  //     "Jan",
-  //     "Feb",
-  //     "Mar",
-  //     "Apr",
-  //     "May",
-  //     "Jun",
-  //     "Jul",
-  //     "Aug",
-  //     "Sep",
-  //     "Oct",
-  //     "Nov",
-  //     "Dec",
-  //   ];
-
-  //   const emptyGraphData = monthNames.map((month) => ({
-  //     name: month,
-  //     thismonthrevenue: 0,
-  //     prevmonthrevenue: 0,
-  //     totalsales: 0,
-  //   }));
-
-  //   setGraphData(emptyGraphData);
-
-  //   const getYearlyGraph = async () => {
-  //     const tkn = localStorage.getItem("auth-token");
-  //     const selectedYear = selectedDate
-  //       ? selectedDate.getFullYear()
-  //       : new Date().getFullYear();
-
-  //     const data =
-  //       selectedOption === "All"
-  //         ? { year: selectedYear }
-  //         : { year: selectedYear, departmentId: selectedOption };
-
-  //     if (selectedOption) {
-  //       try {
-  //         const res = await axios.post(
-  //           `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/sales/getYearlySales`,
-  //           data,
-  //           {
-  //             headers: { Authorization: `Bearer ${tkn}` },
-  //           }
-  //         );
-
-  //         if (res.data && res.data.length > 0) {
-  //           const monthNames = [
-  //             "Jan",
-  //             "Feb",
-  //             "Mar",
-  //             "Apr",
-  //             "May",
-  //             "Jun",
-  //             "Jul",
-  //             "Aug",
-  //             "Sep",
-  //             "Oct",
-  //             "Nov",
-  //             "Dec",
-  //           ];
-
-  //           const initialGraphData = monthNames.map((month) => ({
-  //             name: month,
-  //             thisMonthRevenue: 0,
-  //             prevMonthRevenue: 0,
-  //             totalSales: 0,
-  //           }));
-
-  //           res.data.forEach((monthData: any) => {
-  //             const monthIndex = monthData.month - 1;
-  //             if (monthIndex >= 0 && monthIndex < 12) {
-  //               initialGraphData[monthIndex] = {
-  //                 name: monthNames[monthIndex],
-  //                 thisMonthRevenue: parseFloat(
-  //                   monthData.total_thisMonthRevenue
-  //                 ),
-  //                 prevMonthRevenue: parseFloat(monthData.total_preMonthRevenue),
-  //                 totalSales:
-  //                   parseFloat(monthData.total_thisMonthRevenue) +
-  //                   parseFloat(monthData.total_preMonthRevenue),
-  //               };
-  //             }
-  //           });
-
-  //           const processedData = initialGraphData.map((item) => ({
-  //             name: item.name,
-  //             totalsales: item.totalSales,
-  //             thismonthrevenue: item.thisMonthRevenue,
-  //             prevmonthrevenue: item.prevMonthRevenue,
-  //           }));
-
-  //           setGraphData(processedData);
-  //           setYearlyData(res.data);
-
-  //           const latestMonth = res.data.reduce((latest: any, current: any) =>
-  //             current.month > latest.month ? current : latest
-  //           );
-  //           setPrevmonthrevenue(latestMonth.total_preMonthRevenue);
-  //           setThismonthrevenue(latestMonth.total_thisMonthRevenue);
-  //         } else {
-  //           console.log("no data found");
-  //         }
-  //       } catch (error) {
-  //         console.error("Error fetching data:", error);
-  //       }
-  //     }
-  //   };
-
-  //   getYearlyGraph();
-  // }, [selectedOption, selectedDate]);
-
-  const handleDownload = () => {
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(
-      yearlyData.map((item: any) => ({
-        Month: item.month,
-        Target: item.total_target_amount,
-        "Remaining Targets": `${
-          (item?.total_target_amount ?? 0) - (item?.total_thisMonthRevenue ?? 0)
-        }`,
-        "Revenue Received": item.total_thisMonthRevenue || "0",
-        "Revenue Received (Remaining)": item.total_preMonthRevenue || "0",
-        "Sales (So Far)": item.total_Sales || "0",
-      }))
-    );
-
-    XLSX.utils.book_append_sheet(wb, ws, "Dashboard Data");
-
-    XLSX.writeFile(wb, "dashboard_data.xlsx");
-    setIsDownloaded(true);
-    setTimeout(() => {
-      setIsDownloaded(false);
-    }, 3000);
-  };
 
   return (
     <>

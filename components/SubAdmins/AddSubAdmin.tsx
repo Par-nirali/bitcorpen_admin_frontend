@@ -1,4 +1,4 @@
-import { Input, Radio } from "antd";
+import { Input, Radio, Checkbox } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,7 +30,9 @@ const addSubAdminValidationSchema = Yup.object().shape({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Confirm password is required"),
-  userRole: Yup.string().required("Role selection is required"),
+  userRole: Yup.array()
+    .min(1, "At least one role must be selected")
+    .required("Role selection is required"),
 });
 
 const AddSubAdmin = () => {
@@ -66,7 +68,7 @@ const AddSubAdmin = () => {
         phoneNumber: selectedSubAdminDetail?.phoneNumber || "",
         password: "",
         confirmPassword: "",
-        userRole: selectedSubAdminDetail?.userRole || "",
+        userRole: selectedSubAdminDetail?.userRole || [],
         profileImage: null,
       };
     }
@@ -77,7 +79,7 @@ const AddSubAdmin = () => {
       phoneNumber: "",
       password: "",
       confirmPassword: "",
-      userRole: "",
+      userRole: [],
       profileImage: null,
     };
   }, [selectedSubAdminDetail]);
@@ -107,13 +109,18 @@ const AddSubAdmin = () => {
   const handleSubmit = async (values: any) => {
     console.log("Form submitted with values:", values);
     let tkn = localStorage.getItem("auth-token");
+
+    const resources = values.userRole.map((role: string) =>
+      role.toLowerCase().replace(/\s/g, "")
+    );
+
     const payload = {
       firstName: values.firstName,
       lastName: values.lastName,
       email: values.email,
       phoneNumber: values.phoneNumber,
       password: values.password,
-      userRole: values.userRole.toLowerCase().replace(/\s/g, ""),
+      resource: resources,
       profileImage: values.profileImage,
     };
     try {
@@ -298,18 +305,7 @@ const AddSubAdmin = () => {
                           <label htmlFor="phoneNumber" className={styles.text}>
                             phoneNumber
                           </label>
-                          {/*<Field
-                            type="text"
-                            name="phoneNumber"
-                            id="phoneNumber"
-                            placeholder="Type partner type"
-                            className={`${styles.input} ${
-                              touched.phoneNumber && errors.phoneNumber
-                                ? styles.inputError
-                                : ""
-                            }`}
-                          />
-                          */}
+
                           <PhoneInput
                             defaultCountry="us"
                             value={values.phoneNumber || ""}
@@ -392,20 +388,8 @@ const AddSubAdmin = () => {
                       </div>
                       <div className={styles.roleSection}>
                         <h4 className={styles.detailHeading}>Sub Admin Role</h4>
-                        {/* <div className={styles.rolesGrid}>
-                          {userRole.map((role) => (
-                            <label key={role} className={styles.roleLabel}>
-                              <Field
-                                type="checkbox"
-                                name="userRole"
-                                value={role}
-                                className={styles.roleCheckbox}
-                              />
-                              {role}
-                            </label>
-                          ))}
-                        </div> */}
-                        <Radio.Group
+
+                        {/* <Radio.Group
                           name="userRole"
                           value={values.userRole}
                           onChange={(e) =>
@@ -422,7 +406,24 @@ const AddSubAdmin = () => {
                               <span>{role}</span>
                             </Radio>
                           ))}
-                        </Radio.Group>
+                        </Radio.Group> */}
+                        <Checkbox.Group
+                          value={values.userRole}
+                          onChange={(checkedValues) =>
+                            setFieldValue("userRole", checkedValues)
+                          }
+                          className={styles.rolesGrid}
+                        >
+                          {userRole.map((role) => (
+                            <Checkbox
+                              key={role}
+                              value={role}
+                              className={styles.roleRadio}
+                            >
+                              <span>{role}</span>
+                            </Checkbox>
+                          ))}
+                        </Checkbox.Group>
                         <ErrorMessage
                           name="userRole"
                           component="div"
