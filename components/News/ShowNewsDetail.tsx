@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./shownewsdetail.module.scss";
 import { IoIosArrowBack } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,16 +6,115 @@ import { selectedProjects } from "../redux/actions";
 import { Table } from "antd";
 import { createPortal } from "react-dom";
 import DeleteNewsPopup from "./DeleteNewsPopup";
+import { useRouter } from "next/router";
+import axios from "axios";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { useToast } from "@chakra-ui/react";
+import moment from "moment";
 // import UpdateUserPopup from "./UpdateUserPopup";
 // import SendMsgUser from "./SendMsgUser";
 
 const ShowNewsDetail = ({ setSelectedProject, warningpopup }: any) => {
+  const toast = useToast();
+  const router = useRouter();
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
   const selectedUserDetails = useSelector(
     (state: any) => state.selectedDetails
   );
+  const [newsDetailsdata, setNewsDetailsData] = useState<any>([]);
   console.log(selectedUserDetails, "selectedUserDetails");
+  const modules = {
+    toolbar: false,
+  };
+  const [loading, setLoading] = useState(true);
+  const { id } = router.query;
+
+  const getNewsDetails = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/news/getEnNews/${id}`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data.data, "responsearticledetailsssssssssssss");
+      setNewsDetailsData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (isoDate: string) => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const handleLike = async (post: any) => {
+    let tkn = localStorage.getItem("auth-token");
+
+    // setLikedPosts((prev) => ({
+    //   ...prev,
+    //   [post._id]: !prev[post._id],
+    // }));
+
+    const payload = {
+      commentId: newsDetailsdata.latestCommets?.[0]._id,
+    };
+
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/like/create`,
+        payload,
+        {
+          headers: {
+            Authorization: `${tkn}`,
+          },
+        }
+      );
+      // getAllPosts();
+    } catch (error) {
+      // setLikedPosts((prev) => ({
+      //   ...prev,
+      //   [post._id]: !prev[post._id],
+      // }));
+
+      toast({
+        title: "Error",
+        description: "Failed to like post",
+        status: "error",
+        position: "top-right",
+        isClosable: true,
+      });
+    }
+  };
+  const getTimeDifference = (createdAt: any) => {
+    const currentTime = moment();
+    const imageCreatedTime = moment(createdAt);
+    const diffInHours = currentTime.diff(imageCreatedTime, "hours");
+
+    if (diffInHours < 1) {
+      return "Just now";
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours !== 1 ? "s" : ""} ago`;
+    } else {
+      const diffInDays = currentTime.diff(imageCreatedTime, "days");
+      return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} ago`;
+    }
+  };
+  useEffect(() => {
+    if (id) {
+      getNewsDetails();
+    }
+  }, [id]);
 
   return (
     <>
@@ -24,7 +123,10 @@ const ShowNewsDetail = ({ setSelectedProject, warningpopup }: any) => {
           <button
             className={styles.backMainDiv}
             // onClick={() => setSelectedProject("sales projects")}
-            onClick={() => dispatch(selectedProjects("news"))}
+            onClick={() => {
+              dispatch(selectedProjects("news"));
+              router.push("/news");
+            }}
           >
             {/* <div className={styles.backArrow}> */}
             <img src="/icons/back.svg" alt="back" />
@@ -49,106 +151,123 @@ const ShowNewsDetail = ({ setSelectedProject, warningpopup }: any) => {
         <div className={styles.dashboardScroll}>
           <div className={styles.graphTableDivMain}>
             <div className={styles.newsHeadDiv}>
-              <h3 className={styles.newsTitle}>
-                Level Up Your Career with Expert Insights
-              </h3>
-              <p className={styles.newsSubTitle}>
-                Discover actionable strategies to unlock your true potential and
-                achieve professional growth in any industry.
-              </p>
+              <h3 className={styles.newsTitle}>{newsDetailsdata?.title}</h3>
+              <p className={styles.newsSubTitle}>{newsDetailsdata?.subTitle}</p>
               <span className={styles.newsPublishTime}>
-                Published on Dec 19, 2024 • 5 min read
+                Published on {formatDate(newsDetailsdata?.createdAt)} • 5 min
+                read
               </span>
             </div>
             <hr className={styles.hrLine} />
             <div className={styles.newsDetailDiv}>
-              <span className={styles.newsDescText}>
-                Advancing your career is not just about working hard; it&apos;s
-                about working smart. In today’s fast-paced professional world,
-                it’s critical to stay ahead by continuously developing your
-                skills and making informed decisions. This article outlines key
-                strategies to help you reach the next level in your career,
-                whether you&apos;re aiming for a promotion, transitioning roles,
-                or starting fresh
-              </span>
-              <div className={styles.newsPointsDiv}>
-                <div className={styles.newsPointDetailDiv}>
-                  <h5 className={styles.newsPointHeadText}>
-                    1. Set Clear Goals and Prioritize Them
-                  </h5>
-                  <span className={styles.newsDescText}>
-                    Clarity is the foundation of success. Begin by identifying
-                    your short-term and long-term career goals. Use tools like
-                    SMART goal-setting frameworks to ensure your objectives are
-                    Specific, Measurable, Achievable, Relevant, and Time-bound.
-                  </span>
-                  <p className={styles.newsExtraText}>
-                    Pro Tip : Break your goals into actionable steps and track
-                    your progress regularly.
-                  </p>
-                  <div className={styles.newsPointImgDiv}>
-                    <img src="/newspointimg.png" alt="newspoint" />
-                  </div>
-                </div>
+              <div className={styles.newsPointImgDiv}>
+                <img
+                  src={
+                    newsDetailsdata
+                      ? `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${newsDetailsdata?.mediaUrl}`
+                      : "/profile.svg"
+                  }
+                  alt="newspoint"
+                />
               </div>
-              <div className={styles.conclusionDiv}>
-                <h5 className={styles.newsPointHeadText}>Conclusion</h5>
-                <span className={styles.newsDescText}>
-                  Taking your career to the next level requires a combination of
-                  effort, planning, and the right mindset. By setting clear
-                  goals, learning continuously, and building a strong network,
-                  you’ll be well on your way to achieving your professional
-                  aspirations. Remember, the journey is just as important as the
-                  destination—so enjoy the process!
-                </span>
-              </div>
+              <ReactQuill
+                value={newsDetailsdata?.description}
+                readOnly={true}
+                modules={modules}
+                // theme="snow"
+              />
             </div>
             <hr className={styles.hrLine} />
-            <div className={styles.newsCommentDiv}>
-              <div className={styles.commnetUserProfImg}>
-                <img src="/icons/profile.svg" alt="commentuserprofile" />
-              </div>
-              <div className={styles.commentRightDiv}>
-                <div className={styles.commentRightUpDiv}>
-                  <div className={styles.commentUserDiv}>
-                    <p>Nathan B</p>
-                    <span>3d ago</span>
-                  </div>
-                  <div className={styles.commentTextDiv}>
-                    <p>
-                      Networking is a crucial part of professional growth. Here
-                      are five tips to help you expand your network effectively,
-                      Here are five tips to help you expand your network
-                    </p>
-                    <span>Show 2 replies</span>
-                  </div>
+            {newsDetailsdata?.latestCommets?.length > 0 && (
+              <div className={styles.newsCommentDiv}>
+                <div className={styles.commnetUserProfImg}>
+                  <img
+                    src={
+                      newsDetailsdata?.latestCommets?.[0]?.commentsBy
+                        ? `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${newsDetailsdata?.latestCommets?.[0]?.commentsBy?.profileImage}`
+                        : "/profile.svg"
+                    }
+                    // src={
+                    //   newsDetailsdata?.userId?.profileImage
+                    //     ? `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${newsDetailsdata?.userId?.profileImage?.url}`
+                    //     : "/profile.svg"
+                    // }
+                    alt="commentuserprofile"
+                  />
                 </div>
-                <div className={styles.commentActionsDiv}>
-                  <div className={styles.commentLeftDiv}>
-                    <div className={styles.ationTextDiv}>
-                      <img src="/icons/upvote.svg" alt="upvote" />
-                      <p>2 Upvotes</p>
+                <div className={styles.commentRightDiv}>
+                  <div className={styles.commentRightUpDiv}>
+                    <div className={styles.commentUserDiv}>
+                      <p>
+                        {" "}
+                        {
+                          newsDetailsdata?.latestCommets?.[0]?.commentsBy
+                            ?.firstName
+                        }{" "}
+                        {
+                          newsDetailsdata?.latestCommets?.[0]?.commentsBy
+                            ?.lastName
+                        }
+                        {/* {" "}
+                      {newsDetailsdata?.userId?.firstName}{" "}
+                      {newsDetailsdata?.userId?.lastName} */}
+                      </p>
+                      <span>
+                        {getTimeDifference(newsDetailsdata.createdAt)}
+                      </span>
                     </div>
-                    <div className={styles.ationTextDiv}>
+                    <div className={styles.commentTextDiv}>
+                      <p>{newsDetailsdata?.latestCommets?.[0]?.comment}</p>
+                      {newsDetailsdata?.latestCommets?.[0]?.replies?.length >
+                        0 && (
+                        <>
+                          <span>Show 2 replies</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className={styles.commentActionsDiv}>
+                    <div className={styles.commentLeftDiv}>
+                      <div className={styles.ationTextDiv}>
+                        <img
+                          src={
+                            newsDetailsdata?.isLiked
+                              ? "/icons/like.svg"
+                              : "/icons/heart.svg"
+                          }
+                          alt="like"
+                          onClick={handleLike}
+                        />
+                        <p>
+                          {newsDetailsdata?.latestCommets?.[0]?.likeCount || 0}{" "}
+                          Likes
+                        </p>
+                      </div>
+                      {/* <div className={styles.ationTextDiv}>
                       <img src="/icons/downvote.svg" alt="downvote" />
                       <p>1 Downvote</p>
                     </div>
                     <div className={styles.ationTextDiv}>
                       <img src="/icons/reply.svg" alt="reply" />
                       <p>Reply</p>
+                    </div> */}
                     </div>
+                    {/* <p className={styles.viewMoreText}>view more</p> */}
                   </div>
-                  <p className={styles.viewMoreText}>view more</p>
                 </div>
               </div>
-            </div>
-            <hr className={styles.hrLine} />
+            )}
+
+            {/* <hr className={styles.hrLine} /> */}
           </div>
         </div>
       </div>
       {showPopup &&
         createPortal(
-          <DeleteNewsPopup onClose={() => setShowPopup(false)} />,
+          <DeleteNewsPopup
+            onClose={() => setShowPopup(false)}
+            // refreshData={getAllNewsData}
+          />,
           document.getElementById("modals")!
         )}
     </>

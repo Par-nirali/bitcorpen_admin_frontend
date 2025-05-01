@@ -4,25 +4,43 @@ import styles1 from "./finalremovepopup.module.scss";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 interface RemoveSubAdminProps {
   onClose: () => void;
+  refreshData: () => void;
 }
-const RemoveSubAdminPopup: React.FC<RemoveSubAdminProps> = ({ onClose }) => {
-  //   const isDeactivating = currentStatus === "Active";
-  //   const actionText = isDeactivating ? "Deactivate" : "Activate";
+const RemoveSubAdminPopup: React.FC<RemoveSubAdminProps> = ({
+  onClose,
+  refreshData,
+}) => {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const selectedSubAdminDetail = useSelector(
     (state: any) => state.selectedDetails
   );
 
-  const handleSubmit = () => {
-    setShowSuccessPopup(true);
+  const handleSubmit = async () => {
+    let tkn = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "delete",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/subAdmin/delete/${selectedSubAdminDetail._id}`,
+        // data: {
+        //   enAssistId: selectedReqDetail._id,
+        // },
+        headers: {
+          Authorization: `${tkn}`,
+        },
+      });
+      console.log("API Response:", response.data);
+      setShowSuccessPopup(true);
+      refreshData();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   if (showSuccessPopup) {
-    // const statusText = isDeactivating ? "Deactivated" : "Activated";
-
     return (
       <div className={styles1.modifyMainDiv}>
         <div className={styles1.modifyContainer}>

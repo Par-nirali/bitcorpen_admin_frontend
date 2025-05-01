@@ -1,18 +1,53 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./dashboard.module.scss";
-import { Table } from "antd";
+import { Spin, Table } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { selectedProjects } from "../redux/actions";
 
 const RecentSubscribed = () => {
   const dispatch = useDispatch();
+  const selectRecSubscribedUserData = useSelector(
+    (state: any) => state.selectedRecSubscribedUserDetails
+  );
+  console.log(selectRecSubscribedUserData, "selectRecSubscribedUserData");
+  const [showRecSubscribedUser, setShowRecSubscribedUser] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const getRecentSubscribedUser = async () => {
+    // setLoading(false);
+    if (selectRecSubscribedUserData && selectRecSubscribedUserData.data) {
+      const formattedData = selectRecSubscribedUserData.data.map(
+        (user: any, index: number) => ({
+          key: user._id || index.toString(),
+          enid: user.ENID || "ENID{NUMBER}",
+          userName: user.userName || "-",
+          name: `${user.firstName || "Test"} ${user.lastName || "User"}`.trim(),
+          plan: user.userType || "-",
+          status: user.status || "-",
+          joinedDate: new Date(user.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+          planexpires: new Date(user.expireTime).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+          // joinedThrough: user.userIS || "-",
+        })
+      );
+      setShowRecSubscribedUser(formattedData);
+      setLoading(false);
+    }
+  };
 
   const columns = [
     {
       title: "ENID",
       dataIndex: "enid",
       key: "enid",
-      render: () => <p className={styles.enidTag}>ENID5666959</p>,
+      render: (text: any) => <p className={styles.enidTag}>{text}</p>,
     },
     {
       title: "User Name",
@@ -33,7 +68,11 @@ const RecentSubscribed = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: () => <p className={styles.statusTag}>Active</p>,
+      render: (text: any) => (
+        <p className={styles.statusTag}>
+          {text === "active" ? "Active" : text}
+        </p>
+      ),
     },
     {
       title: "Joined date",
@@ -42,8 +81,16 @@ const RecentSubscribed = () => {
     },
     {
       title: "Plan Expires",
-      dataIndex: "planExpires",
-      key: "planExpires",
+      dataIndex: "planexpires",
+      key: "planexpires",
+      // render: (text: any) =>
+      //   text === "ORGANIC"
+      //     ? "Organic"
+      //     : text === "AD"
+      //     ? "Ad"
+      //     : text === "AFFILIATES"
+      //     ? "Affiliates"
+      //     : text,
     },
   ];
 
@@ -60,6 +107,12 @@ const RecentSubscribed = () => {
     },
   ];
 
+  useEffect(() => {
+    if (selectRecSubscribedUserData) {
+      getRecentSubscribedUser();
+    }
+  }, [selectRecSubscribedUserData]);
+
   return (
     <>
       <div className={styles.graphTableDiv}>
@@ -74,13 +127,18 @@ const RecentSubscribed = () => {
         </div>
 
         <div className={styles.graphDivtable}>
+          {/* {loading ? (
+            <Spin size="large" />
+          ) : ( */}
           <Table
             bordered={true}
             columns={columns}
-            dataSource={data}
+            dataSource={showRecSubscribedUser}
             pagination={false}
             className={styles.recentJoinTable}
+            loading={showRecSubscribedUser.length === 0}
           />
+          {/* )} */}
         </div>
       </div>
     </>

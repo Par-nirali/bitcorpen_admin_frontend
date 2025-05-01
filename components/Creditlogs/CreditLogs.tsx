@@ -1,75 +1,96 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./creditlogs.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { selectedProjects } from "../redux/actions";
 import { createPortal } from "react-dom";
+import axios from "axios";
+import Pagination from "../Pagination/Pagination";
 
 const CreditLogs = () => {
   const dispatch = useDispatch();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [activeFilter, setActiveFilter] = useState("All");
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [creditLogsDashboard, setCreditLogsDashboard] = useState<any>("");
+  const [creditLogData, setCreditLogData] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
-  const data = [
-    {
-      key: "1",
-      enid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      plan: "Recruiter",
-      price: 349.9,
-      status: "Completed",
-      gateway: "Paypal",
-      invoice: "Invoice-001",
-      joinedDate: "Jan,07 2025",
-      expireDate: "Jan,07 2026",
-    },
-    {
-      key: "2",
-      enid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      plan: "Recruiter",
-      price: 349.9,
-      status: "Pending",
-      gateway: "Paypal",
-      invoice: "Invoice-002",
-      joinedDate: "Jan,07 2025",
-      expireDate: "Jan,07 2026",
-    },
-    {
-      key: "3",
-      enid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      plan: "Recruiter",
-      price: 349.9,
-      status: "Completed",
-      gateway: "Paypal",
-      invoice: "Invoice-003",
-      joinedDate: "Jan,07 2025",
-      expireDate: "Jan,07 2026",
-    },
-    {
-      key: "4",
-      enid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      plan: "Recruiter",
-      price: 349.9,
-      status: "Failed",
-      gateway: "Paypal",
-      invoice: "Invoice-004",
-      joinedDate: "Jan,07 2025",
-      expireDate: "Jan,07 2026",
-    },
-  ];
+  const handleFilterSelect = (filter: string) => {
+    setSelectedFilter(filter);
+    setCurrentPage(1);
+  };
 
-  const filteredData = useMemo(() => {
-    if (activeFilter === "All") return data;
-    return data.filter((item) => item.status === activeFilter);
-  }, [activeFilter]);
+  const getCreditLogsDashboard = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/subscription/AllCredits`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response, "response");
+      setCreditLogsDashboard(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCreditLogsAll = async () => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/subscription/AllUser?filter=${selectedFilter}`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data.data);
+      if (response.data && response.data.data) {
+        const formattedData = response.data.data.map(
+          (credits: any, index: number) => ({
+            key: credits._id || index.toString(),
+            enid: credits.userId?.ENID || "ENID{NUMBER}",
+            userName: credits.userId?.userName || "-",
+            name: `${credits.userId?.firstName || "Test"} ${
+              credits.userId?.lastName || "User"
+            }`.trim(),
+            plan: credits.subscriptionType || "-",
+            price: credits.price || "-",
+            status: credits.status || "-",
+            invoice: credits.invoice || "-",
+            joinedDate: new Date(credits.createdAt).toLocaleDateString(
+              "en-US",
+              {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              }
+            ),
+            expireDate: credits?.expiredTime
+              ? new Date(credits?.expiredTime).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : "-",
+            originalData: credits,
+          })
+        );
+        setCreditLogData(formattedData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = [
     {
@@ -103,21 +124,22 @@ const CreditLogs = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      // width: 100,
       render: (status: string) => (
         <span
           style={{
             padding: "4px 8px",
             borderRadius: "64px",
             backgroundColor:
-              status === "Completed"
+              status === "active"
                 ? "#E8F7F7"
-                : status === "Pending"
+                : status === "incomplete"
                 ? "#ffe10033"
                 : "#FFE9E9",
             color:
-              status === "Completed"
+              status === "active"
                 ? "#00A3B1"
-                : status === "Pending"
+                : status === "incomplete"
                 ? "#968612"
                 : "#FF4D4F",
           }}
@@ -135,23 +157,48 @@ const CreditLogs = () => {
       title: "Invoice",
       dataIndex: "invoice",
       key: "invoice",
+      width: 380,
       render: (text: string) => (
-        <span style={{ color: "#00A3B1", textDecoration: "underline" }}>
+        <a
+          style={{
+            color: "#00A3B1",
+            textDecoration: "underline",
+            wordBreak: "break-all",
+          }}
+          href={text}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {text}
-        </span>
+        </a>
       ),
     },
     {
       title: "Joined date",
       dataIndex: "joinedDate",
       key: "joinedDate",
+      // width: 120,
     },
     {
       title: "Expire date",
       dataIndex: "expireDate",
       key: "expireDate",
+      // width: 120,
     },
   ];
+
+  useEffect(() => {
+    getCreditLogsDashboard();
+  }, []);
+
+  useEffect(() => {
+    getCreditLogsAll();
+  }, [selectedFilter]);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return creditLogData.slice(startIndex, startIndex + itemsPerPage);
+  }, [creditLogData, currentPage, itemsPerPage]);
 
   return (
     <>
@@ -166,14 +213,14 @@ const CreditLogs = () => {
               <h3>Total sales</h3>
 
               <div className={styles.leftPercentScore}>
-                <p>$000</p>
+                <p>${creditLogsDashboard?.totalSale?.toFixed(2)}</p>
               </div>
             </div>
 
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Total Subscribers</h3>
               <div className={styles.leftPercentScore}>
-                <p>7888</p>
+                <p>{creditLogsDashboard?.totalUser}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -181,7 +228,7 @@ const CreditLogs = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Active Subscribers</h3>
               <div className={styles.leftPercentScore}>
-                <p>756</p>
+                <p>{creditLogsDashboard?.totalActiveSubscriber}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -189,29 +236,45 @@ const CreditLogs = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Deactivated Subscribers</h3>
               <div className={styles.leftPercentScore}>
-                <p style={{ color: "#FF4B4E" }}>754684</p>
+                <p style={{ color: "#FF4B4E" }}>
+                  {creditLogsDashboard?.totalDeactiveSubscriber}
+                </p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
           </div>
           <div className={styles.tableFilterMainDiv}>
             <div className={styles.userFilter}>
-              {["All", "Completed", "Pending", "Failed"].map((filter) => (
-                <p
-                  key={filter}
-                  onClick={() => setActiveFilter(filter)}
-                  // style={{
-                  //   cursor: "pointer",
-                  //   fontWeight: activeFilter === filter ? "bold" : "normal",
-                  //   color: activeFilter === filter ? "#00A3B1" : "inherit",
-                  // }}
-                  className={`${styles.userFilterP} ${
-                    activeFilter === filter ? styles.activeFilter : ""
-                  }`}
-                >
-                  {filter}
-                </p>
-              ))}
+              <p
+                className={selectedFilter === "All" ? styles.activeFilter : ""}
+                onClick={() => handleFilterSelect("All")}
+              >
+                All
+              </p>
+              <p
+                className={
+                  selectedFilter === "Active" ? styles.activeFilter : ""
+                }
+                onClick={() => handleFilterSelect("Active")}
+              >
+                Active
+              </p>
+              <p
+                className={
+                  selectedFilter === "Pending" ? styles.activeFilter : ""
+                }
+                onClick={() => handleFilterSelect("Pending")}
+              >
+                Pending
+              </p>
+              <p
+                className={
+                  selectedFilter === "Failed" ? styles.activeFilter : ""
+                }
+                onClick={() => handleFilterSelect("Failed")}
+              >
+                Failed
+              </p>
             </div>
           </div>
           <div className={styles.graphUserTableDiv}>
@@ -219,12 +282,21 @@ const CreditLogs = () => {
               <Table
                 bordered={true}
                 columns={columns}
-                dataSource={filteredData}
+                dataSource={paginatedData}
+                // dataSource={creditLogData}
+                loading={loading}
                 pagination={false}
                 className={styles.recentJoinTable}
               />
             </div>
           </div>
+          <Pagination
+            totalItems={creditLogData.length}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
         </div>
       </div>
     </>

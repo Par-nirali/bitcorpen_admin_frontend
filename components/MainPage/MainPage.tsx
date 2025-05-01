@@ -1,43 +1,42 @@
-import React, { useState, useEffect } from "react";
-import styles from "./mainpage.module.scss";
-import axios from "axios";
-import Slidebar from "../Slidebar/Slidebar";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectedProjects } from "../redux/actions";
-import Dashboard from "../Dashboard/Dashboard";
-import Users from "../Users/Users";
-import CreditLogs from "../Creditlogs/CreditLogs";
-import Subscribers from "../Subscribers/Subscribers";
-import SupportAdmin from "../SupportAdmin/SupportAdmin";
-import Affiliation from "../Affiliation/Affiliation";
-import EnAssist from "../EnAssist/EnAssist";
-import RecentAllJoin from "../Dashboard/RecentAllJoin/RecentAllJoin";
-import RecentAllSubscribed from "../Dashboard/RecentAllSubscribed/RecentAllSubscribed";
-import { ConfigProvider } from "antd";
-import ShowUserDetail from "../Users/ShowUserDetail";
-import IssueHelpedDetail from "../SupportAdmin/IssueHelpedDetail";
-import AffiliationUserDetail from "../Affiliation/AffiliationUserDetail";
-import Team from "../Teams/Team";
-import AddMember from "../Teams/AddMember";
-import Partners from "../PartnersCollabration/Partners";
-import AddPartners from "../PartnersCollabration/AddPartners";
 import AdControls from "../AdControls/AdControls";
 import AddAdControls from "../AdControls/AddAdControls";
-import LeaderBoard from "../LeaderBoard/LeaderBoard";
-import NotificationSetting from "../NotiifcationSetting/NotificationSetting";
-import SubAdmins from "../SubAdmins/SubAdmins";
-import AddSubAdmin from "../SubAdmins/AddSubAdmin";
-import FlagUser from "../FlagUsers/FlagUser";
+import AdminEditProfile from "../AdminEditProfile/AdminEditProfile";
+import Affiliation from "../Affiliation/Affiliation";
+import AffiliationUserDetail from "../Affiliation/AffiliationUserDetail";
+import Articles from "../Articles/Articles";
+import ShowArticleDetail from "../Articles/ShowArticleDetail";
 import ContentModeration from "../ContentModeration/ContentModeration";
 import UserContentPost from "../ContentModeration/UserContentPosts";
+import CreditLogs from "../Creditlogs/CreditLogs";
+import Dashboard from "../Dashboard/Dashboard";
+import RecentAllJoin from "../Dashboard/RecentAllJoin/RecentAllJoin";
+import RecentAllSubscribed from "../Dashboard/RecentAllSubscribed/RecentAllSubscribed";
+import EditSubAdminProfile from "../EditSubAdminProfile/EditSubAdminProfile";
+import EnAssist from "../EnAssist/EnAssist";
+import FlagUser from "../FlagUsers/FlagUser";
+import HeaderNotifHelpDetail from "../HeaderNotification/headerNotifHelpDetail";
+import HeaderNotification from "../HeaderNotification/HeaderNotification";
+import IssueHelpedDetail from "../HelpAndSupportAdmin/IssueHelpedDetail";
+import SupportAdmin from "../HelpAndSupportAdmin/SupportAdmin";
+import LeaderBoard from "../LeaderBoard/LeaderBoard";
 import News from "../News/News";
-import Articles from "../Articles/Articles";
 import ShowNewsDetail from "../News/ShowNewsDetail";
 import WriteNews from "../News/WriteNews";
-import ShowArticleDetail from "../Articles/ShowArticleDetail";
-import AdminEditProfile from "../AdminEditProfile/AdminEditProfile";
-import HeaderNotification from "../HeaderNotification/HeaderNotification";
-import EditSubAdminProfile from "../EditSubAdminProfile/EditSubAdminProfile";
+import NotificationSetting from "../NotiifcationSetting/NotificationSetting";
+import AddPartners from "../PartnersCollabration/AddPartners";
+import Partners from "../PartnersCollabration/Partners";
+import { selectedProjects } from "../redux/actions";
+import Slidebar from "../Slidebar/Slidebar";
+import AddSubAdmin from "../SubAdmins/AddSubAdmin";
+import SubAdmins from "../SubAdmins/SubAdmins";
+import Subscribers from "../Subscribers/Subscribers";
+import AddMember from "../Teams/AddMember";
+import Team from "../Teams/Team";
+import ShowUserDetail from "../Users/ShowUserDetail";
+import Users from "../Users/Users";
+import styles from "./mainpage.module.scss";
 
 const Performance = () => {
   const [userDetail, setUserDetail] = useState<any>("");
@@ -57,7 +56,7 @@ const Performance = () => {
         setUserDetail(userData);
       }
     };
-
+    setShowPopup(false);
     fetchUserData();
   }, []);
 
@@ -65,7 +64,7 @@ const Performance = () => {
     if (userDetail?.userRole === "ADMIN") {
       setSelectedProject("dashboard");
       dispatch(selectedProjects("dashboard"));
-    } else if (userDetail?.userRole === "SUB_ADMIN") {
+    } else if (userDetail?.userRole === "SUBADMIN") {
       setSelectedProject("help_support_admin");
       dispatch(selectedProjects("help_support_admin"));
     } else {
@@ -87,6 +86,7 @@ const Performance = () => {
               submanagername={submanagername}
               setSubManagerName={setSubManagerName}
             />
+
             {selectedproject === "dashboard" ? (
               <Dashboard />
             ) : selectedproject === "users" ? (
@@ -151,52 +151,16 @@ const Performance = () => {
               <AdminEditProfile />
             ) : selectedproject === "header_notification" ? (
               <HeaderNotification />
+            ) : selectedproject === "headernotifhelpdetail" ? (
+              <HeaderNotifHelpDetail />
             ) : selectedproject === "editsubadminsprofile" ? (
               <EditSubAdminProfile />
             ) : null}
           </div>
         </div>
-
-        {/* {showpopup && (
-          <Reviewpopup
-            setShowPopup={setShowPopup}
-            projectid={projectid}
-            setProjectId={setProjectId}
-            projectAmount={projectAmount}
-            showStartDate={showStartDate}
-            showProjectType={showProjectType}
-            setLoader={setLoader}
-            loader={loader}
-          />
-        )}
-
-        {errorpopup && (
-          <Errorpopup errorpopup={errorpopup} setErrorPopup={setErrorPopup} />
-        )} */}
       </div>
     </>
   );
 };
 
 export default Performance;
-// import React from "react";
-// import styles from "./mainpage.module.scss";
-// import Slidebar from "../Slidebar/Slidebar";
-
-// const Performance = () => {
-//   return (
-//     <>
-//       <>
-//         <div className={styles.pMainDiv}>
-//           <div className={styles.pContainer}>
-//             <div className={styles.pSubDiv}>
-//               <Slidebar />
-//             </div>
-//           </div>
-//         </div>
-//       </>
-//     </>
-//   );
-// };
-
-// export default Performance;

@@ -1,20 +1,130 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./showuserdetail.module.scss";
 import { IoIosArrowBack } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { selectedProjects } from "../redux/actions";
+import { selectedDetails, selectedProjects } from "../redux/actions";
 import { Table } from "antd";
 import { createPortal } from "react-dom";
 import UpdateUserPopup from "./UpdateUserPopup";
 import SendMsgUser from "./SendMsgUser";
+import axios from "axios";
+import { useToast } from "@chakra-ui/react";
 
 const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
+  const toast = useToast();
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
+  const [showPopupUpdate, setShowPopupUpdate] = useState(false);
   const selectedUserDetails = useSelector(
     (state: any) => state.selectedDetails
   );
+  const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState<any>("");
+  const [userTableData, setUserTableData] = useState<any>([]);
+  const [invoiceTableData, setInvoiceTableData] = useState<any>([]);
+
   console.log(selectedUserDetails, "selectedUserDetails");
+
+  const getUserByIdData = async () => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/user/get-user/${selectedUserDetails._id}`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data, "response.data.data----by useriddddddddddd");
+
+      setUserInfo(response.data.data);
+      const selectAllUserData = [response.data.data];
+      if (selectAllUserData && selectAllUserData) {
+        const formattedData = selectAllUserData.map(
+          (user: any, index: number) => ({
+            _id: user._id || index.toString(),
+            enid: user.ENID || "ENID{NUMBER}",
+            profile: user?.profileImage
+              ? `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${user?.profileImage?.url}`
+              : "/profile.png",
+            email: user.email || "-",
+            userName: user.userName || "-",
+            name: `${user.firstName || "Test"} ${
+              user.lastName || "User"
+            }`.trim(),
+            phone: user.phoneNumber || "-",
+            plan: user.userType || "-",
+            status: user.status || "-",
+            joinedDate: new Date(user.createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+            subscription: user.userType || "-",
+          })
+        );
+        setUserTableData(formattedData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getInvoiceDetails = async () => {
+    let tkn = localStorage.getItem("auth-token");
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/subscription/subscriptionDetails?userId=${selectedUserDetails._id}`,
+        {
+          headers: {
+            Authorization: `${tkn}`,
+          },
+        }
+      );
+      console.log("invoice data:", response.data.data);
+      const selectInvoicesData = response.data.data;
+      if (selectInvoicesData && selectInvoicesData) {
+        const formattedData = selectInvoicesData.map(
+          (invoice: any, index: number) => ({
+            _id: invoice._id || index.toString(),
+            plan: invoice.subscriptionType || "-",
+            price: invoice.price || "-",
+            billingdate: new Date(invoice.updatedAt).toLocaleDateString(
+              "en-US",
+              {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              }
+            ),
+            expiredate: new Date(invoice.expiredTime).toLocaleDateString(
+              "en-US",
+              {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              }
+            ),
+            status: invoice.status || "-",
+            invoicedownload: invoice.invoice || "-",
+            originalData: invoice,
+          })
+        );
+        setInvoiceTableData(formattedData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch profile data",
+        status: "error",
+        position: "top-right",
+        isClosable: true,
+      });
+    }
+  };
 
   const usercolumns = [
     {
@@ -27,9 +137,9 @@ const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
       title: "Profile",
       dataIndex: "profile",
       key: "profile",
-      render: () => (
+      render: (profile: any) => (
         <img
-          src="/profile.png"
+          src={profile}
           alt="Profile"
           style={{ width: "84px", height: "84px" }}
         />
@@ -64,11 +174,11 @@ const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
           style={{
             padding: "4px 8px",
             borderRadius: "64px",
-            backgroundColor: status === "Active" ? "#E8F7F7" : "#FFE9E9",
-            color: status === "Active" ? "#00A3B1" : "#FF4D4F",
+            backgroundColor: status === "active" ? "#E8F7F7" : "#FFE9E9",
+            color: status === "active" ? "#00A3B1" : "#FF4D4F",
           }}
         >
-          {status}
+          {status === "active" ? "Active" : "Inactivated"}
         </span>
       ),
     },
@@ -86,9 +196,15 @@ const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
       title: "Operate",
       dataIndex: "operate",
       key: "operate",
-      render: () => (
+      render: (_: any, record: any) => (
         <div style={{ display: "flex", gap: "8px" }}>
-          <a onClick={() => setShowPopup(true)}>
+          <a
+            onClick={() => {
+              dispatch(selectedDetails(record));
+              // setIsMultipleEdit(false);
+              setShowPopupUpdate(true);
+            }}
+          >
             <img src="/icons/edit.svg" alt="edit" />
           </a>
           {/* <a onClick={() => dispatch(selectedProjects("userdetails"))}>
@@ -98,6 +214,7 @@ const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
       ),
     },
   ];
+
   const invoicecolumns = [
     {
       title: "Plan",
@@ -129,44 +246,33 @@ const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
           style={{
             padding: "4px 8px",
             borderRadius: "64px",
-            backgroundColor: status === "Active" ? "#E8F7F7" : "#FFE9E9",
-            color: status === "Active" ? "#00A3B1" : "#FF4D4F",
+            backgroundColor: status === "active" ? "#E8F7F7" : "#FFE9E9",
+            color: status === "active" ? "#00A3B1" : "#FF4D4F",
           }}
         >
-          {status}
+          {status === "active" ? "Active" : "Deactivated"}
         </span>
       ),
     },
     {
       title: "Invoice",
-      dataIndex: "invoice",
-      key: "invoice",
-      render: () => (
-        <div style={{ display: "flex", gap: "8px" }}>
-          <a style={{ display: "flex", gap: "8px" }}>
+      dataIndex: "invoicedownload",
+      key: "invoicedownload",
+      render: (_: any, record: any) => (
+        <div>
+          <a
+            style={{ display: "flex", gap: "8px", textDecoration: "none" }}
+            href={record?.invoicedownload}
+            download
+          >
             <img src="/icons/edit.svg" alt="edit" />
-            <p>Download</p>
+            <p style={{ textDecoration: "none" }}>Download</p>
           </a>
-          {/* <a onClick={() => dispatch(selectedProjects("userdetails"))}>
-            <img src="/icons/eye.svg" alt="eye" />
-          </a> */}
         </div>
       ),
     },
   ];
-  const userdata = [
-    {
-      key: "1",
-      enid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      status: "Active",
-      joinedDate: "Jan, 07, 2025",
-      subscription: "Influencer",
-    },
-  ];
+
   const invoicedata = [
     {
       key: "1",
@@ -177,6 +283,11 @@ const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
       status: "Active",
     },
   ];
+
+  useEffect(() => {
+    getUserByIdData();
+    getInvoiceDetails();
+  }, []);
 
   return (
     <>
@@ -213,7 +324,9 @@ const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
                 bordered={true}
                 // border={"1px solid #000"}
                 columns={usercolumns}
-                dataSource={userdata}
+                // dataSource={userdata}
+                dataSource={userTableData}
+                loading={loading}
                 pagination={false}
                 className={styles.recentJoinTable}
               />
@@ -224,61 +337,60 @@ const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
                 <div className={styles.badgeDiv}>
                   <div className={styles.pointsDiv}>
                     <span>Badge</span>
-                    <p>Member</p>
+                    <p>{userInfo?.memberProfile?.badgeLevel?.title || "-"}</p>
                   </div>
-                  <div className={styles.downloadDiv}>
+                  {/* <div className={styles.downloadDiv}>
                     <img src="/icons/download.svg" alt="download" />
                     <p>Download</p>
-                  </div>
+                  </div> */}
                 </div>
                 <div className={styles.pointsDiv}>
                   <span>Next Rank to Reach</span>
                   <p className={styles.numberPoints}>
-                    500<span> Points</span>
+                    {userInfo?.memberProfile?.points?.nextRankRequirement || 0}
+                    <span> Points</span>
                   </p>
                 </div>
                 <div className={styles.pointsDiv}>
                   <span>Current ENR Points</span>
                   <p className={styles.numberPoints}>
-                    500<span> Points</span>
+                    {userInfo?.memberProfile?.points?.enrPoints || 0}
+                    <span> Points</span>
                   </p>
                 </div>
                 <div className={styles.pointsDiv}>
                   <span>Paid Affiliates</span>
-                  <p className={styles.numberPoints}>4568</p>
+                  <p className={styles.numberPoints}>
+                    {userInfo?.memberProfile?.affiliates?.paid || 0}
+                  </p>
                 </div>
                 <div className={styles.pointsDiv}>
                   <span>Unpaid Affilates</span>
-                  <p className={styles.numberPoints}>5233</p>
+                  <p className={styles.numberPoints}>
+                    {userInfo?.memberProfile?.affiliates?.unpaid || 0}
+                  </p>
                 </div>
               </div>
               <div className={styles.pointsDiv}>
                 <span>Bio</span>
-                <p>
-                  Accomplished business strategist and entrepreneur known for
-                  his innovative approach to sustainable development and
-                  environmental stewardship. With over two decades of
-                  experience, Pit has built a reputation for combining
-                  profitability with social responsibility, paving the way for a
-                  new era of conscious business practices.
-                </p>
+                <p>{userInfo?.bio || "-"}</p>
               </div>
               <div className={styles.userDetailsDiv}>
                 <div className={styles.pointsDiv}>
                   <span>Country</span>
-                  <p>USA</p>
+                  <p>{userInfo?.country || "-"}</p>
                 </div>
                 <div className={styles.pointsDiv}>
                   <span>City</span>
-                  <p>Springfield</p>
+                  <p>{userInfo?.city || "-"}</p>
                 </div>
                 <div className={styles.pointsDiv}>
                   <span>Address Line 1</span>
-                  <p>123 Main Street</p>
+                  <p>{userInfo?.address_1 || "-"}</p>
                 </div>
                 <div className={styles.pointsDiv}>
                   <span>Address Line 2</span>
-                  <p>Springfield, IL 62701</p>
+                  <p>{userInfo?.address_2 || "-"}</p>
                 </div>
               </div>
             </div>
@@ -287,31 +399,41 @@ const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
               <div className={styles.userDetailsDiv}>
                 <div className={styles.pointsDiv}>
                   <span>Job Title</span>
-                  <p>Business Development Exclusive </p>
+                  <p>{userInfo?.experience?.[0]?.jobTitle || "-"}</p>
                 </div>
                 <div className={styles.pointsDiv}>
                   <span>Employed at</span>
-                  <p>Company name</p>
+                  <p>{userInfo?.experience?.[0]?.companyName || "-"}</p>
                 </div>
               </div>
               <div className={styles.userDetailsDiv}>
                 <div className={styles.pointsDiv}>
                   <span>Industry </span>
-                  <p className={styles.skillPoint}>Aerospace</p>
+                  <p className={styles.skillPoint}>
+                    {userInfo?.industryID?.industry || "No industry"}
+                  </p>
                 </div>
                 <div className={styles.pointsDiv}>
                   <span>Skills</span>
                   <div className={styles.skillsDiv}>
-                    <p className={styles.skillPoint}>Aerodynamics</p>
+                    {userInfo?.skillID?.map((skill: any, index: number) => (
+                      <p key={index} className={styles.skillPoint}>
+                        {skill?.skill}
+                      </p>
+                    ))}
+                    {/* <p className={styles.skillPoint}>Aerodynamics</p>
                     <p className={styles.skillPoint}>Avionics</p>
-                    <p className={styles.skillPoint}>CAD</p>
+                    <p className={styles.skillPoint}>CAD</p> */}
                   </div>
                 </div>
               </div>
             </div>
             <button
               className={styles.messageBtn}
-              onClick={() => setShowPopup(true)}
+              onClick={() => {
+                dispatch(selectedDetails(userInfo));
+                setShowPopup(true);
+              }}
               type="button"
             >
               Send a Message
@@ -322,7 +444,8 @@ const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
                 bordered={true}
                 // border={"1px solid #000"}
                 columns={invoicecolumns}
-                dataSource={invoicedata}
+                dataSource={invoiceTableData}
+                loading={loading}
                 pagination={false}
                 className={styles.recentJoinTable}
               />
@@ -330,9 +453,20 @@ const ShowUserDetail = ({ setSelectedProject, warningpopup }: any) => {
           </div>
         </div>
       </div>
+      {showPopupUpdate &&
+        createPortal(
+          <UpdateUserPopup
+            onClose={() => setShowPopupUpdate(false)}
+            refreshData={getUserByIdData}
+          />,
+          document.getElementById("modals")!
+        )}
       {showPopup &&
         createPortal(
-          <SendMsgUser onClose={() => setShowPopup(false)} />,
+          <SendMsgUser
+            onClose={() => setShowPopup(false)}
+            // refreshData={getUserByIdData}
+          />,
           document.getElementById("modals")!
         )}
     </>

@@ -4,20 +4,41 @@ import styles1 from "./finalremovepopup.module.scss";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 interface RemoveLeaderProps {
   onClose: () => void;
+  refreshData?: any;
 }
-const RemoveLeaderPopup: React.FC<RemoveLeaderProps> = ({ onClose }) => {
+const RemoveLeaderPopup: React.FC<RemoveLeaderProps> = ({
+  onClose,
+  refreshData,
+}) => {
   const selectedLeaderDetail = useSelector(
     (state: any) => state.selectedDetails
   );
+  console.log("selectedLeaderDetail", selectedLeaderDetail);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showReasonPopup, setShowReasonPopup] = useState(false);
 
-  const handleSubmit = () => {
-    setShowReasonPopup(true);
+  const handleSubmit = async () => {
+    let tkn = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "delete",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/leaderBoard/remove/${selectedLeaderDetail?.originalData?.userId?._id}`,
+        headers: {
+          Authorization: `${tkn}`,
+        },
+      });
+      console.log("API Response:", response.data);
+      setShowSuccessPopup(true);
+      refreshData();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
+
   if (showReasonPopup) {
     return (
       <div className={styles1.modifyMainDiv}>

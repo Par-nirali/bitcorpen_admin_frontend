@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import styles from "./addmembers.module.scss";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { IoIosArrowBack } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { selectedProjects } from "../redux/actions";
-import { Table } from "antd";
+import { Input, Table } from "antd";
 import { createPortal } from "react-dom";
-// import SendMsgUser from "./SendMsgUser";
+import axios from "axios";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
+import { useToast } from "@chakra-ui/react";
 
 const addMemValidationSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -27,7 +30,7 @@ const addMemValidationSchema = Yup.object().shape({
     .required("Email is required"),
 
   phone: Yup.string()
-    .matches(/^\d{10}$/, "Phone number must be exactly 10 digits")
+    // .matches(/^\d{10}$/, "Phone number must be exactly 10 digits")
     .required("Phone number is required"),
 
   role: Yup.string()
@@ -54,13 +57,147 @@ const addMemValidationSchema = Yup.object().shape({
     .url("Please enter a valid URL")
     .nullable()
     .transform((value) => (value === "" ? null : value)),
+
+  // profileUrl: Yup.string().required("Please upload a profileUrl"),
 });
 
 const AddMember = () => {
   const dispatch = useDispatch();
-  const handleSubmit = () => {
-    console.log("clicked");
+  const toast = useToast();
+  const selectedMemberDetail = useSelector(
+    (state: any) => state.selectedDetails
+  );
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  console.log(selectedMemberDetail, "selectedMemberDetail");
+
+  const initialValue = useMemo(() => {
+    if (selectedMemberDetail) {
+      if (selectedMemberDetail?.profileUrl) {
+        setPreviewImage(
+          `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${selectedMemberDetail?.profileUrl}`
+        );
+      }
+      return {
+        email: selectedMemberDetail?.email || "",
+        phone: selectedMemberDetail?.phone || "",
+        firstName: selectedMemberDetail?.firstName || "",
+        lastName: selectedMemberDetail?.lastName || "",
+        role: selectedMemberDetail?.role || "",
+        facebook: selectedMemberDetail?.facebookUrl || "",
+        twitter: selectedMemberDetail?.twitterUrl || "",
+        linkedin: selectedMemberDetail?.linkedinUrl || "",
+        instagram: selectedMemberDetail?.instagramUrl || "",
+        profileUrl: selectedMemberDetail?.profileUrl || "",
+      };
+    }
+    return {
+      email: "",
+      phone: "",
+      firstName: "",
+      lastName: "",
+      role: "",
+      facebook: "",
+      twitter: "",
+      linkedin: "",
+      instagram: "",
+      profileUrl: "",
+    };
+  }, [selectedMemberDetail]);
+
+  const handleImageUpload = async (file: File) => {
+    const tkn = localStorage.getItem("auth-token");
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/team/upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `${tkn}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data.data.url;
+    } catch (error) {
+      throw new Error("Failed to upload image");
+    }
   };
+
+  const handleSubmit = async (values: any, setSubmitting: any) => {
+    let tkn = localStorage.getItem("auth-token");
+
+    try {
+      const payload: any = {
+        profileUrl: values.profileUrl,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        role: values.role,
+      };
+
+      if (values.facebook) payload.facebookUrl = values.facebook;
+      if (values.twitter) payload.twitterUrl = values.twitter;
+      if (values.instagram) payload.instagramUrl = values.instagram;
+      if (values.linkedin) payload.linkedinUrl = values.linkedin;
+
+      console.log(payload, "payload");
+
+      if (selectedMemberDetail?._id) {
+        const updatePayload = {
+          ...payload,
+          teamId: selectedMemberDetail._id,
+        };
+
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/team/update`,
+          updatePayload,
+          {
+            headers: {
+              Authorization: `${tkn}`,
+            },
+          }
+        );
+        console.log("API Response ACCEPT:", response.data);
+        dispatch(selectedProjects("team"));
+      } else {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/team/create`,
+          payload,
+          {
+            headers: {
+              Authorization: `${tkn}`,
+            },
+          }
+        );
+        toast({
+          title: "Success",
+          description: "Team member profile completed successfully",
+          status: "success",
+          position: "top-right",
+          isClosable: true,
+        });
+        console.log("API Response ACCEPT:", response.data);
+        dispatch(selectedProjects("team"));
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast({
+        title: "Error",
+        description: "Failed to complete team member profile",
+        status: "error",
+        position: "top-right",
+        isClosable: true,
+      });
+      setSubmitting(false);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <>
       <div className={styles.pSubRightDiv}>
@@ -70,35 +207,72 @@ const AddMember = () => {
         >
           <img src="/icons/back.svg" alt="back" />
 
-          <p>Add Member</p>
+          <p>{selectedMemberDetail?._id ? "Update" : "Add"} Member</p>
         </button>
 
         <div className={styles.dashboardScroll}>
           <div className={styles.graphTableDivMain}>
             <Formik
-              initialValues={{
-                email: "",
-                phone: "",
-                firstName: "",
-                lastName: "",
-                role: "",
-                facebook: "",
-                twitter: "",
-                linkedin: "",
-                instagram: "",
-              }}
-              // initialValues={initialValues}
+              initialValues={initialValue}
               validationSchema={addMemValidationSchema}
               onSubmit={handleSubmit}
             >
-              {({ isSubmitting, touched, errors }) => (
+              {({
+                isSubmitting,
+                touched,
+                errors,
+                setFieldValue,
+                setFieldTouched,
+                values,
+              }) => (
                 <Form className={styles.addMemForm}>
                   <div className={styles.addMemberDiv}>
-                    <div className={styles.addMemLeft}>
+                    <div
+                      className={styles.addMemLeft}
+                      onClick={() =>
+                        document.getElementById("banner-upload")?.click()
+                      }
+                    >
                       <img src="/icons/add.svg" alt="add" />
                     </div>
-                    <p>Add Profile Photo</p>
+                    <Input
+                      id="banner-upload"
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            const imageId = await handleImageUpload(file);
+                            setFieldValue("profileUrl", imageId);
+                            setPreviewImage(URL.createObjectURL(file));
+                          } catch (error) {
+                            e.target.value = "";
+                            setFieldValue("profileUrl", "");
+                          }
+                        }
+                      }}
+                    />
+                    <p>
+                      {previewImage || selectedMemberDetail?._id
+                        ? "Change"
+                        : "Add"}{" "}
+                      Team member Image
+                    </p>
                   </div>
+                  {previewImage && (
+                    <div>
+                      <img
+                        src={previewImage}
+                        alt="Preview"
+                        style={{
+                          maxWidth: "100px",
+                          maxHeight: "100px",
+                        }}
+                      />
+                    </div>
+                  )}
                   <div className={styles.addMemFieldsMain}>
                     <div className={styles.addMemFirstDiv}>
                       <div className={styles.addMemPersonalDiv}>
@@ -182,7 +356,7 @@ const AddMember = () => {
                             <label htmlFor="phone" className={styles.text}>
                               phone
                             </label>
-                            <Field
+                            {/* <Field
                               type="number"
                               name="phone"
                               id="phone"
@@ -192,12 +366,31 @@ const AddMember = () => {
                                   ? styles.inputError
                                   : ""
                               }`}
+                            /> */}
+                            <PhoneInput
+                              defaultCountry="us"
+                              value={values.phone || ""}
+                              onChange={(value: string) => {
+                                if (
+                                  !value ||
+                                  value.trim() === "" ||
+                                  value === "+"
+                                ) {
+                                  setFieldValue("phone", "");
+                                  setFieldTouched("phone", true);
+                                } else {
+                                  setFieldValue("phone", value);
+                                  setFieldTouched("phone", false);
+                                }
+                              }}
+                              className={styles.input}
+                              inputClassName={styles.phoneInnerInput}
                             />
-                            <ErrorMessage
+                            {/* <ErrorMessage
                               name="phone"
                               component="div"
                               className={styles.errMes}
-                            />
+                            /> */}
                           </div>
                         </div>
                       </div>
@@ -326,7 +519,11 @@ const AddMember = () => {
                       className={styles.addMemBtn}
                       disabled={isSubmitting}
                     >
-                      {isSubmitting ? "Signing in..." : "Add Member"}
+                      {isSubmitting
+                        ? "Submitting..."
+                        : selectedMemberDetail
+                        ? "Update Member"
+                        : "Add Member"}
                     </button>
                   </div>
                 </Form>

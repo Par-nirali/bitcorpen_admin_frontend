@@ -12,11 +12,13 @@ const IssueHelpedDetail = () => {
   const [showPopup, setShowPopup] = useState(false);
   const selectedQuestion = useSelector((state: any) => state.selectedDetails);
   console.log(selectedQuestion, "selectedQuestion");
+
   if (!selectedQuestion) {
     return null;
   }
 
-  const isUnresolved = selectedQuestion?.status === "Unresolved";
+  const isUnresolved = selectedQuestion.status === "Unresolved";
+  console.log(isUnresolved, "isUnresolved");
 
   return (
     <>
@@ -33,7 +35,10 @@ const IssueHelpedDetail = () => {
           <div className={styles.graphTableDiv}>
             <div className={styles.issueDetailDiv}>
               <div className={styles.userDiv}>
-                <p className={styles.username}>{selectedQuestion?.user}</p>
+                <p className={styles.username}>
+                  {" "}
+                  {selectedQuestion?.userId?.userName || "UserName"}
+                </p>
                 <span
                   className={`${styles.status} ${
                     isUnresolved ? styles.unresolvedStatus : ""
@@ -43,16 +48,25 @@ const IssueHelpedDetail = () => {
                 </span>
               </div>
               <div className={styles.issueInfoDiv}>
-                <span className={styles.date}>{selectedQuestion?.date}</span>
+                <span className={styles.date}>
+                  {selectedQuestion?.createdAt
+                    ? new Date(selectedQuestion?.createdAt)
+                        .toISOString()
+                        .split("T")[0]
+                        .split("-")
+                        .reverse()
+                        .join("-")
+                    : "DD-MM-YYYY"}
+                </span>
                 <p className={styles.queTag}>Question</p>
                 <span className={styles.questionText}>
-                  {selectedQuestion?.question}
+                  {selectedQuestion?.yourIssue}
                 </span>
-                {!isUnresolved && selectedQuestion.answer && (
+                {!isUnresolved && selectedQuestion.answere && (
                   <>
                     <p className={styles.queTag}>Answer</p>
                     <span className={styles.questionText}>
-                      {selectedQuestion?.answer}
+                      {selectedQuestion?.answere}
                     </span>
                   </>
                 )}
@@ -60,7 +74,9 @@ const IssueHelpedDetail = () => {
               {isUnresolved && (
                 <button
                   className={styles.submitButton}
-                  onClick={() => setShowPopup(true)}
+                  onClick={() => {
+                    setShowPopup(true);
+                  }}
                   type="button"
                 >
                   Answer

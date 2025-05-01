@@ -1,10 +1,15 @@
 import { Input, Radio } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import { selectedProjects } from "../redux/actions";
 import styles from "./admineditprofile.module.scss";
+import axios from "axios";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
+import { useToast } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 
 const addSubAdminValidationSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -17,8 +22,8 @@ const addSubAdminValidationSchema = Yup.object().shape({
     .email("Please enter a valid email")
     .required("Email is required"),
   phone: Yup.string()
-    .matches(/^[0-9]+$/, "Please enter valid phone number")
-    .min(10, "Phone number must be at least 10 digits")
+    // .matches(/^[0-9]+$/, "Please enter valid phone number")
+    // .min(10, "Phone number must be at least 10 digits")
     .required("Phone number is required"),
   oldpassword: Yup.string()
     .min(8, "Password must be at least 8 characters")
@@ -32,23 +37,75 @@ const addSubAdminValidationSchema = Yup.object().shape({
 });
 const AdminEditProfile = () => {
   const dispatch = useDispatch();
-  const selectedEditAdminDetail = useSelector(
-    (state: any) => state.selectedDetails
-  );
+  const toast = useToast();
+  const router = useRouter();
+  // const userDetail = useSelector(
+  //   (state: any) => state.selectedDetails
+  // );
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  console.log(selectedEditAdminDetail, "selectedEditAdminDetail");
+  // console.log(userDetail, "userDetail");
+  const [adminData, setAdminData] = useState<any>("");
+  const [userDetail, setUserDetail] = useState<any>("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (typeof window !== "undefined") {
+        const userData = JSON.parse(
+          localStorage.getItem("bitcorpenadminData") || "{}"
+        );
+        console.log(userDetail, "userDetail");
+
+        setUserDetail(userData);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const getUserDetailForEdit = async () => {
+    let tkn = localStorage.getItem("auth-token");
+
+    // if (userDetail?._id) {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/admin-subadmin-profile`,
+        {
+          headers: {
+            Authorization: `${tkn}`,
+          },
+        }
+      );
+      console.log("API Response get:", response.data.data);
+      setAdminData(response.data.data);
+      toast({
+        title: "Success",
+        description: "admin fetched successfully",
+        status: "success",
+        position: "top-right",
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+    // }
+  };
 
   const initialValue = useMemo(() => {
-    if (selectedEditAdminDetail) {
+    if (adminData) {
+      if (adminData?.profileImage) {
+        setPreviewImage(
+          `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${adminData?.profileImage?.url}`
+        );
+      }
       return {
-        firstName: selectedEditAdminDetail?.firstName || "",
-        lastName: selectedEditAdminDetail?.lastName || "",
-        email: selectedEditAdminDetail?.email || "",
-        phone: selectedEditAdminDetail?.phone || "",
+        firstName: adminData?.firstName || "",
+        lastName: adminData?.lastName || "",
+        email: adminData?.email || "",
+        phone: adminData?.phone || "",
         password: "",
         confirmPassword: "",
-        profileImage: null,
+        // profileImage: adminData?.profileImage?._id,
       };
     }
     return {
@@ -58,24 +115,121 @@ const AdminEditProfile = () => {
       phone: "",
       password: "",
       confirmPassword: "",
-      profileImage: null,
+      // profileImage: null,
     };
-  }, [selectedEditAdminDetail]);
-  const handleImageUpload = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    setFieldValue: (field: string, value: any) => void
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setPreviewImage(imageUrl);
-      setFieldValue("profileImage", file);
+  }, [adminData]);
+
+  const handleImageUpload = async (file: File) => {
+    const tkn = localStorage.getItem("auth-token");
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/admin-subadmin-profile/profile`,
+        formData,
+        {
+          headers: {
+            Authorization: `${tkn}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data.data._id;
+    } catch (error) {
+      throw new Error("Failed to upload image");
     }
   };
 
-  const handleSubmit = (values: any) => {
-    console.log("Form submitted with values:", values);
+  const handleForgotPassword = async (values: any) => {
+    const payload = {
+      email: values.email,
+    };
+    try {
+      let tkn = localStorage.getItem("auth-token");
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/auth/forgot-password`,
+        payload,
+        {
+          headers: {
+            Authorization: `${tkn}`,
+          },
+        }
+      );
+      toast({
+        title: "Success",
+        description: "Admin Profile Forgot password link send successfully",
+        status: "success",
+        position: "top-right",
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send forgot password link",
+        status: "error",
+        position: "top-right",
+        isClosable: true,
+      });
+    }
   };
+
+  const handleSubmit = async (values: any, { setSubmitting }: any) => {
+    console.log("values", values);
+
+    const payload = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      phoneNumber: values.phone,
+      profileImage: values.profileImage,
+      oldPassword: values.oldpassword,
+      newPassword: values.password,
+    };
+
+    console.log("payload", payload);
+
+    try {
+      setSubmitting(true);
+      let tkn = localStorage.getItem("auth-token");
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/admin-subadmin-profile/update-details`,
+        payload,
+        {
+          headers: {
+            Authorization: `${tkn}`,
+          },
+        }
+      );
+      getUserDetailForEdit();
+      toast({
+        title: "Success",
+        description: "Admin Profile updated successfully",
+        status: "success",
+        position: "top-right",
+        isClosable: true,
+      });
+      router.push("/");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        status: "error",
+        position: "top-right",
+        isClosable: true,
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    // if (userDetail?._id) {
+    getUserDetailForEdit();
+    // }
+  }, []);
 
   return (
     <>
@@ -95,8 +249,16 @@ const AdminEditProfile = () => {
               initialValues={initialValue}
               validationSchema={addSubAdminValidationSchema}
               onSubmit={handleSubmit}
+              enableReinitialize
             >
-              {({ isSubmitting, touched, errors, setFieldValue, values }) => (
+              {({
+                isSubmitting,
+                touched,
+                errors,
+                setFieldValue,
+                values,
+                setFieldTouched,
+              }) => (
                 <Form className={styles.addMemForm}>
                   <div className={styles.addMemberDiv}>
                     <div
@@ -105,7 +267,7 @@ const AdminEditProfile = () => {
                         document.getElementById("profile-upload")?.click()
                       }
                     >
-                      {previewImage ? (
+                      {/* {previewImage ? (
                         <img
                           src={previewImage}
                           alt="Company Logo"
@@ -116,19 +278,43 @@ const AdminEditProfile = () => {
                             borderRadius: "42px",
                           }}
                         />
-                      ) : (
-                        <img src="/icons/add.svg" alt="add" />
-                      )}
+                      ) : ( */}
+                      <img src="/icons/add.svg" alt="add" />
+                      {/* )} */}
                     </div>
                     <Input
                       id="profile-upload"
                       type="file"
                       accept="image/*"
                       style={{ display: "none" }}
-                      onChange={(e) => handleImageUpload(e, setFieldValue)}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            const imageId = await handleImageUpload(file);
+                            setFieldValue("profileImage", imageId);
+                            setPreviewImage(URL.createObjectURL(file));
+                          } catch (error) {
+                            e.target.value = "";
+                            setFieldValue("profileImage", "");
+                          }
+                        }
+                      }}
                     />
-                    <p>Sub Admin Profile Image</p>
+                    <p>Admin Profile Image</p>
                   </div>
+                  {previewImage && (
+                    <img
+                      src={previewImage}
+                      alt="Company Logo"
+                      style={{
+                        maxWidth: "100px",
+                        maxHeight: "100px",
+                        objectFit: "cover",
+                        // borderRadius: "42px",
+                      }}
+                    />
+                  )}
                   <div className={styles.addMemFieldsMain}>
                     <div className={styles.addMemLastDiv}>
                       <h4 className={styles.detailHeading}>
@@ -205,7 +391,7 @@ const AdminEditProfile = () => {
                           <label htmlFor="phone" className={styles.text}>
                             Phone
                           </label>
-                          <Field
+                          {/* <Field
                             type="text"
                             name="phone"
                             id="phone"
@@ -215,6 +401,25 @@ const AdminEditProfile = () => {
                                 ? styles.inputError
                                 : ""
                             }`}
+                          /> */}
+                          <PhoneInput
+                            defaultCountry="us"
+                            value={values.phone || ""}
+                            onChange={(value: string) => {
+                              if (
+                                !value ||
+                                value.trim() === "" ||
+                                value === "+"
+                              ) {
+                                setFieldValue("phone", "");
+                                setFieldTouched("phone", true);
+                              } else {
+                                setFieldValue("phone", value);
+                                setFieldTouched("phone", false);
+                              }
+                            }}
+                            className={styles.input}
+                            inputClassName={styles.phoneInnerInput}
                           />
                           <ErrorMessage
                             name="phone"
@@ -247,7 +452,10 @@ const AdminEditProfile = () => {
                             component="div"
                             className={styles.errMes}
                           />
-                          <p className={styles.foregtPswdText}>
+                          <p
+                            className={styles.foregtPswdText}
+                            onClick={() => handleForgotPassword(values)}
+                          >
                             Forgot Password?
                           </p>
                         </div>
@@ -274,7 +482,7 @@ const AdminEditProfile = () => {
                             className={styles.errMes}
                           />
                         </div>
-                        {!selectedEditAdminDetail?.password ? (
+                        {!userDetail?.password ? (
                           <div className={styles.inputDiv}>
                             <label
                               htmlFor="confirmPassword"

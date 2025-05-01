@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./news.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
@@ -8,124 +8,79 @@ import { createPortal } from "react-dom";
 import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import DeleteNewsPopup from "./DeleteNewsPopup";
-// import RemoveAdPopup from "./RemoveAdPopup";
-// import StatusChangePopup from "./StatusChangePopup";
+import axios from "axios";
+import moment from "moment";
+import Link from "next/link";
 
-const adsData = [
-  {
-    id: 1,
-    enid: "ENID5666959",
-    adImage: "/newsimg.png",
-    name: "John Doe",
-    position: "CEO",
-    title: "How to Build a Strong Professional Network in 2024",
-    email: "john@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Active",
-    subscriptionDate: "Jan, 08, 2025",
-    expiryDate: "Jan, 08, 2026",
-    adType: "Banner",
-    adUrl: "encolunyty/dummy-referral-spam.html",
-    time: "2 days ago",
-    companyName: "Bitcorpon LLC",
-    description:
-      "Professionals seeking jobs that align with their passions and financial goals find a refreshing alternative here. ",
-  },
-  {
-    id: 2,
-    enid: "ENID5666959",
-    adImage: "/newsimg.png",
-    name: "Sarah Johnson",
-    position: "Founder",
-    title: "How to Build a Strong Professional Network in 2024",
-    email: "sarah@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Deactivated",
-    subscriptionDate: "Dec, 15, 2024",
-    expiryDate: "Dec, 15, 2025",
-    adType: "Stripe",
-    adUrl: "encolunyty/dummy-referral-spam.html",
-    time: "5 minutes ago",
-    companyName: "Bitcorpon LLC",
-    description:
-      "With their passions and financial goals find a refreshing alternative here. ",
-  },
-  {
-    id: 3,
-    enid: "ENID5666959",
-    adImage: "/newsimg.png",
-    name: "Michael Brown",
-    position: "Product Manager",
-    title: "How to Build a Strong Professional Network in 2024",
-    email: "michel@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Active",
-    subscriptionDate: "Jan, 01, 2025",
-    expiryDate: "Jan, 01, 2026",
-    adType: "Paypal",
-    adUrl: "encolunyty/dummy-referral-spam.html",
-    time: "1 day ago",
-    companyName: "Bitcorpon LLC",
-    description: "Professionals seeking jobs that align with their passions.",
-  },
-  {
-    id: 4,
-    enid: "ENID5666959",
-    adImage: "/newsimg.png",
-    name: "Michael Brown",
-    position: "Product Manager",
-    title: "How to Build a Strong Professional Network in 2024",
-    email: "michel@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Active",
-    subscriptionDate: "Jan, 01, 2025",
-    expiryDate: "Jan, 01, 2026",
-    adType: "Paypal",
-    adUrl: "encolunyty/dummy-referral-spam.html",
-    time: "1 day ago",
-    companyName: "Bitcorpon LLC",
-    description: "Professionals seeking jobs that align with their passions.",
-  },
-];
 const News = () => {
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
-  const [showStatusPopup, setShowStatusPopup] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<
-    "Active" | "Deactivated"
-  >();
-  const [teamMembers, setTeamMembers] = useState(adsData);
-  const [activeFilter, setActiveFilter] = useState<any>("All News");
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const [newsData, setNewsData] = useState<any>([]);
+  const [newsDashboardData, setNewsDashboardData] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleFilterClick = (filter: any) => {
-    setActiveFilter(filter);
+  const handleFilterSelect = (filter: string) => {
+    setSelectedFilter(filter);
   };
 
-  const filteredTeamMembers = teamMembers.filter((members) => {
-    if (activeFilter === "All News") return true;
-    if (activeFilter === "Latest") return members.status === "Active";
-    return true;
-  });
+  const getNewsDashboard = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/news/dashbord`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response, "response");
+      setNewsDashboardData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getAllNewsData = async () => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/news/getAll?filter=${selectedFilter}`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data.data);
+      setNewsData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getTimeDifference = (createdAt: any) => {
+    const currentTime = moment();
+    const imageCreatedTime = moment(createdAt);
+    const diffInHours = currentTime.diff(imageCreatedTime, "hours");
+
+    if (diffInHours < 1) {
+      return "Just now";
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours !== 1 ? "s" : ""} ago`;
+    } else {
+      const diffInDays = currentTime.diff(imageCreatedTime, "days");
+      return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} ago`;
+    }
+  };
+
+  useEffect(() => {
+    getNewsDashboard();
+  }, []);
+
+  useEffect(() => {
+    getAllNewsData();
+  }, [selectedFilter]);
 
   return (
     <>
@@ -149,7 +104,7 @@ const News = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Total News Published</h3>
               <div className={styles.leftPercentScore}>
-                <p>50</p>
+                <p>{newsDashboardData?.totalNews || 0}</p>
                 <span className={styles.userTitle}>News</span>
               </div>
             </div>
@@ -157,14 +112,14 @@ const News = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Latest News</h3>
               <div className={styles.leftPercentScore}>
-                <p>88</p>
+                <p>{newsDashboardData?.latestTotalNews || 0}</p>
                 <span className={styles.userTitle}>News</span>
               </div>
             </div>
           </div>
           <div className={styles.tableFilterMainDiv}>
             <div className={styles.userFilter}>
-              {["All News", "Latest"].map((filter) => (
+              {/* {["All News", "Latest"].map((filter) => (
                 <p
                   key={filter}
                   className={activeFilter === filter ? styles.selected : ""}
@@ -172,53 +127,95 @@ const News = () => {
                 >
                   {filter}
                 </p>
-              ))}
+              ))} */}
+              <p
+                className={selectedFilter === "All" ? styles.selected : ""}
+                onClick={() => handleFilterSelect("All")}
+              >
+                All News
+              </p>
+              <p
+                className={selectedFilter === "Latest" ? styles.selected : ""}
+                onClick={() => handleFilterSelect("Latest")}
+              >
+                Latest
+              </p>
             </div>
           </div>
           <div className={styles.graphUserTableDiv}>
             <div className={styles.candMainDiv}>
               <div className={styles.cardsGrid}>
-                {filteredTeamMembers?.map((news) => (
-                  <div
-                    className={styles.cardContainer}
-                    key={news.id}
-                    // onClick={() => {
-                    //   dispatch(selectedDetails(news));
-                    //   dispatch(selectedProjects("news_details"));
-                    // }}
-                  >
-                    <div
-                      className={styles.cardUpDiv}
-                      onClick={() => {
-                        dispatch(selectedDetails(news));
-                        dispatch(selectedProjects("news_details"));
-                      }}
-                    >
-                      <div className={styles.rankAdImg}>
-                        <img src="/newsimg.png" alt="profile" />
-                        {/* <img src={news?.adImage} alt="profile" /> */}
+                {newsData?.length > 0 ? (
+                  newsData?.map((news: any) => (
+                    <Link href={`/news/${news._id}`} key={news._id}>
+                      <div
+                        className={styles.cardContainer}
+                        key={news._id}
+                        // onClick={() => {
+                        //   dispatch(selectedDetails(news));
+                        //   dispatch(selectedProjects("news_details"));
+                        // }}
+                      >
+                        <div
+                          className={styles.cardUpDiv}
+                          onClick={() => {
+                            dispatch(selectedDetails(news));
+                            dispatch(selectedProjects("news_details"));
+                          }}
+                        >
+                          <div className={styles.rankAdImg}>
+                            <img
+                              src={
+                                news?.mediaUrl
+                                  ? `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${news?.mediaUrl}`
+                                  : "/profile.svg"
+                              }
+                              alt="profile"
+                            />
+                            {/* <img src={news?.adImage} alt="profile" /> */}
+                          </div>
+                          <div className={styles.cardDetailsDiv}>
+                            <h4 className={styles.cardTitle}>{news?.title}</h4>
+                            <p className={styles.cardSubTitle}>
+                              {news?.companyName}{" "}
+                              <span>
+                                {/* {Math.floor(
+                                (new Date().getTime() -
+                                  new Date(
+                                    news?.createdAt as string
+                                  ).getTime()) /
+                                  (1000 * 60 * 60 * 24)
+                              )}{" "}
+                              Days ago */}
+                                {getTimeDifference(news?.createdAt)}
+                              </span>
+                            </p>
+                            <p className={styles.cardDesc}>
+                              {news?.subTitle}
+                              {/* {news?.description?.slice(0, 100)} */}
+                            </p>
+                          </div>
+                        </div>
+                        {/* <div> */}
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            dispatch(selectedDetails(news));
+                            setShowPopup(true);
+                          }}
+                        >
+                          <img src="/icons/delete.svg" alt="delete" /> Delete
+                        </button>
+                        {/* </div> */}
                       </div>
-                      <div className={styles.cardDetailsDiv}>
-                        <h4 className={styles.cardTitle}>{news?.title}</h4>
-                        <p className={styles.cardSubTitle}>
-                          {news?.companyName} <span>{news?.time}</span>
-                        </p>
-                        <p className={styles.cardDesc}>{news?.description}</p>
-                      </div>
-                    </div>
-                    {/* <div> */}
-                    <button
-                      className={styles.deleteBtn}
-                      onClick={() => {
-                        dispatch(selectedDetails(news));
-                        setShowPopup(true);
-                      }}
-                    >
-                      <img src="/icons/delete.svg" alt="delete" /> Delete
-                    </button>
-                    {/* </div> */}
+                    </Link>
+                  ))
+                ) : (
+                  <div className={styles.noDataDiv}>
+                    <p>No News Found</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -227,7 +224,11 @@ const News = () => {
 
       {showPopup &&
         createPortal(
-          <DeleteNewsPopup onClose={() => setShowPopup(false)} />,
+          <DeleteNewsPopup
+            onClose={() => setShowPopup(false)}
+            refreshData={getAllNewsData}
+            refreshDashboardData={getNewsDashboard}
+          />,
           document.getElementById("modals")!
         )}
       {/*  {showStatusPopup &&

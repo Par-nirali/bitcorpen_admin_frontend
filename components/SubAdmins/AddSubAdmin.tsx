@@ -1,39 +1,14 @@
-import { Input, Radio, Checkbox } from "antd";
+import { useToast } from "@chakra-ui/react";
+import { Checkbox, Input } from "antd";
+import axios from "axios";
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import { selectedProjects } from "../redux/actions";
 import styles from "./addsubadmin.module.scss";
-import axios from "axios";
-import { useToast } from "@chakra-ui/react";
-import { PhoneInput } from "react-international-phone";
-import "react-international-phone/style.css";
-
-const addSubAdminValidationSchema = Yup.object().shape({
-  firstName: Yup.string()
-    .required("First name is required")
-    .min(2, "First name must be at least 2 characters"),
-  lastName: Yup.string()
-    .required("Last name is required")
-    .min(2, "Last name must be at least 2 characters"),
-  email: Yup.string()
-    .email("Please enter a valid email")
-    .required("Email is required"),
-  phoneNumber: Yup.string()
-    // .matches(/^[0-9]+$/, "Please enter valid phoneNumber number")
-    // .min(10, "phoneNumber number must be at least 10 digits")
-    .required("phoneNumber number is required"),
-  password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
-    .required("Password is required"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password")], "Passwords must match")
-    .required("Confirm password is required"),
-  userRole: Yup.array()
-    .min(1, "At least one role must be selected")
-    .required("Role selection is required"),
-});
 
 const AddSubAdmin = () => {
   const dispatch = useDispatch();
@@ -43,6 +18,59 @@ const AddSubAdmin = () => {
   );
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   console.log(selectedSubAdminDetail, "selectedSubAdminDetail");
+  // const addSubAdminValidationSchema = () => {
+  //   const isUpdate = !!selectedSubAdminDetail?._id;
+  //   return Yup.object().shape({
+  //     firstName: Yup.string()
+  //       .required("First name is required")
+  //       .min(2, "First name must be at least 2 characters"),
+  //     lastName: Yup.string()
+  //       .required("Last name is required")
+  //       .min(2, "Last name must be at least 2 characters"),
+  //     email: Yup.string()
+  //       .email("Please enter a valid email")
+  //       .required("Email is required"),
+  //     phoneNumber: Yup.string().required("phoneNumber number is required"),
+  //     password: Yup.string()
+  //       .min(8, "Password must be at least 8 characters")
+  //       .required("Password is required"),
+  //     confirmPassword: isUpdate
+  //       ? Yup.string().notRequired()
+  //       : Yup.string()
+  //           .oneOf([Yup.ref("password")], "Passwords must match")
+  //           .required("Confirm password is required"),
+  //     userRole: Yup.array()
+  //       .min(1, "At least one role must be selected")
+  //       .required("Role selection is required"),
+  //   });
+  // };
+  const addSubAdminValidationSchema = useMemo(() => {
+    const isUpdate = !!selectedSubAdminDetail?._id;
+
+    return Yup.object().shape({
+      firstName: Yup.string()
+        .required("First name is required")
+        .min(2, "First name must be at least 2 characters"),
+      lastName: Yup.string()
+        .required("Last name is required")
+        .min(2, "Last name must be at least 2 characters"),
+      email: Yup.string()
+        .email("Please enter a valid email")
+        .required("Email is required"),
+      phoneNumber: Yup.string().required("Phone number is required"),
+      password: Yup.string()
+        .min(8, "Password must be at least 8 characters")
+        .required("Password is required"),
+      confirmPassword: isUpdate
+        ? Yup.string().notRequired()
+        : Yup.string()
+            .oneOf([Yup.ref("password")], "Passwords must match")
+            .required("Confirm password is required"),
+      userRole: Yup.array()
+        .min(1, "At least one role must be selected")
+        .required("Role selection is required"),
+    });
+  }, [selectedSubAdminDetail]);
 
   const userRole = [
     "User",
@@ -59,17 +87,36 @@ const AddSubAdmin = () => {
     "News",
   ];
 
+  const transformResourceToOriginal = (resource: string) => {
+    return (
+      userRole.find(
+        (role) => role.toLowerCase().replace(/\s/g, "") === resource
+      ) || ""
+    );
+  };
+
   const initialValue = useMemo(() => {
     if (selectedSubAdminDetail) {
+      if (selectedSubAdminDetail?.originalData?.profileImage) {
+        setPreviewImage(
+          `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${selectedSubAdminDetail?.originalData?.profileImage?.url}`
+        );
+      }
+      const transformedResources = selectedSubAdminDetail?.resources
+        ? selectedSubAdminDetail.resources
+            .map(transformResourceToOriginal)
+            .filter(Boolean)
+        : [];
       return {
-        firstName: selectedSubAdminDetail?.firstName || "",
-        lastName: selectedSubAdminDetail?.lastName || "",
+        firstName: selectedSubAdminDetail?.originalData?.firstName || "",
+        lastName: selectedSubAdminDetail?.originalData?.lastName || "",
         email: selectedSubAdminDetail?.email || "",
         phoneNumber: selectedSubAdminDetail?.phoneNumber || "",
-        password: "",
+        password: selectedSubAdminDetail?.password || "",
         confirmPassword: "",
-        userRole: selectedSubAdminDetail?.userRole || [],
-        profileImage: null,
+        userRole: transformedResources,
+        profileImage: selectedSubAdminDetail?.originalData?.profileImage?._id,
+        isUpdate: true,
       };
     }
     return {
@@ -80,7 +127,8 @@ const AddSubAdmin = () => {
       password: "",
       confirmPassword: "",
       userRole: [],
-      profileImage: null,
+      profileImage: "",
+      isUpdate: false,
     };
   }, [selectedSubAdminDetail]);
 
@@ -110,46 +158,70 @@ const AddSubAdmin = () => {
     console.log("Form submitted with values:", values);
     let tkn = localStorage.getItem("auth-token");
 
-    const resources = values.userRole.map((role: string) =>
-      role.toLowerCase().replace(/\s/g, "")
-    );
-
-    const payload = {
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      phoneNumber: values.phoneNumber,
-      password: values.password,
-      resource: resources,
-      profileImage: values.profileImage,
-    };
     try {
-      await axios({
-        method: "post",
-        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/subAdmin/create`,
-        data: payload,
+      const resources = values.userRole.map((role: string) =>
+        role.toLowerCase().replace(/\s/g, "")
+      );
+      const payload = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        password: values.password,
+        resource: resources,
+        profileImage: values.profileImage,
+      };
+      console.log("payload", payload);
 
-        headers: {
-          Authorization: `${tkn}`,
-        },
-      })
-        .then((res) => {
-          console.log("Complete profile response:", res.data);
+      if (selectedSubAdminDetail?._id) {
+        const updatePayload = {
+          ...payload,
+          userId: selectedSubAdminDetail._id,
+        };
 
-          toast({
-            title: "Success",
-            description: "Profile completed successfully",
-            status: "success",
-            position: "top-right",
-            isClosable: true,
-          });
-        })
-        .catch((error) => {});
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/subAdmin/update`,
+          updatePayload,
+          {
+            headers: {
+              Authorization: `${tkn}`,
+            },
+          }
+        );
+        console.log("API Response ACCEPT:", response.data);
+        toast({
+          title: "Success",
+          description: "Sub admin updated successfully",
+          status: "success",
+          position: "top-right",
+          isClosable: true,
+        });
+        dispatch(selectedProjects("sub_admins"));
+      } else {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/subAdmin/create`,
+          payload,
+          {
+            headers: {
+              Authorization: `${tkn}`,
+            },
+          }
+        );
+        console.log("API Response ACCEPT:", response.data);
+        toast({
+          title: "Success",
+          description: "sub admin completed successfully",
+          status: "success",
+          position: "top-right",
+          isClosable: true,
+        });
+        dispatch(selectedProjects("sub_admins"));
+      }
     } catch (error) {
       console.error("Error:", error);
       toast({
         title: "Error",
-        description: "Failed to complete profile",
+        description: "Failed to sub admin",
         status: "error",
         position: "top-right",
         isClosable: true,
@@ -182,8 +254,8 @@ const AddSubAdmin = () => {
                 touched,
                 errors,
                 setFieldValue,
-                values,
                 setFieldTouched,
+                values,
               }) => (
                 <Form className={styles.addMemForm}>
                   <div className={styles.addMemberDiv}>
@@ -193,20 +265,7 @@ const AddSubAdmin = () => {
                         document.getElementById("profile-upload")?.click()
                       }
                     >
-                      {previewImage ? (
-                        <img
-                          src={previewImage}
-                          alt="Company Logo"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            borderRadius: "42px",
-                          }}
-                        />
-                      ) : (
-                        <img src="/icons/add.svg" alt="add" />
-                      )}
+                      <img src="/icons/add.svg" alt="add" />
                     </div>
                     <Input
                       id="profile-upload"
@@ -229,6 +288,18 @@ const AddSubAdmin = () => {
                     />
                     <p>Sub Admin Profile Image</p>
                   </div>
+                  {previewImage && (
+                    <div>
+                      <img
+                        src={previewImage}
+                        alt="Preview"
+                        style={{
+                          maxWidth: "100px",
+                          maxHeight: "100px",
+                        }}
+                      />
+                    </div>
+                  )}
                   <div className={styles.addMemFieldsMain}>
                     <div className={styles.addMemLastDiv}>
                       <h4 className={styles.detailHeading}>

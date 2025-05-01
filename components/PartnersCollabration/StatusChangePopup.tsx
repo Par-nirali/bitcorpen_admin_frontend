@@ -3,25 +3,50 @@ import styles from "./removepartnerpopup.module.scss";
 import styles1 from "./finalremovepopup.module.scss";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 interface StatusChangeProps {
   onClose: () => void;
-  currentStatus: "Active" | "Deactivated";
+  refreshData: () => void;
+  refreshDashData?: any;
+  // currentStatus: "Active" | "Inactivated";
 }
 const StatusChangePopup: React.FC<StatusChangeProps> = ({
   onClose,
-  currentStatus,
+  refreshData,
+  refreshDashData,
+  // currentStatus,
 }) => {
-  const isDeactivating = currentStatus === "Active";
-  const actionText = isDeactivating ? "Deactivate" : "Activate";
+  const selectedPartnerDetail = useSelector(
+    (state: any) => state.selectedDetails
+  );
+  const isDeactivating = selectedPartnerDetail?.status === "active";
+  const actionText = isDeactivating ? "Inactivate" : "Activate";
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  console.log(selectedPartnerDetail, "selectedPartnerDetail");
 
-  const handleSubmit = () => {
-    setShowSuccessPopup(true);
+  const handleSubmit = async () => {
+    let tkn = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "patch",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/partner-collaboration/changeStatus/${selectedPartnerDetail._id}`,
+        headers: {
+          Authorization: `${tkn}`,
+        },
+      });
+      console.log("API Response:", response.data);
+      setShowSuccessPopup(true);
+      refreshData();
+      refreshDashData();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   if (showSuccessPopup) {
-    const statusText = isDeactivating ? "Deactivated" : "Activated";
+    const statusText = isDeactivating ? "Inactivated" : "Activated";
 
     return (
       <div className={styles1.modifyMainDiv}>
@@ -30,7 +55,10 @@ const StatusChangePopup: React.FC<StatusChangeProps> = ({
             <div className={styles1.modifyHead}>
               <h5>Partner {statusText}</h5>
               <p className={styles1.modifyLinkDiv}>
-                <span className={styles1.enid}>Dummy Name</span>
+                <span className={styles1.enid}>
+                  {" "}
+                  {selectedPartnerDetail?.companyName}
+                </span>{" "}
                 Partner {statusText}
               </p>
             </div>
@@ -62,7 +90,7 @@ const StatusChangePopup: React.FC<StatusChangeProps> = ({
               <h4>{actionText} Partner</h4>
               <p>
                 Are you sure do you want to {actionText.toLowerCase()} of
-                <span>Dummy Name </span>
+                <span> {selectedPartnerDetail?.companyName}</span>
               </p>
             </div>
             <div className={styles.connectBtns}>

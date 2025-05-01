@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectedProjects } from "../redux/actions";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
+import axios from "axios";
 
 interface SendMsgUserProps {
   onClose: () => void;
@@ -12,15 +13,34 @@ interface SendMsgUserProps {
 
 const AnswerMsgUser: React.FC<SendMsgUserProps> = ({ onClose }) => {
   const dispatch = useDispatch();
-  const [status, setStatus] = useState<"Active" | "Deactivated">("Active");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const selectedQuestion = useSelector((state: any) => state.selectedDetails);
+  console.log(selectedQuestion, "selectedQuestion");
+  const [answerMessage, setAnswerMessage] = useState("");
 
-  const handleStatusChange = (e: any) => {
-    setStatus(e.target.value);
-  };
+  const handleSubmit = async () => {
+    console.log("selectedContentDetail");
 
-  const handleSubmit = () => {
-    setShowSuccessPopup(true);
+    let tkn = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "patch",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/helpAndSupport/resolveRequest`,
+        data: {
+          supportId: selectedQuestion._id,
+          answere: answerMessage,
+        },
+        headers: {
+          Authorization: `${tkn}`,
+        },
+      });
+      console.log("API Response:", response.data);
+      setShowSuccessPopup(true);
+      // refreshData();
+      // refreshDashData();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   if (showSuccessPopup) {
@@ -41,7 +61,8 @@ const AnswerMsgUser: React.FC<SendMsgUserProps> = ({ onClose }) => {
                   fontWeight: "400",
                 }}
               >
-                John#_Doe will recive this message in notifications
+                {selectedQuestion?.userId?.userName || "UserName"} will recive
+                this message in notifications
               </p>
             </div>
             <button
@@ -71,9 +92,16 @@ const AnswerMsgUser: React.FC<SendMsgUserProps> = ({ onClose }) => {
 
           <div className={styles.connectContent}>
             <div className={styles.connectHeadDiv}>
-              <h4>Answering to John#_Doe</h4>
+              <h4>
+                Answering to {selectedQuestion?.userId?.userName || "UserName"}
+              </h4>
               <div className={styles.connectReqBody}>
-                <textarea rows={14} placeholder="Write message here" />
+                <textarea
+                  rows={14}
+                  placeholder="Write message here"
+                  value={answerMessage}
+                  onChange={(e) => setAnswerMessage(e.target.value)}
+                />
               </div>
             </div>
 

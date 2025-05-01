@@ -1,90 +1,25 @@
-import React, { useState } from "react";
-import styles from "./adcontrols.module.scss";
-import { Table } from "antd";
-import { EditOutlined, EyeOutlined } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
-import { selectedProjects, selectedDetails } from "../redux/actions";
-import { createPortal } from "react-dom";
-import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
+import { Dropdown } from "antd";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { useDispatch } from "react-redux";
+import { selectedDetails, selectedProjects } from "../redux/actions";
+import styles from "./adcontrols.module.scss";
 import RemoveAdPopup from "./RemoveAdPopup";
 import StatusChangePopup from "./StatusChangePopup";
-
-const adsData = [
-  {
-    id: 1,
-    enid: "ENID5666959",
-    adImage: "/adimage.png",
-    name: "John Doe",
-    position: "CEO",
-    title: "Professional",
-    email: "john@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Active",
-    subscriptionDate: "Jan, 08, 2025",
-    expiryDate: "Jan, 08, 2026",
-    adType: "Banner",
-    adUrl: "encolunyty/dummy-referral-spam.html",
-  },
-  {
-    id: 2,
-    enid: "ENID5666959",
-    adImage: "/adimage.png",
-    name: "Sarah Johnson",
-    position: "Founder",
-    title: "Professional",
-    email: "sarah@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Deactivated",
-    subscriptionDate: "Dec, 15, 2024",
-    expiryDate: "Dec, 15, 2025",
-    adType: "Stripe",
-    adUrl: "encolunyty/dummy-referral-spam.html",
-  },
-  {
-    id: 3,
-    enid: "ENID5666959",
-    adImage: "/adimage.png",
-    name: "Michael Brown",
-    position: "Product Manager",
-    title: "Professional",
-    email: "michel@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Active",
-    subscriptionDate: "Jan, 01, 2025",
-    expiryDate: "Jan, 01, 2026",
-    adType: "Paypal",
-    adUrl: "encolunyty/dummy-referral-spam.html",
-  },
-];
 
 const AdControls = () => {
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
   const [showStatusPopup, setShowStatusPopup] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<
-    "Active" | "Deactivated"
-  >();
-  const [teamMembers, setTeamMembers] = useState(adsData);
-  const [activeFilter, setActiveFilter] = useState<any>("All AD's");
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const [adData, setAdData] = useState<any[]>([]);
+  const [adDashboard, setAdDashboard] = useState<any>("");
+  const [loading, setLoading] = useState(true);
 
-  const handleFilterClick = (filter: any) => {
-    setActiveFilter(filter);
+  const handleFilterSelect = (filter: any) => {
+    setSelectedFilter(filter);
   };
 
   const getMoreItems = (ads: any): MenuProps["items"] => [
@@ -106,20 +41,55 @@ const AdControls = () => {
     },
     {
       key: "status",
-      label: ads.status === "Active" ? "Deactivate" : "Activate",
+      label: ads.adStatus === "active" ? "Deactivate" : "Activate",
       onClick: () => {
         dispatch(selectedDetails(ads));
         setShowStatusPopup(true);
       },
     },
   ];
-  const filteredTeamMembers = teamMembers.filter((members) => {
-    if (activeFilter === "All AD's") return true;
-    if (activeFilter === "Active AD's") return members.status === "Active";
-    if (activeFilter === "Deactivated AD's")
-      return members.status === "Deactivated";
-    return true;
-  });
+  const getADsDashboard = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/adControls/getTotal-ad`,
+        headers: { Authorization: `${token}` },
+      });
+
+      setAdDashboard(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getADsDashboard();
+  }, []);
+
+  const getAllADs = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/adControls/get-ad?filter=${selectedFilter}`,
+        headers: { Authorization: `${token}` },
+      });
+      setAdData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getAllADs();
+  }, [selectedFilter]);
 
   return (
     <>
@@ -143,7 +113,7 @@ const AdControls = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Totals AD’s</h3>
               <div className={styles.leftPercentScore}>
-                <p>500</p>
+                <p>{adDashboard?.totalAdControls}</p>
                 <span className={styles.userTitle}>AD&apos;s</span>
               </div>
             </div>
@@ -151,85 +121,109 @@ const AdControls = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Active AD’s</h3>
               <div className={styles.leftPercentScore}>
-                <p>7888</p>
+                <p>{adDashboard?.totalActiveAdControls}</p>
                 <span className={styles.userTitle}>AD&apos;s</span>
               </div>
             </div>
 
             <div className={styles.pScoreLeftinnerDiv}>
-              <h3>Removed AD’s</h3>
+              <h3>Inactive AD’s</h3>
               <div className={styles.leftPercentScore}>
-                <p>756</p>
+                <p>{adDashboard?.totalInactiveAdControls}</p>
                 <span className={styles.userTitle}>AD&apos;s</span>
               </div>
             </div>
           </div>
           <div className={styles.tableFilterMainDiv}>
             <div className={styles.userFilter}>
-              {["All AD's", "Active AD's", "Deactivated AD's"].map((filter) => (
-                <p
-                  key={filter}
-                  className={activeFilter === filter ? styles.selected : ""}
-                  onClick={() => handleFilterClick(filter)}
-                >
-                  {filter}
-                </p>
-              ))}
+              <p
+                className={selectedFilter === "All" ? styles.selected : ""}
+                onClick={() => handleFilterSelect("All")}
+              >
+                All AD&apos;s
+              </p>
+              <p
+                className={selectedFilter === "active" ? styles.selected : ""}
+                onClick={() => handleFilterSelect("active")}
+              >
+                Active AD&apos;s
+              </p>
+              <p
+                className={selectedFilter === "inactive" ? styles.selected : ""}
+                onClick={() => handleFilterSelect("inactive")}
+              >
+                Inactivate AD&apos;s
+              </p>
             </div>
           </div>
           <div className={styles.graphUserTableDiv}>
             <div className={styles.candMainDiv}>
               <div className={styles.cardsGrid}>
-                {filteredTeamMembers?.map((ads) => (
-                  <div className={styles.candCardMain} key={ads.id}>
-                    <div className={styles.cardContainer}>
-                      <div className={styles.rankMainDiv}>
-                        <div className={styles.rankBadge}>
-                          <p>{ads.name}</p>
-                        </div>
-                        <Dropdown
-                          menu={{ items: getMoreItems(ads) }}
-                          trigger={["hover"]}
-                          placement="bottomRight"
-                          // style={{ width: "100%" }}
-                        >
-                          <div className={styles.rankBadgeMore}>
-                            <img src="/icons/more.svg" alt="more" />
+                {adData?.length > 0 ? (
+                  adData?.map((ads, index) => (
+                    <div className={styles.candCardMain} key={ads.id}>
+                      <div className={styles.cardContainer}>
+                        <div className={styles.rankMainDiv}>
+                          <div className={styles.rankBadge}>
+                            <p>{ads.adTitle}</p>
                           </div>
-                        </Dropdown>
-                      </div>
-                      <div className={styles.rankAdImg}>
-                        <img src="/profile.png" alt="profile" />
-                        {/* <img src={subscriber.adImage} alt="profile" /> */}
-                      </div>
-                      <div className={styles.adsSection}>
-                        <div className={styles.adsPointDiv}>
-                          <p>AD ID</p>
-                          <span>{ads.enid}</span>
-                        </div>
-                        <div className={styles.adsPointDiv}>
-                          <p>AD Type</p>
-                          <span>{ads.adType}</span>
-                        </div>
-                        <div className={styles.adsPointDiv}>
-                          <p>AD Link</p>
-                          <a>{ads.adUrl}</a>
-                        </div>
-                        <div className={styles.adsPointDiv}>
-                          <p>AD Status</p>
-                          <div
-                            className={`${styles.statusDiv} ${
-                              ads.status === "Active" ? "" : styles.deactivated
-                            }
-                            }`}
+                          <Dropdown
+                            menu={{ items: getMoreItems(ads) }}
+                            trigger={["hover"]}
+                            placement="bottomRight"
                           >
-                            {ads.status}
+                            <div className={styles.rankBadgeMore}>
+                              <img src="/icons/more.svg" alt="more" />
+                            </div>
+                          </Dropdown>
+                        </div>
+                        <div className={styles.rankAdImg}>
+                          <img
+                            src={
+                              ads?.adImageUrl
+                                ? `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${ads?.adImageUrl}`
+                                : "/profile.png"
+                            }
+                            alt="profile"
+                          />
+                        </div>
+                        <div className={styles.adsSection}>
+                          <div className={styles.adsPointDiv}>
+                            <p>AD Number</p>
+                            <span>{ads?.adID}</span>
+                          </div>
+                          <div className={styles.adsPointDiv}>
+                            <p>AD Type</p>
+                            <span>{ads?.adType}</span>
+                          </div>
+                          <div className={styles.adsPointDiv}>
+                            <p>AD Link</p>
+                            <a>{ads?.adUrl}</a>
+                          </div>
+                          <div className={styles.adsPointDiv}>
+                            <p>AD Status</p>
+                            <div
+                              className={`${styles.statusDiv} ${
+                                ads?.adStatus === "active"
+                                  ? ""
+                                  : styles.deactivated
+                              }
+                            }`}
+                            >
+                              {ads?.adStatus === "active"
+                                ? "Active"
+                                : "Inactive"}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className={styles.noData}>
+                    <p>No data found</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -238,7 +232,11 @@ const AdControls = () => {
 
       {showPopup &&
         createPortal(
-          <RemoveAdPopup onClose={() => setShowPopup(false)} />,
+          <RemoveAdPopup
+            onClose={() => setShowPopup(false)}
+            refreshData={getAllADs}
+            refreshDashData={getADsDashboard}
+          />,
           document.getElementById("modals")!
         )}
       {showStatusPopup &&
@@ -246,8 +244,9 @@ const AdControls = () => {
           <StatusChangePopup
             onClose={() => {
               setShowStatusPopup(false);
-              setSelectedStatus(undefined);
             }}
+            refreshData={getAllADs}
+            refreshDashData={getADsDashboard}
           />,
           document.getElementById("modals")!
         )}

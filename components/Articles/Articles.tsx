@@ -1,146 +1,93 @@
-import React, { useState } from "react";
-import styles from "./articles.module.scss";
-import { Table } from "antd";
-import { EditOutlined, EyeOutlined } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
-import { selectedProjects, selectedDetails } from "../redux/actions";
+import axios from "axios";
+import moment from "moment";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Dropdown } from "antd";
-import type { MenuProps } from "antd";
+import { useDispatch } from "react-redux";
+import { selectedDetails, selectedProjects } from "../redux/actions";
+import styles from "./articles.module.scss";
 import DeleteArticlePopup from "./DeleteArticlePopup";
-// import DeleteNewsPopup from "./DeleteNewsPopup";
 
-const adsData = [
-  {
-    id: 1,
-    enid: "ENID5666959",
-    adImage: "/newsimg.png",
-    name: "John Doe",
-    position: "CEO",
-    title: "How to Build a Strong Professional Network in 2024",
-    email: "john@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Active",
-    subscriptionDate: "Jan, 08, 2025",
-    expiryDate: "Jan 08, 2026",
-    adType: "Banner",
-    adUrl: "encolunyty/dummy-referral-spam.html",
-    time: "2 days ago",
-    companyName: "Bitcorpon LLC",
-    description:
-      "Professionals seeking jobs that align with their passions and financial goals find a refreshing alternative here. ",
-  },
-  {
-    id: 2,
-    enid: "ENID5666959",
-    adImage: "/newsimg.png",
-    name: "Sarah Johnson",
-    position: "Founder",
-    title: "How to Build a Strong Professional Network in 2024",
-    email: "sarah@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Deactivated",
-    subscriptionDate: "Dec, 15, 2024",
-    expiryDate: "Dec, 15, 2025",
-    adType: "Stripe",
-    adUrl: "encolunyty/dummy-referral-spam.html",
-    time: "5 minutes ago",
-    companyName: "Bitcorpon LLC",
-    description:
-      "With their passions and financial goals find a refreshing alternative here. ",
-  },
-  {
-    id: 3,
-    enid: "ENID5666959",
-    adImage: "/newsimg.png",
-    name: "Michael Brown",
-    position: "Product Manager",
-    title: "How to Build a Strong Professional Network in 2024",
-    email: "michel@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Active",
-    subscriptionDate: "Jan, 01, 2025",
-    expiryDate: "Jan, 01, 2026",
-    adType: "Paypal",
-    adUrl: "encolunyty/dummy-referral-spam.html",
-    time: "1 day ago",
-    companyName: "Bitcorpon LLC",
-    description: "Professionals seeking jobs that align with their passions.",
-  },
-  {
-    id: 4,
-    enid: "ENID5666959",
-    adImage: "/newsimg.png",
-    name: "Michael Brown",
-    position: "Product Manager",
-    title: "How to Build a Strong Professional Network in 2024",
-    email: "michel@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Active",
-    subscriptionDate: "Jan, 01, 2025",
-    expiryDate: "Jan, 01, 2026",
-    adType: "Paypal",
-    adUrl: "encolunyty/dummy-referral-spam.html",
-    time: "1 day ago",
-    companyName: "Bitcorpon LLC",
-    description: "Professionals seeking jobs that align with their passions.",
-  },
-];
 const Articles = () => {
+  const router = useRouter();
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
   const [showStatusPopup, setShowStatusPopup] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<
     "Active" | "Deactivated"
   >();
-  const [teamMembers, setTeamMembers] = useState(adsData);
-  const [activeFilter, setActiveFilter] = useState<any>("All Articles");
-
-  const handleFilterClick = (filter: any) => {
-    setActiveFilter(filter);
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const [articlesData, setArticlesData] = useState<any>([]);
+  const [articlesDashboardData, setArticlesDashboardData] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
+  const handleFilterSelect = (filter: string) => {
+    setSelectedFilter(filter);
   };
 
-  const filteredTeamMembers = teamMembers.filter((members) => {
-    if (activeFilter === "All Articles") return true;
-    if (activeFilter === "Latest") return members.status === "Active";
-    return true;
-  });
+  const getArticlesDashboard = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/article/dashboard`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response, "response");
+      setArticlesDashboardData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getAllArticlesData = async () => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/article/getAll?filter=${selectedFilter}`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data.data);
+      setArticlesData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getTimeDifference = (createdAt: any) => {
+    const currentTime = moment();
+    const imageCreatedTime = moment(createdAt);
+    const diffInHours = currentTime.diff(imageCreatedTime, "hours");
+
+    if (diffInHours < 1) {
+      return "Just now";
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours !== 1 ? "s" : ""} ago`;
+    } else {
+      const diffInDays = currentTime.diff(imageCreatedTime, "days");
+      return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} ago`;
+    }
+  };
+
+  useEffect(() => {
+    getArticlesDashboard();
+  }, []);
+
+  useEffect(() => {
+    getAllArticlesData();
+  }, [selectedFilter]);
 
   return (
     <>
       <div className={styles.pSubRightDiv}>
         <div className={styles.pHeadingDiv}>
           <p className={styles.tabTitle}>Articles</p>
-          {/* <button
-            className={styles.addPartnerBtn}
-            type="button"
-            onClick={() => {
-              dispatch(selectedDetails(""));
-              dispatch(selectedProjects("writenews"));
-            }}
-          >
-            Add New
-          </button> */}
         </div>
 
         <div className={styles.dashboardScroll}>
@@ -148,7 +95,7 @@ const Articles = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Total Published Articles </h3>
               <div className={styles.leftPercentScore}>
-                <p>50</p>
+                <p>{articlesDashboardData?.totalArticles || 0}</p>
                 <span className={styles.userTitle}>Articles</span>
               </div>
             </div>
@@ -156,70 +103,90 @@ const Articles = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Latest Articles</h3>
               <div className={styles.leftPercentScore}>
-                <p>88</p>
+                <p>{articlesDashboardData?.totalLatestArticles || 0}</p>
                 <span className={styles.userTitle}>Articles</span>
               </div>
             </div>
           </div>
           <div className={styles.tableFilterMainDiv}>
             <div className={styles.userFilter}>
-              {["All Articles", "Latest"].map((filter) => (
-                <p
-                  key={filter}
-                  className={activeFilter === filter ? styles.selected : ""}
-                  onClick={() => handleFilterClick(filter)}
-                >
-                  {filter}
-                </p>
-              ))}
+              <p
+                className={selectedFilter === "All" ? styles.selected : ""}
+                onClick={() => handleFilterSelect("All")}
+              >
+                All Articles
+              </p>
+              <p
+                className={selectedFilter === "Latest" ? styles.selected : ""}
+                onClick={() => handleFilterSelect("Latest")}
+              >
+                Latest
+              </p>
             </div>
           </div>
           <div className={styles.graphUserTableDiv}>
             <div className={styles.candMainDiv}>
               <div className={styles.cardsGrid}>
-                {filteredTeamMembers?.map((article) => (
-                  <div
-                    className={styles.cardContainer}
-                    key={article.id}
-                    // onClick={() => {
-                    //   dispatch(selectedDetails(article));
-                    //   dispatch(selectedProjects("article_details"));
-                    // }}
-                  >
-                    <div
-                      className={styles.cardUpDiv}
-                      onClick={() => {
-                        dispatch(selectedDetails(article));
-                        dispatch(selectedProjects("article_details"));
-                      }}
-                    >
-                      <div className={styles.rankAdImg}>
-                        <img src="/newsimg.png" alt="profile" />
-                        {/* <img src={news?.adImage} alt="profile" /> */}
+                {articlesData?.length > 0 ? (
+                  articlesData?.map((article: any) => (
+                    // <Link
+                    //   href={`/articles?id=${article._id}`}
+                    //   key={article._id}
+                    // >
+                    <Link href={`/articles/${article._id}`} key={article._id}>
+                      <div className={styles.cardContainer} key={article._id}>
+                        <div
+                          className={styles.cardUpDiv}
+                          onClick={() => {
+                            dispatch(selectedDetails(article));
+                            dispatch(selectedProjects("article_details"));
+                          }}
+                        >
+                          <div className={styles.rankAdImg}>
+                            <img
+                              src={
+                                article?.mediaUrl
+                                  ? `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${article?.mediaUrl}`
+                                  : "/profile.svg"
+                              }
+                              alt="profile"
+                            />
+                          </div>
+                          <div className={styles.cardDetailsDiv}>
+                            <h4 className={styles.cardTitle}>
+                              {article?.title}
+                            </h4>
+                            <p className={styles.cardSubTitle}>
+                              {article?.companyName}{" "}
+                              <span>
+                                {" "}
+                                {getTimeDifference(article?.createdAt)}
+                              </span>
+                            </p>
+                            <p className={styles.cardDesc}>
+                              {article?.description?.slice(0, 100)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            dispatch(selectedDetails(article));
+                            setShowPopup(true);
+                          }}
+                        >
+                          <img src="/icons/delete.svg" alt="delete" /> Delete
+                        </button>
                       </div>
-                      <div className={styles.cardDetailsDiv}>
-                        <h4 className={styles.cardTitle}>{article?.title}</h4>
-                        <p className={styles.cardSubTitle}>
-                          {article?.companyName} <span>{article?.time}</span>
-                        </p>
-                        <p className={styles.cardDesc}>
-                          {article?.description}
-                        </p>
-                      </div>
-                    </div>
-                    {/* <div> */}
-                    <button
-                      className={styles.deleteBtn}
-                      onClick={() => {
-                        dispatch(selectedDetails(article));
-                        setShowPopup(true);
-                      }}
-                    >
-                      <img src="/icons/delete.svg" alt="delete" /> Delete
-                    </button>
-                    {/* </div> */}
+                    </Link>
+                  ))
+                ) : (
+                  <div className={styles.noDataDiv}>
+                    <p>No News Found</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -228,7 +195,11 @@ const Articles = () => {
 
       {showPopup &&
         createPortal(
-          <DeleteArticlePopup onClose={() => setShowPopup(false)} />,
+          <DeleteArticlePopup
+            onClose={() => setShowPopup(false)}
+            refreshData={getAllArticlesData}
+            refreshDashboardData={getArticlesDashboard}
+          />,
           document.getElementById("modals")!
         )}
     </>

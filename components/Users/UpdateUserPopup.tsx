@@ -1,23 +1,58 @@
-import React, { useState } from "react";
-import styles from "./updateuserpopup.module.scss";
-import styles1 from "./finalupdatepopup.module.scss";
-import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
+import axios from "axios";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import styles1 from "./finalupdatepopup.module.scss";
+import styles from "./updateuserpopup.module.scss";
 
 interface UpdateUserPopupProps {
   onClose: () => void;
+  refreshData?: any;
+  userIds?: string[];
+  isMultipleEdit?: boolean;
 }
 
-const UpdateUserPopup: React.FC<UpdateUserPopupProps> = ({ onClose }) => {
-  const [status, setStatus] = useState<"Active" | "Deactivated">("Active");
+const UpdateUserPopup: React.FC<UpdateUserPopupProps> = ({
+  onClose,
+  refreshData,
+  userIds = [],
+  isMultipleEdit = false,
+}) => {
+  const selectedUserDetails = useSelector(
+    (state: any) => state.selectedDetails
+  );
+  console.log(selectedUserDetails, selectedUserDetails);
+  const [status, setStatus] = useState<"Active" | "Inactivate">("Active");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-
   const handleStatusChange = (e: any) => {
     setStatus(e.target.value);
   };
+  console.log(userIds, "userIds");
 
-  const handleSubmit = () => {
-    setShowSuccessPopup(true);
+  const handleSubmit = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      // const payload = {
+      //   userId: selectedUserDetails._id,
+      //   status: status.toLocaleLowerCase(),
+      // };
+      const payload = {
+        userId: isMultipleEdit ? userIds : [selectedUserDetails._id],
+        status: status.toLocaleLowerCase(),
+      };
+      const joinedResponse = await axios({
+        method: "patch",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/user/update`,
+        data: payload,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(joinedResponse, "joinedResponse");
+      setShowSuccessPopup(true);
+      refreshData();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   if (showSuccessPopup) {
@@ -27,11 +62,25 @@ const UpdateUserPopup: React.FC<UpdateUserPopupProps> = ({ onClose }) => {
           <div className={styles1.modifySubDiv}>
             <div className={styles1.modifyHead}>
               <h5>
-                User {status === "Active" ? " Activated" : " Deactivated"}{" "}
+                {isMultipleEdit ? "Users" : "User"}{" "}
+                {status === "Active" ? " Activated" : " Inactivate"}{" "}
               </h5>
               <p className={styles1.modifyLinkDiv}>
-                <span className={styles1.enid}>ENID5666959</span> User Account
-                {status === "Active" ? " Activated" : " Deactivated"}
+                {/* <span className={styles1.enid}>ENID5666959</span> User Account
+                {status === "Active" ? " Activated" : " Inactivate"} */}
+                {isMultipleEdit ? (
+                  `${userIds?.length} User Accounts ${
+                    status === "Active" ? "Activated" : "Inactivated"
+                  }`
+                ) : (
+                  <>
+                    <span className={styles1.enid}>
+                      {selectedUserDetails?.enid}
+                    </span>{" "}
+                    User Account{" "}
+                    {status === "Active" ? "Activated" : "Inactivated"}
+                  </>
+                )}
               </p>
             </div>
             <button
@@ -59,7 +108,10 @@ const UpdateUserPopup: React.FC<UpdateUserPopupProps> = ({ onClose }) => {
 
           <div className={styles.connectContent}>
             <div className={styles.connectHeadDiv}>
-              <h4>Update User Status</h4>
+              <h4>
+                Update {isMultipleEdit ? `${userIds.length} Users` : "User"}{" "}
+                Status
+              </h4>
               <div className={styles.connectReqBody}>
                 <div className={styles.statusOptions}>
                   <label className={styles.statusLable}>Status:</label>
@@ -88,14 +140,14 @@ const UpdateUserPopup: React.FC<UpdateUserPopupProps> = ({ onClose }) => {
                       <button
                         type="button"
                         className={`${styles.deactiveBtn} ${
-                          status === "Deactivated" ? styles.deactivated : ""
+                          status === "Inactivate" ? styles.deactivated : ""
                         }`}
-                        onClick={() => setStatus("Deactivated")}
+                        onClick={() => setStatus("Inactivate")}
                       >
                         <Radio
-                          value="Deactivated"
+                          value="Inactivate"
                           className={
-                            status === "Deactivated" ? "deactivated-radio" : ""
+                            status === "Inactivate" ? "deactivated-radio" : ""
                           }
                         >
                           <span
@@ -103,7 +155,7 @@ const UpdateUserPopup: React.FC<UpdateUserPopupProps> = ({ onClose }) => {
                               color: "#FF4B4E",
                             }}
                           >
-                            Deactivated
+                            Inactivate
                           </span>
                         </Radio>
                       </button>

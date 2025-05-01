@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./contentmoderation.module.scss";
 import { message, Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
@@ -9,73 +9,53 @@ import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import RemoveContentPopup from "./RemoveContentPopup";
 import SendContentAlertPopup from "./SendContentAlertPopup";
-// import ValidationPopup from "./ValidationPopup";
+import axios from "axios";
+import Pagination from "../Pagination/Pagination";
+
 const ContentModeration = () => {
   const dispatch = useDispatch();
-  //   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showAlertPopup, setShowAlertPopup] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All content Reported");
-  //   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-  //     setSelectedRowKeys(newSelectedRowKeys);
-  //   };
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const [contentDashboard, setContentDashboard] = useState<any>("");
+  const [contentModData, setContentModData] = useState<any[]>([]);
+  const [currentFilter, setCurrentFilter] = useState<string>("Month");
+  const [dropdownLabel, setDropdownLabel] = useState<string>("Month");
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
-  //   const rowSelection = {
-  //     selectedRowKeys,
-  //     onChange: onSelectChange,
-  //   };
-  const handle7days = async (requestId: string) => {
-    try {
-      console.log("Connection removed:", requestId);
-      // setSelectedUserId(requestId);
-      // setShowRemovePopup(true);
-    } catch (error) {
-      console.error("Error removing connection:", error);
-    }
-  };
-
-  const handle10days = async (requestId: string) => {
-    try {
-      console.log("User blocked:", requestId);
-      // setSelectedUserId(requestId);
-      // setShowBlockPopup(true);
-    } catch (error) {
-      console.error("Error blocking user:", error);
-    }
-  };
-  const handleMonth = async (requestId: string) => {
-    try {
-      console.log("User blocked:", requestId);
-      // setSelectedUserId(requestId);
-      // setShowBlockPopup(true);
-    } catch (error) {
-      console.error("Error blocking user:", error);
-    }
-  };
-
-  const getDropdownItems = (userId: string): MenuProps["items"] => [
+  const getDropdownItems = (): MenuProps["items"] => [
     {
-      key: "7days",
+      key: "7 Days",
       label: "7 Days",
       onClick: () => {
-        handle7days(userId);
+        setDropdownLabel("7 Days");
+        setCurrentFilter("7 Days");
+        getAllContentMod("7 Days");
       },
     },
     {
-      key: "10days",
+      key: "10 Days",
       label: "10 Days",
       onClick: () => {
-        handle10days(userId);
+        setDropdownLabel("10 Days");
+        setCurrentFilter("10 Days");
+        getAllContentMod("10 Days");
       },
     },
     {
-      key: "month",
+      key: "Month",
       label: "Month",
       onClick: () => {
-        handleMonth(userId);
+        setDropdownLabel("Month");
+        setCurrentFilter("Month");
+        getAllContentMod("Month");
       },
     },
   ];
+
   const getMoreItems = (record: any): MenuProps["items"] => [
     {
       key: "remove",
@@ -94,6 +74,70 @@ const ContentModeration = () => {
       },
     },
   ];
+
+  const getContentDashboard = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/content-moderation/getTotalUser`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response, "response");
+      setContentDashboard(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getAllContentMod = async (filterDate: string) => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/content-moderation/getReporteddetail?filter=${selectedFilter}&filterDate=${filterDate}`,
+        headers: { Authorization: `${token}` },
+      });
+      const selectAllContentMod = response.data;
+      if (selectAllContentMod && selectAllContentMod.data) {
+        const formattedData = selectAllContentMod.data.map(
+          (content: any, index: number) => ({
+            _id: content._id || index.toString(),
+            enid: content?.postId
+              ? content?.postId?.userId?.ENID
+              : content?.messageId
+              ? content?.messageId?.userId?.ENID
+              : "ENID{NUMBER}",
+            // enid: content?.ENID || "ENID{NUMBER}",
+            userName: content?.reportedBy?.userName || "-",
+            name: `${content?.reportedBy?.firstName || "Test"} ${
+              content?.reportedBy?.lastName || "User"
+            }`.trim(),
+            status: content?.status || "-",
+            reportedUserENId: content?.postId
+              ? content?.postId?.userId?.ENID
+              : content?.messageId
+              ? content?.messageId?.userId?.ENID
+              : content?.reportedUserId
+              ? content?.reportedUserId?.ENID
+              : "-",
+            message: content?.reason || "-",
+            originalData: content,
+          })
+        );
+        setContentModData(formattedData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = [
     // {
@@ -128,15 +172,15 @@ const ContentModeration = () => {
             padding: "4px 8px",
             borderRadius: "64px",
             backgroundColor:
-              status === "Resolved"
+              status === "resolved"
                 ? "#E8F7F7"
-                : status === "Under Review"
+                : status === "under_review"
                 ? "#ffe10033"
                 : "#FFE9E9",
             color:
-              status === "Resolved"
+              status === "resolved"
                 ? "#00A3B1"
-                : status === "Under Review"
+                : status === "under_review"
                 ? "#968612"
                 : "#FF4D4F",
           }}
@@ -146,10 +190,24 @@ const ContentModeration = () => {
       ),
     },
     {
-      title: "Reported",
-      dataIndex: "referralenid",
-      key: "referralenid",
-      render: (text: any) => <span style={{ color: "#00A3B1" }}>{text}</span>,
+      title: "Reporte BY",
+      dataIndex: "reportedUserENId",
+      key: "reportedUserENId",
+      render: (text: any, record: any) => (
+        <>
+          <span style={{ color: "#00A3B1" }}>{text}</span>
+          <br />
+          <span>
+            {record?.originalData?.postId
+              ? "Post Report"
+              : record?.originalData?.messageId
+              ? "Message Report"
+              : record?.originalData?.reportedUserId
+              ? "User Report"
+              : ""}
+          </span>
+        </>
+      ),
     },
     {
       title: "Message",
@@ -172,7 +230,7 @@ const ContentModeration = () => {
           >
             <img src="/icons/eye.svg" alt="eye" />
           </a>
-          {record.status === "Under Review" ? (
+          {record.status === "under_review" ? (
             <Dropdown
               menu={{ items: getMoreItems(record) }}
               trigger={["hover"]}
@@ -191,73 +249,24 @@ const ContentModeration = () => {
     },
   ];
 
-  const data = [
-    {
-      key: "1",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Resolved",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "Influencer",
-      message:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-    },
-    {
-      key: "2",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Under Review",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "recruiter",
-      message:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-    },
-    {
-      key: "3",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Under Review",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "Influencer",
-      message:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-    },
-    {
-      key: "4",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Resolved",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "Influencer",
-      message:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting.",
-    },
-  ];
+  const handleFilterSelect = (filter: string) => {
+    setSelectedFilter(filter);
+    setCurrentPage(1);
+  };
 
-  const filteredData = useMemo(() => {
-    if (activeFilter === "All content Reported") return data;
-    return data.filter((item) => item.status === activeFilter);
-  }, [activeFilter]);
+  useEffect(() => {
+    getContentDashboard();
+  }, []);
+
+  useEffect(() => {
+    getAllContentMod("Month");
+    setDropdownLabel("Month");
+  }, [selectedFilter]);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return contentModData.slice(startIndex, startIndex + itemsPerPage);
+  }, [contentModData, currentPage, itemsPerPage]);
 
   return (
     <>
@@ -271,7 +280,7 @@ const ContentModeration = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Total Users Reported</h3>
               <div className={styles.leftPercentScore}>
-                <p>55</p>
+                <p>{contentDashboard?.totalReported}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -279,7 +288,7 @@ const ContentModeration = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Under Review</h3>
               <div className={styles.leftPercentScore}>
-                <p>7888</p>
+                <p>{contentDashboard?.totalUnderReviewReported}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -287,7 +296,7 @@ const ContentModeration = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Resolved</h3>
               <div className={styles.leftPercentScore}>
-                <p>756</p>
+                <p>{contentDashboard?.totalResolvedReported}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -295,7 +304,7 @@ const ContentModeration = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Removed</h3>
               <div className={styles.leftPercentScore}>
-                <p>754684</p>
+                <p>{contentDashboard?.totalRemovedReported}</p>
                 <span className={styles.userTitle}>Reports</span>
               </div>
             </div>
@@ -303,17 +312,16 @@ const ContentModeration = () => {
 
           <div className={styles.tableFilterMainDiv}>
             <div className={styles.inputMainDiv}>
-              <p>500 Total Reports</p>
+              <p>{contentDashboard?.totalReported} Total Reports</p>
             </div>
             <div className={styles.monthsDropdown}>
               <Dropdown
-                menu={{ items: getDropdownItems("") }}
+                menu={{ items: getDropdownItems() }}
                 trigger={["hover"]}
                 placement="bottomRight"
-                // style={{ width: "100%" }}
               >
                 <div className={styles.dollarsLabel}>
-                  <p>Month</p>
+                  <p>{dropdownLabel}</p>
                   <div className={styles.dropdownArrow}>
                     <img src="/icons/dashdownarrow.svg" alt="dropdownarrow" />
                   </div>
@@ -321,7 +329,7 @@ const ContentModeration = () => {
               </Dropdown>
             </div>
           </div>
-          <div className={styles.userFilter}>
+          {/* <div className={styles.userFilter}>
             {["All content Reported", "Under Review", "Resolved"].map(
               (filter) => (
                 <p
@@ -340,6 +348,30 @@ const ContentModeration = () => {
                 </p>
               )
             )}
+          </div> */}
+          <div className={styles.userFilter}>
+            <p
+              className={selectedFilter === "All" ? styles.activeFilter : ""}
+              onClick={() => handleFilterSelect("All")}
+            >
+              All content Reported
+            </p>
+            <p
+              className={
+                selectedFilter === "under_review" ? styles.activeFilter : ""
+              }
+              onClick={() => handleFilterSelect("under_review")}
+            >
+              Under Review
+            </p>
+            <p
+              className={
+                selectedFilter === "resolved" ? styles.activeFilter : ""
+              }
+              onClick={() => handleFilterSelect("resolved")}
+            >
+              Resolved
+            </p>
           </div>
           <div className={styles.graphUserTableDiv}>
             <div className={styles.graphDivtable}>
@@ -348,22 +380,39 @@ const ContentModeration = () => {
                 // rowKey="key"
                 bordered={true}
                 columns={columns}
-                dataSource={filteredData}
+                dataSource={paginatedData}
+                // dataSource={contentModData}
+                loading={loading}
                 pagination={false}
                 className={styles.recentJoinTable}
               />
             </div>
           </div>
+          <Pagination
+            totalItems={contentModData.length}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
         </div>
       </div>
       {showPopup &&
         createPortal(
-          <RemoveContentPopup onClose={() => setShowPopup(false)} />,
+          <RemoveContentPopup
+            onClose={() => setShowPopup(false)}
+            refreshData={getAllContentMod}
+            refreshDashData={getContentDashboard}
+          />,
           document.getElementById("modals")!
         )}
       {showAlertPopup &&
         createPortal(
-          <SendContentAlertPopup onClose={() => setShowAlertPopup(false)} />,
+          <SendContentAlertPopup
+            onClose={() => setShowAlertPopup(false)}
+            refreshData={getAllContentMod}
+            refreshDashData={getContentDashboard}
+          />,
           document.getElementById("modals")!
         )}
     </>

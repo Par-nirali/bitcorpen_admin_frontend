@@ -1,26 +1,55 @@
-import React from "react";
-import styles from "./recentallsubscribed.module.scss";
-import { IoIosArrowBack } from "react-icons/io";
+import { Table } from "antd";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectedProjects } from "../../redux/actions";
-import { Table } from "antd";
+import styles from "./recentallsubscribed.module.scss";
+import Pagination from "../../Pagination/Pagination";
 
-const RecentAllSubscribed = ({
-  setSelectedProject,
-  warningpopup,
-  setWarningPopup,
-  errorpopup,
-  setErrorPopup,
-  stopwarninpopup,
-  setStopWarningpopup,
-}: any) => {
+const RecentAllSubscribed = () => {
   const dispatch = useDispatch();
+  const selectRecSubscribedUserData = useSelector(
+    (state: any) => state.selectedRecSubscribedUserDetails
+  );
+  console.log(selectRecSubscribedUserData, "selectRecSubscribedUserData");
+  const [showRecSubscribedUser, setShowRecSubscribedUser] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+
+  const getRecentSubscribedUser = async () => {
+    if (selectRecSubscribedUserData && selectRecSubscribedUserData.data) {
+      const formattedData = selectRecSubscribedUserData.data.map(
+        (user: any, index: number) => ({
+          key: user._id || index.toString(),
+          enid: user.ENID || "ENID{NUMBER}",
+          userName: user.userName || "-",
+          name: `${user.firstName || "Test"} ${user.lastName || "User"}`.trim(),
+          plan: user.userType || "-",
+          status: user.status || "-",
+          joinedDate: new Date(user.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+          joinedThrough: user.userIS || "-",
+          planexpires: new Date(user.expireTime).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+        })
+      );
+      setShowRecSubscribedUser(formattedData);
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
       title: "ENID",
       dataIndex: "enid",
       key: "enid",
-      render: () => <p className={styles.enidTag}>ENID5666959</p>,
+      render: (text: any) => <p className={styles.enidTag}>{text}</p>,
     },
     {
       title: "User Name",
@@ -41,7 +70,11 @@ const RecentAllSubscribed = ({
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: () => <p className={styles.statusTag}>Active</p>,
+      render: (text: any) => (
+        <p className={styles.statusTag}>
+          {text === "active" ? "Active" : text}
+        </p>
+      ),
     },
     {
       title: "Joined date",
@@ -49,9 +82,17 @@ const RecentAllSubscribed = ({
       key: "joinedDate",
     },
     {
-      title: "Joined Through ",
-      dataIndex: "joinedThrough",
-      key: "joinedThrough",
+      title: "Plan Expires",
+      dataIndex: "planexpires",
+      key: "planexpires",
+      // render: (text: any) =>
+      //   text === "ORGANIC"
+      //     ? "Organic"
+      //     : text === "AD"
+      //     ? "Ad"
+      //     : text === "AFFILIATES"
+      //     ? "Affiliates"
+      //     : text,
     },
   ];
 
@@ -68,6 +109,16 @@ const RecentAllSubscribed = ({
     },
   ];
 
+  useEffect(() => {
+    if (selectRecSubscribedUserData) {
+      getRecentSubscribedUser();
+    }
+  }, [selectRecSubscribedUserData]);
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return showRecSubscribedUser.slice(startIndex, startIndex + itemsPerPage);
+  }, [showRecSubscribedUser, currentPage, itemsPerPage]);
+
   return (
     <div className={styles.pSubRightDiv}>
       <button
@@ -75,48 +126,17 @@ const RecentAllSubscribed = ({
         // onClick={() => setSelectedProject("sales projects")}
         onClick={() => dispatch(selectedProjects("dashboard"))}
       >
-        {/* <div className={styles.backArrow}> */}
         <img src="/icons/back.svg" alt="back" />
-        {/* </div> */}
         <p>Recent Subscribed </p>
       </button>
 
-      {/* <div className={styles.pHeadingDiv}>
-          <h3>Add Project</h3>
-        </div> */}
-
       <div className={styles.dashboardScroll}>
-        <div className={styles.pScoreDiv}>
+        {/* <div className={styles.pScoreDiv}>
           <div className={styles.pScoreLeftinnerDiv}>
-            {/* <div className={styles.pleftHead}> */}
             <h3>Organic Joiners</h3>
-            {/* </div> */}
 
             <div className={styles.leftPercentScore}>
-              {/* <p>
-                    $
-                    {loading ? (
-                      <>
-                        <Skeleton
-                          height={20}
-                          width={100}
-                          className={styles.skelMargin}
-                        />
-                      </>
-                    ) : showValue ? (
-                      `${
-                        departmentdata?.[0]?.total_target_amount?.toFixed(0) ?? 0
-                      }`
-                    ) : (
-                      "*".repeat(
-                        (departmentdata?.[0]?.total_target_amount ?? 0)
-  
-                          .toFixed(0)
-                          .toString().length || 0
-                      )
-                    )}
-                  </p> */}
-              <p>$000</p>
+              <p>{selectRecSubscribedUserData?.totalOrganicUser}</p>
               <span className={styles.userTitle}>Users</span>
             </div>
           </div>
@@ -124,33 +144,7 @@ const RecentAllSubscribed = ({
           <div className={styles.pScoreLeftinnerDiv}>
             <h3>Joined Through AD</h3>
             <div className={styles.leftPercentScore}>
-              {/* <p>
-                    $
-                    {loading ? (
-                      <>
-                        <Skeleton
-                          height={20}
-                          width={100}
-                          className={styles.skelMargin}
-                        />
-                      </>
-                    ) : showValue ? (
-                      `${(
-                        (departmentdata?.[0]?.total_target_amount ?? 0) -
-                        (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                      ).toFixed(0)}`
-                    ) : (
-                      "*".repeat(
-                        (
-                          (departmentdata?.[0]?.total_target_amount ?? 0) -
-                          (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                        )
-                          .toFixed(0)
-                          .toString().length || 0
-                      )
-                    )}
-                  </p> */}
-              <p>999</p>
+              <p>{selectRecSubscribedUserData?.totalAdUser}</p>
               <span className={styles.userTitle}>Users</span>
             </div>
           </div>
@@ -158,56 +152,32 @@ const RecentAllSubscribed = ({
           <div className={styles.pScoreLeftinnerDiv}>
             <h3>Affiliate Joiners</h3>
             <div className={styles.leftPercentScore}>
-              {/* <p>
-                    $
-                    {loading ? (
-                      <>
-                        <Skeleton
-                          height={20}
-                          width={100}
-                          className={styles.skelMargin}
-                        />
-                      </>
-                    ) : showValue ? (
-                      `${
-                        departmentdata?.[0]?.total_thisMonthRevenue.toFixed(2) ??
-                        0
-                      }`
-                    ) : (
-                      "*".repeat(
-                        (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                          .toFixed(2)
-                          .toString().length || 0
-                      )
-                    )}
-                  </p> */}
-              <p>8758</p>
+              <p>{selectRecSubscribedUserData?.totalAffilatesUser}</p>
               <span className={styles.userTitle}>Users</span>
             </div>
           </div>
-        </div>
+        </div> */}
         <div className={styles.graphTableDiv}>
-          {/* <div className={styles.dropdownsSection}>
-              <p className={styles.dollarsTitle}>Recent Subscribed</p>
-              <button
-                className={styles.viewAllBtn}
-                onClick={() => dispatch(selectedProjects("recenetalljoin"))}
-              >
-                View All
-              </button>
-            </div> */}
-
           <div className={styles.graphDivtable}>
             <Table
               bordered={true}
               // border={"1px solid #000"}
               columns={columns}
-              dataSource={data}
+              // dataSource={showRecSubscribedUser}
+              dataSource={paginatedData}
               pagination={false}
               className={styles.recentJoinTable}
+              loading={showRecSubscribedUser.length === 0}
             />
           </div>
         </div>
+        <Pagination
+          totalItems={showRecSubscribedUser.length}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+        />
       </div>
     </div>
   );

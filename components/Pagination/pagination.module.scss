@@ -1,0 +1,166 @@
+.paginationContainer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: transparent;
+    // border-top: 1px solid #e8e8e8;
+    font-size: 14px;
+    color: #666;
+
+    .itemsInfo {
+        white-space: nowrap;
+        font-size: 13px;
+        color: #676666;
+        // font-family: "SF Pro";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
+}
+
+.itemsInfoLeftDiv {
+    // width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    // width: 50%;
+}
+
+
+
+.rowsPerPage {
+    display: flex;
+    align-items: center;
+
+}
+
+.rowsSelect {
+    width: 60px;
+    height: auto;
+    padding: 8px 20px 8px 18px;
+    margin-right: 8px;
+    border-radius: 8px;
+    border: 1px solid #B5B5B5;
+    background-color: white;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 8px;
+
+    &:focus {
+        outline: none;
+        border-color: #40a9ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    }
+}
+
+.rowsLabel {
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+.pageNavigation {
+    display: flex;
+    align-items: center;
+
+}
+
+.pageLabel,
+.pageTotal {
+    margin-right: 8px;
+    color: #676666;
+    font-family: "SF Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: normal;
+}
+
+.pageTotal {
+    margin-left: 8px;
+}
+
+.pageInputContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    // height: 32px;
+    // border: 1px solid #d9d9d9;
+    // border-radius: 4px;
+    background-color: white;
+    overflow: hidden;
+}
+
+.pageInput {
+    width: 55px;
+    height: 100%;
+    padding: 8px 20px;
+    // padding: 4px 20px 4px 8px;
+    text-align: left;
+    border-radius: 8px;
+    border: 1px solid #B5B5B5;
+    font-size: 14px;
+    color: #333;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.arrowsContainer {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    // border-left: 1px solid #f0f0f0;
+}
+
+.pageArrowButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 50%;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #8E8E8E;
+
+    // &:first-child {
+    //     border-bottom: 1px solid #f0f0f0;
+    // }
+
+    &:hover:not(:disabled) {
+        color: #666;
+        background-color: transparent;
+    }
+
+    &:hover {
+        // background: none;
+        // columns: ;
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    &:disabled {
+        color: #dddddd;
+        cursor: not-allowed;
+    }
+
+    svg {
+        width: 8px;
+        height: 4px;
+    }
+}

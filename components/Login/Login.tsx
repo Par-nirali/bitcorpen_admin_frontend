@@ -1,21 +1,14 @@
+import { useToast } from "@chakra-ui/react";
 import axios from "axios";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
-import { useToast } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
-import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-import { Slide, toast, ToastContainer } from "react-toastify";
+import { useRef, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
+import SocketIOClient from "socket.io-client";
 import * as Yup from "yup";
 import setAuthHeader from "../../utils/setAuth";
 import styles from "./login.module.scss";
-// import NotificationHandler from "../NotificationInbox/NotificationInbox";
-import Link from "next/link";
-import { io, Socket } from "socket.io-client";
-import SocketIOClient from "socket.io-client";
-
-// const socket = SocketIOClient("http://172.168.16.69:8455");
 
 const loginValidationSchema = Yup.object().shape({
   email: Yup.string()
@@ -33,16 +26,19 @@ const forgotPasswordValidationSchema = Yup.object().shape({
 let activeSocket: any = null;
 
 export const initializeSocket = (userId: string) => {
-  // if (activeSocket) {
-  //   activeSocket.disconnect();
-  //   console.log("Socket disconnected");
-  // }
+  if (activeSocket) {
+    activeSocket.disconnect();
+    console.log("Socket disconnected");
+  }
 
-  activeSocket = SocketIOClient(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL);
+  activeSocket = SocketIOClient(
+    process.env.NEXT_PUBLIC_REACT_APP_BASE_URL_SOCKET
+  );
 
   activeSocket.on("connect", () => {
-    console.log("Socket connected");
-    activeSocket.emit("auth", userId);
+    console.log("Socket connected========");
+    activeSocket.emit("setup", userId);
+    console.log("socket connecteeeeeeeeeeeeee", userId);
   });
 
   activeSocket.on("connect_error", (error: any) => {
@@ -52,14 +48,58 @@ export const initializeSocket = (userId: string) => {
   return activeSocket;
 };
 
-export const getSocket = () => activeSocket;
+export const getSocket = () => {
+  return activeSocket;
+};
 
-export const sendNotificationMessage = (message: string) => {
-  if (activeSocket) {
-    activeSocket.emit("notification", message);
-    return true;
+// Add this function in your Login.tsx file
+
+// Map permission names to their corresponding routes
+const permissionRouteMap: Record<string, string> = {
+  dashboard: "/dashboard",
+  user: "/users",
+  creditlogs: "/creditlogs",
+  subscribers: "/subscribers",
+  helpAndSupport: "/helpandsupport",
+  affiliation: "/affiliation",
+  enassist: "/enassist",
+  team: "/team",
+  partners: "/partners",
+  adcontrols: "/adcontrols",
+  mobileadcontrols: "/mobileadcontrols",
+  leaderboard: "/leaderboard",
+  notifications: "/notification", // Note: for subadmin it's /notification not /notifications
+  subadmins: "/subadmins",
+  flaguser: "/flaguser",
+  accountverification: "/accountverification",
+  withdrawls: "/withdrawls",
+  contentmoderation: "/contentmoderation",
+  news: "/news",
+  articles: "/articles",
+};
+
+// Function to determine the first permitted page from permissions array
+const getFirstPermittedPage = (permissions: string[]): string => {
+  // Define priority order for permissions if needed
+  // This is optional - you could define certain pages to take precedence
+  const priorityOrder = ["dashboard", "user", "helpAndSupport"];
+
+  // Check if any priority permissions exist in the user's permissions
+  for (const priority of priorityOrder) {
+    if (permissions.includes(priority)) {
+      return permissionRouteMap[priority];
+    }
   }
-  return false;
+
+  // If no priority permissions found, use the first available permission
+  for (const permission of permissions) {
+    if (permissionRouteMap[permission]) {
+      return permissionRouteMap[permission];
+    }
+  }
+
+  // Default fallback route if no matches found
+  return "/subadminprofile";
 };
 
 const Login = () => {
@@ -67,7 +107,6 @@ const Login = () => {
   const toast = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const [socket, setSocket] = useState<Socket | null>(null);
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [logg, setLogg] = useState(false);
@@ -75,187 +114,33 @@ const Login = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  // const socket = SocketIOClient(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL);
+
   const socketRef = useRef<ReturnType<typeof SocketIOClient>>();
-  // const socket = SocketIOClient("http://172.168.16.48:8455");
-  // Function to create and manage SSE connection
-  // const createEventSource = () => {
-  //   // Close existing connection if any
-  //   if (eventSource) {
-  //     eventSource.close();
-  //   }
 
-  //   // Get the authentication token
-  //   const token = localStorage.getItem("auth-token");
-  //   if (!token) {
-  //     console.error("No auth token found");
-  //     return;
-  //   }
-
-  //   try {
-  //     // Create EventSource with the correct endpoint
-  //     const source = new EventSource(
-  //       `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/notification/events?token=${token}`
-  //     );
-
-  //     // source.onopen = () => {
-  //     //   // console.log("SSE connection established");
-  //     // };
-
-  //     source.onmessage = (event) => {
-  //       try {
-  //         const newMessage = JSON.parse(event.data);
-  //         setMessages((prevMessages) => [...prevMessages, newMessage]);
-  //         // console.log("Received message:", newMessage);
-  //       } catch (error) {
-  //         console.error("Error parsing SSE message:", error);
-  //       }
-  //     };
-
-  //     source.onerror = (error) => {
-  //       console.error("EventSource failed:", error);
-  //       source.close();
-  //       setTimeout(() => {
-  //         // console.log("Attempting to reconnect...");
-  //         createEventSource();
-  //       }, 1000);
-  //     };
-
-  //     setEventSource(source);
-  //   } catch (error) {
-  //     console.error("Error creating EventSource:", error);
-  //     startPolling();
-  //   }
-  // };
-
-  // const startPolling = async () => {
-  //   const token = localStorage.getItem("auth-token");
-  //   if (!token) return;
-
-  //   try {
-  //     const response = await axios.get(
-  //       `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/notification/eventsevents?token=${token}`,
-  //       {
-  //         // headers: {
-  //         //   Authorization: token,
-  //         // },
-  //         responseType: "stream",
-  //       }
-  //     );
-
-  //     // console.log("Notification response:", response.data);
-  //     if (response.data) {
-  //       setMessages((prevMessages) => [...prevMessages, response.data]);
-  //     }
-  //   } catch (error) {
-  //     console.error("Notification error:", error);
-  //   }
-  // };
-
-  // // Cleanup function
-  // useEffect(() => {
-  //   return () => {
-  //     if (eventSource) {
-  //       eventSource.close();
-  //     }
-  //   };
-  // }, [eventSource]);
-
-  // useEffect(() => {
-  //   const connectSocket = (userId: string) => {
-  //     // Direct connection without a token (no auth)
-  //     // const socketInstance = io(process.env.NEXT_PUBLIC_REACT_APP_BASE_URL);
-  //     socket.on("connect", () => {
-  //       console.log("Socket connected");
-  //     });
-  //     socket.emit("auth", userId);
-
-  //     socket.on("connect_error", (error) => {
-  //       console.error("Socket connection error:", error);
-  //     });
-
-  //     socket.on("notification", (message) => {
-  //       setMessages((prevMessages) => [...prevMessages, message]);
-  //     });
-
-  //     // setSocket(socket);
-  //   };
-  //   connectSocket(); // Connect to Socket on mount
-
-  //   return () => {
-  //     if (socket) {
-  //       socket.disconnect();
-  //     }
-  //   };
-  // }, []);
-
-  // const initializeSocket = (userId: string) => {
-  //   // Disconnect existing socket if any
-  //   if (socketRef.current) {
-  //     socketRef.current.disconnect();
-  //     console.log("Socket disconnected");
-  //   }
-
-  //   socketRef.current = SocketIOClient(
-  //     process.env.NEXT_PUBLIC_REACT_APP_BASE_URL
-  //   );
-
-  //   // Set up socket event handlers
-  //   socketRef.current.on("connect", () => {
-  //     console.log("Socket connected");
-  //     // Emit auth event with user ID
-  //     socketRef.current?.emit("auth", userId);
-  //   });
-
-  //   socketRef.current.on("connect_error", (error) => {
-  //     console.error("Socket connection error:", error);
-  //   });
-
-  //   socketRef.current.on("notification", (message) => {
-  //     console.log("Received message:", message);
-  //     setMessages((prevMessages) => [...prevMessages, message]);
-  //   });
-  // };
-
-  // useEffect(() => {
-  //   return () => {
-  //     if (socketRef.current) {
-  //       socketRef.current.disconnect();
-  //       console.log("Socket disconnected");
-  //     }
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   if (logg) {
-  //     initializeSocket();
-  //   }
-  // }, [logg]);
-
-  const loginMail = (values: any) => {
+  const loginMail = async (values: any) => {
     let payload = {
       email: values.email,
       password: values.password,
     };
-    setIsSubmitting(true);
-    // socket?.emit("login", payload);
+
     try {
-      axios({
+      await axios({
         method: "post",
         url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin-auth/login`,
         data: payload,
       })
-        .then((res) => {
+        .then(async (res) => {
           console.log("login admin responseeeeeeeeeeeeee", res.data);
           let userData: any = {
+            userName: res.data.data.userName,
             firstName: res.data.data.firstName,
             lastName: res.data.data.lastName,
             email: res.data.data.email,
             _id: res.data.data._id,
             userType: res.data.data.userType,
             userRole: res.data.data.userRole,
-            departmentId: res.data.data.departmentId,
-            group: res.data.data.group,
+            profileImage: res.data.data.profileImage,
+            phone: res.data.data.phone,
           };
 
           localStorage.setItem("bitcorpenadminData", JSON.stringify(userData));
@@ -264,17 +149,13 @@ const Login = () => {
             "auth-token",
             res.headers["X-Auth-Token"] || res.headers["x-auth-token"]
           );
-          // localStorage.setItem("auth-token", authToken);
+
           setAuthHeader(
             res.headers["X-Auth-Token"] || res.headers["x-auth-token"]
           );
           Cookies.set("isLoggedIn", true as any, { expires: 365 });
-          // connectSocket(res.data._id);
-          // const socket = initializeSocket(res.data._id);
-          // socket.on("notification", (message: any) => {
-          //   // Handle global notifications if needed
-          //   console.log("Received message:", message);
-          // });
+
+          initializeSocket(res.data.data._id);
           toast({
             title: "Login Successfull",
             description: "Admin login successfully.",
@@ -282,16 +163,51 @@ const Login = () => {
             position: "top-right",
             isClosable: true,
           });
-          // notification();
-          // createEventSource();
+
           setLogg(true);
-          setTimeout(() => {
-            router.push("/");
-          }, 1000);
-          // setIsSubmitting(false);
+          // setTimeout(() => {
+          //   router.push("/dashboard");
+          // }, 1000);
+
+          if (res.data.data.userRole === "ADMIN") {
+            // Admin goes to dashboard as usual
+            setTimeout(() => {
+              router.push("/dashboard");
+            }, 1000);
+          } else if (res.data.data.userRole === "SUBADMIN") {
+            // For subadmin, get permissions and redirect to first permitted page
+            try {
+              const token =
+                res.headers["X-Auth-Token"] || res.headers["x-auth-token"];
+              const permissionsResponse = await axios({
+                method: "get",
+                url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/permission/get`,
+                headers: { Authorization: `${token}` },
+              });
+              console.log("permissionsResponse", permissionsResponse.data.data);
+
+              const permissions: any = permissionsResponse.data.data;
+              localStorage.setItem(
+                "subadminroles",
+                JSON.stringify(permissions)
+              );
+
+              // Determine first accessible page from permissions
+              const redirectPath = getFirstPermittedPage(permissions);
+
+              setTimeout(() => {
+                router.push(redirectPath);
+              }, 1000);
+            } catch (error) {
+              console.error("Error fetching permissions:", error);
+              // Fallback to dashboard if permissions fetch fails
+              setTimeout(() => {
+                router.push("/dashboard");
+              }, 1000);
+            }
+          }
         })
         .catch((error) => {
-          // console.log(error, "errrrrrorrr");
           toast({
             title: "Admin Login Error",
             description:
@@ -300,7 +216,6 @@ const Login = () => {
             position: "top-right",
             isClosable: true,
           });
-          setIsSubmitting(false);
         });
     } catch (error) {
       toast({
@@ -311,14 +226,13 @@ const Login = () => {
         isClosable: true,
       });
     } finally {
-      // setIsSubmitting(true);
     }
   };
+
   const handleForgotPassword = (values: any) => {
-    // setIsSubmitting(true);
     axios({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/user/sendFrogetPassLink`,
+      url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/auth/forgot-password`,
       data: {
         email: values.email,
       },
@@ -331,8 +245,6 @@ const Login = () => {
           position: "top-right",
           isClosable: true,
         });
-        // setIsSubmitting(false);
-        // setIsForgotPassword(false);
       })
       .catch((error) => {
         toast({
@@ -344,41 +256,15 @@ const Login = () => {
           position: "top-right",
           isClosable: true,
         });
-        // setIsSubmitting(false);
-        // setIsForgotPassword(false);
       });
+    //i wnat that after login if amdin login then it have to show dashboard and otherwise for subadmin login it hvae to hsow subadmin
   };
-  // useEffect(() => {
-  //   // return () => {
-  //   //   if (timerRef.current) {
-  //   //     clearTimeout(timerRef.current);
-  //   //   }
-  //   notification();
-  // }, []);
-
-  // const notification = () => {
-  //   let tkn = localStorage.getItem("auth-token");
-  //   const res = axios.get(
-  //     `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/notification/events?token=${tkn}`
-  //   );
-  //   console.log("jinptificationmkcdsn ", res);
-  // };
 
   return (
     <>
       <div className={styles.loginMainDiv}>
         <div className={styles.loginContainer}>
-          <div
-            className={styles.loginSubDiv}
-            // ref={closeRef}
-          >
-            {/* <div
-              className={styles.loginClose}
-              // onClick={onClose}
-            >
-              <img src="/icons/close.svg" alt="close" />
-            </div> */}
-
+          <div className={styles.loginSubDiv}>
             <div className={styles.loginContent}>
               <div className={styles.loginHead}>
                 <div className={styles.logoImg}>
@@ -395,12 +281,9 @@ const Login = () => {
                   email: "",
                   password: "",
                 }}
-                // initialValues={initialValues}
-                // validationSchema={LoginSchema}
                 onSubmit={loginMail}
-                // onSubmit={handleSubmit}
               >
-                {({ isSubmitting, touched, errors }) => (
+                {({ isSubmitting, touched, errors, values }) => (
                   <Form className={styles.loginForm}>
                     <div className={styles.loginFieldsMain}>
                       <div className={styles.coolinput}>
@@ -448,14 +331,15 @@ const Login = () => {
                       </div>
                     </div>
 
-                    <p className={styles.forgotPassword}>Forgot Password?</p>
+                    <p
+                      className={styles.forgotPassword}
+                      onClick={() => handleForgotPassword(values)}
+                    >
+                      Forgot Password?
+                    </p>
                     <div className={styles.formFooter}>
-                      <button
-                        type="submit"
-                        className={styles.signInButton}
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? "Signing in..." : "Sign in"}
+                      <button type="submit" className={styles.signInButton}>
+                        Sign in
                       </button>
                     </div>
                   </Form>

@@ -3,17 +3,44 @@ import styles from "./removepartnerpopup.module.scss";
 import styles1 from "./finalremovepopup.module.scss";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 interface RemovePartnerProps {
   onClose: () => void;
+  refreshData: () => void;
+  refreshDashData?: any;
 }
-const RemovePartnerPopup: React.FC<RemovePartnerProps> = ({ onClose }) => {
+const RemovePartnerPopup: React.FC<RemovePartnerProps> = ({
+  onClose,
+  refreshData,
+  refreshDashData,
+}) => {
   //   const isDeactivating = currentStatus === "Active";
   //   const actionText = isDeactivating ? "Deactivate" : "Activate";
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const selectedPartnerDetail = useSelector(
+    (state: any) => state.selectedDetails
+  );
+  console.log(selectedPartnerDetail, "selectedPartnerDetail");
 
-  const handleSubmit = () => {
-    setShowSuccessPopup(true);
+  const handleSubmit = async () => {
+    let tkn = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "delete",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/partner-collaboration/delete/${selectedPartnerDetail._id}`,
+        headers: {
+          Authorization: `${tkn}`,
+        },
+      });
+      console.log("API Response:", response.data);
+      setShowSuccessPopup(true);
+      refreshData();
+      refreshDashData();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   if (showSuccessPopup) {
@@ -26,7 +53,10 @@ const RemovePartnerPopup: React.FC<RemovePartnerProps> = ({ onClose }) => {
             <div className={styles1.modifyHead}>
               <h5>Partner Removed</h5>
               <p className={styles1.modifyLinkDiv}>
-                <span className={styles1.enid}>Dummy Name</span> Partner Removed
+                <span className={styles1.enid}>
+                  {selectedPartnerDetail?.companyName}
+                </span>{" "}
+                Partner Removed
               </p>
             </div>
             <button
@@ -57,7 +87,7 @@ const RemovePartnerPopup: React.FC<RemovePartnerProps> = ({ onClose }) => {
               <h4>Remove Partner</h4>
               <p>
                 Are you sure do you want to Remove Partner{" "}
-                <span>Dummy Name </span>
+                <span> {selectedPartnerDetail?.companyName}</span>
               </p>
             </div>
             <div className={styles.connectBtns}>

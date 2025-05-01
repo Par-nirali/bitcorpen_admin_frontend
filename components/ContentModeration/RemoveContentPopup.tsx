@@ -4,20 +4,44 @@ import styles1 from "./finalremovepopup.module.scss";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 interface RemoveContentProps {
   onClose: () => void;
+  refreshData?: any;
+  refreshDashData: () => void;
 }
-const RemoveContentPopup: React.FC<RemoveContentProps> = ({ onClose }) => {
-  //   const isDeactivating = currentStatus === "Active";
-  //   const actionText = isDeactivating ? "Deactivate" : "Activate";
+const RemoveContentPopup: React.FC<RemoveContentProps> = ({
+  onClose,
+  refreshData,
+  refreshDashData,
+}) => {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const selectedSubAdminDetail = useSelector(
+  const selectedContentDetail = useSelector(
     (state: any) => state.selectedDetails
   );
+  console.log("selectedContentDetail", selectedContentDetail);
 
-  const handleSubmit = () => {
-    setShowSuccessPopup(true);
+  const handleSubmit = async () => {
+    let tkn = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "delete",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/content-moderation/removeReport`,
+        data: {
+          reportId: selectedContentDetail._id,
+        },
+        headers: {
+          Authorization: `${tkn}`,
+        },
+      });
+      console.log("API Response:", response.data);
+      setShowSuccessPopup(true);
+      refreshData();
+      refreshDashData();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   if (showSuccessPopup) {
@@ -31,7 +55,7 @@ const RemoveContentPopup: React.FC<RemoveContentProps> = ({ onClose }) => {
               <h5>Report Removed</h5>
               <p className={styles1.modifyLinkDiv}>
                 <span className={styles1.enid}>
-                  {selectedSubAdminDetail?.enid}
+                  {selectedContentDetail?.originalData?.reportedBy?.ENID}
                 </span>{" "}
                 Report is removed
               </p>
@@ -64,7 +88,11 @@ const RemoveContentPopup: React.FC<RemoveContentProps> = ({ onClose }) => {
               <h4>Remove Report</h4>
               <p>
                 Are you sure do you want to Remove{" "}
-                <span>{selectedSubAdminDetail?.enid} </span>report?
+                <span>
+                  {" "}
+                  {selectedContentDetail?.originalData?.reportedBy?.ENID}{" "}
+                </span>
+                report?
               </p>
             </div>
             <div className={styles.connectBtns}>

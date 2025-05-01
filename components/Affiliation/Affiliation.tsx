@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./affiliation.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
@@ -8,12 +8,26 @@ import { createPortal } from "react-dom";
 import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import ValidationPopup from "./ValidationPopup";
+import axios from "axios";
+import { get } from "lodash";
+import Pagination from "../Pagination/Pagination";
 
 const Affiliation = () => {
   const dispatch = useDispatch();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [showPopup, setShowPopup] = useState(false);
+  const [scoreData, setScoreData] = useState<any>("");
   const [activeFilter, setActiveFilter] = useState("All");
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const [affiliateTableData, setAffiliateTableData] = useState<any>("");
+  const [currentFilter, setCurrentFilter] = useState<string>("Month");
+  const [dropdownLabel, setDropdownLabel] = useState<string>("Month");
+  const [loading, setLoading] = useState(true);
+  const searchColumns = useMemo(() => ["userName", "status"], []);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
@@ -22,64 +36,125 @@ const Affiliation = () => {
     selectedRowKeys,
     onChange: onSelectChange,
   };
-  const handle7days = async (requestId: string) => {
-    try {
-      console.log("Connection removed:", requestId);
-      // setSelectedUserId(requestId);
-      // setShowRemovePopup(true);
-    } catch (error) {
-      console.error("Error removing connection:", error);
-    }
+
+  const handleFilterSelect = (filter: string) => {
+    setSelectedFilter(filter);
+    setCurrentPage(1);
+  };
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
   };
 
-  const handle10days = async (requestId: string) => {
-    try {
-      console.log("User blocked:", requestId);
-      // setSelectedUserId(requestId);
-      // setShowBlockPopup(true);
-    } catch (error) {
-      console.error("Error blocking user:", error);
-    }
-  };
-  const handleMonth = async (requestId: string) => {
-    try {
-      console.log("User blocked:", requestId);
-      // setSelectedUserId(requestId);
-      // setShowBlockPopup(true);
-    } catch (error) {
-      console.error("Error blocking user:", error);
-    }
+  const search = (restaurant: Record<string, any>) => {
+    return searchColumns.some((column) => {
+      return (
+        get(restaurant, column, "")
+          .toString()
+          .toLowerCase()
+          .indexOf(searchQuery.toLowerCase()) > -1
+      );
+    });
   };
 
-  const getDropdownItems = (userId: string): MenuProps["items"] => [
+  const getDropdownItems = (): MenuProps["items"] => [
     {
-      key: "7days",
+      key: "7 Days",
       label: "7 Days",
       onClick: () => {
-        handle7days(userId);
+        setDropdownLabel("7 Days");
+        setCurrentFilter("7 Days");
+        getAffiliateTableData("7 Days");
       },
     },
     {
-      key: "10days",
+      key: "10 Days",
       label: "10 Days",
       onClick: () => {
-        handle10days(userId);
+        setDropdownLabel("7 Days");
+        setCurrentFilter("10 Days");
+        getAffiliateTableData("10 Days");
       },
     },
     {
-      key: "month",
+      key: "Month",
       label: "Month",
       onClick: () => {
-        handleMonth(userId);
+        setDropdownLabel("Month");
+        setCurrentFilter("Month");
+        getAffiliateTableData("Month");
       },
     },
   ];
-  const getValidationItem = (userId: string): MenuProps["items"] => [
+
+  const getAffiliateHeadData = async () => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/affiliate/getAllTotal`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data.data);
+      setScoreData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getAffiliateTableData = async (filterDate: string) => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/affiliate/getUser?filter=${selectedFilter}&filterDate=${filterDate}`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data.data);
+      // setAffiliateTableData(response.data.data);
+      const selectAllAffiliateData = response.data;
+      if (selectAllAffiliateData && selectAllAffiliateData.data) {
+        const formattedData = selectAllAffiliateData.data
+          .filter(search)
+          .map((affiliate: any, index: number) => ({
+            _id: affiliate._id || index.toString(),
+            enid: affiliate.ENID || "ENID{NUMBER}",
+            userName: affiliate.userName || "-",
+            name: `${affiliate.firstName || "Test"} ${
+              affiliate.lastName || "User"
+            }`.trim(),
+            joinedDate: new Date(affiliate.createdAt).toLocaleDateString(
+              "en-US",
+              {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              }
+            ),
+            referralenid: affiliate.refferalBy.ENID || "-",
+            referrallink: affiliate.refferalBy.refferalLink || "-",
+            status: affiliate.validation || "-",
+            originalData: affiliate,
+          }));
+        setAffiliateTableData(formattedData);
+
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getValidationItem = (record: any): MenuProps["items"] => [
     {
       key: "givevalidation",
       label: "Give Validation",
       onClick: () => {
         setShowPopup(true);
+        dispatch(selectedDetails(record));
       },
     },
   ];
@@ -122,8 +197,16 @@ const Affiliation = () => {
       title: "Referral Link",
       dataIndex: "referrallink",
       key: "referrallink",
+      width: 350,
       render: (text: any) => (
-        <a style={{ color: "#00A3B1", textDecoration: "underline" }}>{text}</a>
+        <a
+          style={{ color: "#00A3B1", textDecoration: "underline" }}
+          href={text}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {text}
+        </a>
       ),
     },
     {
@@ -136,20 +219,24 @@ const Affiliation = () => {
             padding: "4px 8px",
             borderRadius: "64px",
             backgroundColor:
-              status === "Validated"
+              status === "validated"
                 ? "#E8F7F7"
-                : status === "Under Validation"
+                : status === "under_validation"
                 ? "#ffe10033"
                 : "#FFE9E9",
             color:
-              status === "Validated"
+              status === "validated"
                 ? "#00A3B1"
-                : status === "Under Validation"
+                : status === "under_validation"
                 ? "#968612"
                 : "#FF4D4F",
           }}
         >
-          {status}
+          {status === "validated"
+            ? "Validated"
+            : status === "under_validation"
+            ? "Under Validation"
+            : "Invalid"}
         </span>
       ),
     },
@@ -168,9 +255,9 @@ const Affiliation = () => {
           >
             <img src="/icons/eye.svg" alt="eye" />
           </a>
-          {record.status === "Under Validation" ? (
+          {record.status === "under_validation" ? (
             <Dropdown
-              menu={{ items: getValidationItem("") }}
+              menu={{ items: getValidationItem(record) }}
               trigger={["hover"]}
               placement="bottomRight"
               // style={{ width: "100%" }}
@@ -187,65 +274,19 @@ const Affiliation = () => {
     },
   ];
 
-  const data = [
-    {
-      key: "1",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Validated",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "Influencer",
-    },
-    {
-      key: "2",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Invalid",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "recruiter",
-    },
-    {
-      key: "3",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Under Validation",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "Influencer",
-    },
-    {
-      key: "4",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Fraud",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "Influencer",
-    },
-  ];
+  useEffect(() => {
+    getAffiliateHeadData();
+  }, []);
 
-  const filteredData = useMemo(() => {
-    if (activeFilter === "All") return data;
-    return data.filter((item) => item.status === activeFilter);
-  }, [activeFilter]);
+  useEffect(() => {
+    getAffiliateTableData("Month");
+    setDropdownLabel("Month");
+  }, [selectedFilter, searchQuery]);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return affiliateTableData.slice(startIndex, startIndex + itemsPerPage);
+  }, [affiliateTableData, currentPage, itemsPerPage]);
 
   return (
     <>
@@ -257,35 +298,10 @@ const Affiliation = () => {
         <div className={styles.dashboardScroll}>
           <div className={styles.pScoreDiv}>
             <div className={styles.pScoreLeftinnerDiv}>
-              {/* <div className={styles.pleftHead}> */}
               <h3>Total Affiliates</h3>
-              {/* </div> */}
 
               <div className={styles.leftPercentScore}>
-                {/* <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${
-                      departmentdata?.[0]?.total_target_amount?.toFixed(0) ?? 0
-                    }`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_target_amount ?? 0)
-
-                        .toFixed(0)
-                        .toString().length || 0
-                    )
-                  )}
-                </p> */}
-                <p>$000</p>
+                <p>{scoreData?.totalAffilates}</p>
                 <span className={styles.userTitle}>Affiliates</span>
               </div>
             </div>
@@ -293,33 +309,7 @@ const Affiliation = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Affiliates Under Validation</h3>
               <div className={styles.leftPercentScore}>
-                {/* <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${(
-                      (departmentdata?.[0]?.total_target_amount ?? 0) -
-                      (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                    ).toFixed(0)}`
-                  ) : (
-                    "*".repeat(
-                      (
-                        (departmentdata?.[0]?.total_target_amount ?? 0) -
-                        (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                      )
-                        .toFixed(0)
-                        .toString().length || 0
-                    )
-                  )}
-                </p> */}
-                <p>7888</p>
+                <p>{scoreData?.totalUnderValidAffilates}</p>
                 <span className={styles.userTitle}>Affiliates</span>
               </div>
             </div>
@@ -327,30 +317,7 @@ const Affiliation = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Affiliates Validated</h3>
               <div className={styles.leftPercentScore}>
-                {/* <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${
-                      departmentdata?.[0]?.total_thisMonthRevenue.toFixed(2) ??
-                      0
-                    }`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                        .toFixed(2)
-                        .toString().length || 0
-                    )
-                  )}
-                </p> */}
-                <p>756</p>
+                <p>{scoreData?.totalValidAffilate}</p>
                 <span className={styles.userTitle}>Affiliates</span>
               </div>
             </div>
@@ -358,81 +325,68 @@ const Affiliation = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Affiliates Invalid</h3>
               <div className={styles.leftPercentScore}>
-                {/* <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${
-                      departmentdata?.[0]?.total_preMonthRevenue.toFixed(2) ?? 0
-                    }`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_preMonthRevenue ?? 0)
-                        .toFixed(2)
-                        .toString().length || 0
-                    )
-                  )}
-                </p> */}
-                <p>754684</p>
+                <p>{scoreData?.totalInvalidAffilate}</p>
                 <span className={styles.userTitle}>Affiliates</span>
               </div>
             </div>
           </div>
           <div className={styles.tableFilterMainDiv}>
             <div className={styles.userFilter}>
-              {/* <p>All</p>
-              <p>Under Validation</p>
-              <p>Validated</p>
-              <p>Invalid</p> */}
-              {["All", "Under Validation", "Validated", "Invalid"].map(
-                (filter) => (
-                  <p
-                    key={filter}
-                    onClick={() => setActiveFilter(filter)}
-                    // style={{
-                    //   cursor: "pointer",
-                    //   fontWeight: activeFilter === filter ? "bold" : "normal",
-                    //   color: activeFilter === filter ? "#00A3B1" : "inherit",
-                    // }}
-                    className={`${styles.userFilterP} ${
-                      activeFilter === filter ? styles.activeFilter : ""
-                    }`}
-                  >
-                    {filter}
-                  </p>
-                )
-              )}
+              <p
+                className={selectedFilter === "All" ? styles.activeFilter : ""}
+                onClick={() => handleFilterSelect("All")}
+              >
+                All
+              </p>
+              <p
+                className={
+                  selectedFilter === "under_validation"
+                    ? styles.activeFilter
+                    : ""
+                }
+                onClick={() => handleFilterSelect("under_validation")}
+              >
+                Under Validation
+              </p>
+              <p
+                className={
+                  selectedFilter === "validated" ? styles.activeFilter : ""
+                }
+                onClick={() => handleFilterSelect("validated")}
+              >
+                Validated
+              </p>
+              <p
+                className={
+                  selectedFilter === "invalid" ? styles.activeFilter : ""
+                }
+                onClick={() => handleFilterSelect("invalid")}
+              >
+                Invalid
+              </p>
             </div>
             <div className={styles.inputMainDiv}>
               <p>
-                {/* <CiSearch /> */}
                 <img src={"/icons/searchnormal.svg"} alt="search" />
               </p>
               <div className={styles.inputDiv}>
                 <input
+                  id="search"
                   type="text"
                   placeholder="Search Here"
-                  //   value={empsearch}
-                  //   onChange={handleempSearchChange}
+                  onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
             </div>
             <div className={styles.monthsDropdown}>
               <Dropdown
-                menu={{ items: getDropdownItems("") }}
+                menu={{ items: getDropdownItems() }}
                 trigger={["hover"]}
                 placement="bottomRight"
                 // style={{ width: "100%" }}
               >
                 <div className={styles.dollarsLabel}>
-                  <p>Month</p>
+                  <p>{dropdownLabel}</p>
                   <div className={styles.dropdownArrow}>
                     <img src="/icons/dashdownarrow.svg" alt="dropdownarrow" />
                   </div>
@@ -444,20 +398,34 @@ const Affiliation = () => {
             <div className={styles.graphDivtable}>
               <Table
                 rowSelection={rowSelection}
-                rowKey="key"
+                rowKey="_id"
                 bordered={true}
                 columns={columns}
-                dataSource={filteredData}
+                dataSource={paginatedData}
+                // dataSource={affiliateTableData}
+                loading={loading}
+                // dataSource={filteredData}
                 pagination={false}
                 className={styles.recentJoinTable}
               />
             </div>
           </div>
+          <Pagination
+            totalItems={affiliateTableData.length}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
         </div>
       </div>
       {showPopup &&
         createPortal(
-          <ValidationPopup onClose={() => setShowPopup(false)} />,
+          <ValidationPopup
+            onClose={() => setShowPopup(false)}
+            refreshData={getAffiliateTableData}
+            refreshDashData={getAffiliateHeadData}
+          />,
           document.getElementById("modals")!
         )}
     </>

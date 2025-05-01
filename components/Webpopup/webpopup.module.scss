@@ -43,14 +43,14 @@
   color: #000;
 
   h3 {
-    font-family: "Poppins";
+
     font-size: 24px;
     font-weight: 600;
     line-height: normal;
     margin-bottom: 16px;
     color: #000;
     text-align: center;
-    font-family: Poppins;
+
     font-style: normal;
     text-transform: capitalize;
   }
@@ -62,7 +62,7 @@
     font-weight: 300;
     color: #959595;
     text-align: center;
-    font-family: Poppins;
+
     font-style: normal;
     font-weight: 400;
     letter-spacing: -0.24px;
@@ -132,6 +132,7 @@
 }
 
 @media only screen and (max-width: 374px) {
+
   /* Check 320px and add css  */
   .resPageSubDiv {
     gap: 5px;

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./enassist.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
@@ -8,12 +8,28 @@ import { createPortal } from "react-dom";
 import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import ShowAssistDetails from "./ShowAssistDetails";
+import axios from "axios";
+import { get } from "lodash";
+import RemoveAssistPopup from "./RemoveAssistPopup";
+import Pagination from "../Pagination/Pagination";
 
 const EnAssist = () => {
   const dispatch = useDispatch();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [showPopup, setShowPopup] = useState(false);
+  const [showRemovePopup, setShowRemovePopup] = useState(false);
+  const [scoreData, setScoreData] = useState<any>("");
+  const [loading, setLoading] = useState(true);
+  const [enassistTableData, setEnAssistTableData] = useState<any>("");
   const [activeFilter, setActiveFilter] = useState("On Going");
+  const [currentFilter, setCurrentFilter] = useState<string>("Month");
+  const [dropdownLabel, setDropdownLabel] = useState<string>("Month");
+  const [selectedFilter, setSelectedFilter] = useState("On Going");
+  const searchColumns = useMemo(() => ["userName", "question"], []);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
@@ -22,45 +38,115 @@ const EnAssist = () => {
     selectedRowKeys,
     onChange: onSelectChange,
   };
-  const handleTimeDuration = async (requestId: string) => {
+  const handleFilterSelect = (filter: string) => {
+    setSelectedFilter(filter);
+    setCurrentPage(1);
+  };
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+  };
+  const search = (restaurant: Record<string, any>) => {
+    return searchColumns.some((column) => {
+      return (
+        get(restaurant, column, "")
+          .toString()
+          .toLowerCase()
+          .indexOf(searchQuery.toLowerCase()) > -1
+      );
+    });
+  };
+  const getEnAssistHeadData = async () => {
+    let token = localStorage.getItem("auth-token");
     try {
-      console.log("Connection removed:", requestId);
-      // setSelectedUserId(requestId);
-      // setShowRemovePopup(true);
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/ENAssist/get`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data.data);
+      setScoreData(response.data.data);
     } catch (error) {
-      console.error("Error removing connection:", error);
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getDropdownItems = (userId: string): MenuProps["items"] => [
+  const getEnAssistTableData = async (filterDate: string) => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        // url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/ENAssist/getAll`,
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/ENAssist/getAll?filter=${selectedFilter}&filterDate=${filterDate}`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data.data);
+      // setEnAssistTableData(response.data.data);
+      const selectAllEnAssistData = response.data;
+      if (selectAllEnAssistData && selectAllEnAssistData.data) {
+        const formattedData = selectAllEnAssistData.data
+          .filter(search)
+          .map((enassist: any, index: number) => ({
+            _id: enassist._id || index.toString(),
+            enid: enassist.userId.ENID || "ENID{NUMBER}",
+            userName: enassist.userId.userName || "-",
+            name: `${enassist.userId.firstName || "Test"} ${
+              enassist.userId.lastName || "User"
+            }`.trim(),
+            question: enassist.question || "-",
+            anscount: enassist.answere.length || 0,
+            // quecount: enassist.questionCount || 0,
+            status: enassist.status || "-",
+            originalData: enassist,
+          }));
+        setEnAssistTableData(formattedData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getDropdownItems = (): MenuProps["items"] => [
     {
-      key: "7days",
+      key: "7 Days",
       label: "7 Days",
       onClick: () => {
-        handleTimeDuration(userId);
+        setDropdownLabel("7 Days");
+        setCurrentFilter("7 Days");
+        getEnAssistTableData("7 Days");
       },
     },
     {
-      key: "10days",
+      key: "10 Days",
       label: "10 Days",
       onClick: () => {
-        handleTimeDuration(userId);
+        setDropdownLabel("7 Days");
+        setCurrentFilter("10 Days");
+        getEnAssistTableData("10 Days");
       },
     },
     {
-      key: "month",
+      key: "Month",
       label: "Month",
       onClick: () => {
-        handleTimeDuration(userId);
+        setDropdownLabel("Month");
+        setCurrentFilter("Month");
+        getEnAssistTableData("Month");
       },
     },
   ];
-  const getMoreItem = (userId: string): MenuProps["items"] => [
+
+  const getMoreItem = (record: any): MenuProps["items"] => [
     {
       key: "remove",
       label: "Remove",
       onClick: () => {
-        setShowPopup(true);
+        dispatch(selectedDetails(record));
+        setShowRemovePopup(true);
       },
     },
   ];
@@ -98,16 +184,30 @@ const EnAssist = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: any) => (
+      render: (status: string) => (
         <span
           style={{
             padding: "4px 8px",
             borderRadius: "64px",
-            backgroundColor: status === "Resolved" ? "#E8F7F7" : "#FFF7E6",
-            color: status === "Resolved" ? "#00A3B1" : "#968612",
+            backgroundColor:
+              status === "RESOLVED"
+                ? "#E8F7F7"
+                : status === "PENDING"
+                ? "#ffe10033"
+                : "#FFE9E9",
+            color:
+              status === "RESOLVED"
+                ? "#00A3B1"
+                : status === "PENDING"
+                ? "#968612"
+                : "#FF4D4F",
           }}
         >
-          {status}
+          {status === "RESOLVED"
+            ? "Resolved"
+            : status === "PENDING"
+            ? "On Going"
+            : "Re Questioned"}
         </span>
       ),
     },
@@ -125,7 +225,7 @@ const EnAssist = () => {
             justifyContent: "center",
           }}
         >
-          {record.status === "Resolved" ? (
+          {record.status === "RESOLVED" ? (
             <a
               onClick={() => {
                 dispatch(selectedDetails(record));
@@ -138,9 +238,9 @@ const EnAssist = () => {
           ) : (
             ""
           )}
-          {record.status === "On Going" ? (
+          {record.status === "PENDING" ? (
             <Dropdown
-              menu={{ items: getMoreItem("") }}
+              menu={{ items: getMoreItem(record) }}
               trigger={["hover"]}
               placement="bottomRight"
               // style={{ width: "100%" }}
@@ -156,6 +256,7 @@ const EnAssist = () => {
       ),
     },
   ];
+
   const reQuestionedColumns = [
     {
       title: "ENID",
@@ -173,20 +274,20 @@ const EnAssist = () => {
       dataIndex: "name",
       key: "name",
     },
-    {
-      title: "Question Count",
-      dataIndex: "quecount",
-      key: "quecount",
-      render: (_: any, record: any, count: number) => (
-        <p
-          className={styles.countDiv}
-          onClick={() => {
-            dispatch(selectedDetails(record));
-            setShowPopup(true);
-          }}
-        >{`0${count} Question`}</p>
-      ),
-    },
+    // {
+    //   title: "Question Count",
+    //   dataIndex: "quecount",
+    //   key: "quecount",
+    //   render: (_: any, record: any, count: number) => (
+    //     <p
+    //       className={styles.countDiv}
+    //       onClick={() => {
+    //         dispatch(selectedDetails(record));
+    //         setShowPopup(true);
+    //       }}
+    //     >{`0${count} Question`}</p>
+    //   ),
+    // },
     {
       title: "Question",
       dataIndex: "question",
@@ -202,11 +303,25 @@ const EnAssist = () => {
           style={{
             padding: "4px 8px",
             borderRadius: "64px",
-            backgroundColor: "#FFF7E6",
-            color: "#968612",
+            backgroundColor:
+              status === "RESOLVED"
+                ? "#E8F7F7"
+                : status === "PENDING"
+                ? "#ffe10033"
+                : "#FFE9E9",
+            color:
+              status === "RESOLVED"
+                ? "#00A3B1"
+                : status === "PENDING"
+                ? "#968612"
+                : "#FF4D4F",
           }}
         >
-          {status}
+          {status === "RESOLVED"
+            ? "Resolved"
+            : status === "PENDING"
+            ? "On Going"
+            : "Invalid"}
         </span>
       ),
     },
@@ -221,70 +336,23 @@ const EnAssist = () => {
             dispatch(selectedDetails(record));
             setShowPopup(true);
           }}
-        >{`0${count} Answer`}</p>
+        >{`0${record.anscount} Answer`}</p>
       ),
     },
   ];
-  const data = [
-    {
-      key: "1",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Resolved",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "Influencer",
-      quecount: 1,
-      anscount: 2,
-      question: "Lorem Ipsu book?",
-      answer:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lopublishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      key: "2",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Re Questioned",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "recruiter",
-      quecount: 1,
-      anscount: 2,
-      question: "Lorem Ipsum isk?",
-      answer:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has be",
-    },
-    {
-      key: "3",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "On Going",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "Influencer",
-      quecount: 1,
-      anscount: 2,
-      question:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum",
-    },
-  ];
 
-  const filteredData = useMemo(() => {
-    if (activeFilter === "All") return data;
-    return data.filter((item) => item.status === activeFilter);
-  }, [activeFilter]);
+  useEffect(() => {
+    getEnAssistHeadData();
+  }, []);
+
+  useEffect(() => {
+    getEnAssistTableData("Month");
+  }, [selectedFilter, searchQuery]);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return enassistTableData.slice(startIndex, startIndex + itemsPerPage);
+  }, [enassistTableData, currentPage, itemsPerPage]);
 
   return (
     <>
@@ -298,7 +366,7 @@ const EnAssist = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>On Going</h3>
               <div className={styles.leftPercentScore}>
-                <p>000</p>
+                <p>{scoreData?.totalPendingENAssist || 0}</p>
                 <span className={styles.userTitle}>Assists</span>
               </div>
             </div>
@@ -306,7 +374,7 @@ const EnAssist = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Resolved</h3>
               <div className={styles.leftPercentScore}>
-                <p>7888</p>
+                <p>{scoreData?.totalResolvedENAssist || 0}</p>
                 <span className={styles.userTitle}>Assists</span>
               </div>
             </div>
@@ -314,14 +382,14 @@ const EnAssist = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Re Questioned</h3>
               <div className={styles.leftPercentScore}>
-                <p>756</p>
+                <p>{scoreData?.totalReQuestionENAssist || 0}</p>
                 <span className={styles.userTitle}>Assists</span>
               </div>
             </div>
           </div>
           <div className={styles.tableFilterMainDiv}>
             <div className={styles.userFilter}>
-              {["On Going", "Resolved", "Re Questioned"].map((filter) => (
+              {/* {["On Going", "Resolved", "Re Questioned"].map((filter) => (
                 <p
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
@@ -336,7 +404,37 @@ const EnAssist = () => {
                 >
                   {filter}
                 </p>
-              ))}
+              ))} */}
+              {/* <p
+                className={selectedFilter === "All" ? styles.activeFilter : ""}
+                onClick={() => handleFilterSelect("All")}
+              >
+                All
+              </p> */}
+              <p
+                className={
+                  selectedFilter === "On Going" ? styles.activeFilter : ""
+                }
+                onClick={() => handleFilterSelect("On Going")}
+              >
+                On Going
+              </p>
+              <p
+                className={
+                  selectedFilter === "RESOLVED" ? styles.activeFilter : ""
+                }
+                onClick={() => handleFilterSelect("RESOLVED")}
+              >
+                Resolved
+              </p>
+              <p
+                className={
+                  selectedFilter === "Re-Questioned" ? styles.activeFilter : ""
+                }
+                onClick={() => handleFilterSelect("Re-Questioned")}
+              >
+                Re Questioned
+              </p>
             </div>
             <div className={styles.inputMainDiv}>
               <p>
@@ -344,16 +442,16 @@ const EnAssist = () => {
               </p>
               <div className={styles.inputDiv}>
                 <input
+                  id="search"
                   type="text"
                   placeholder="Search Here"
-                  //   value={empsearch}
-                  //   onChange={handleempSearchChange}
+                  onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
             </div>
             <div className={styles.monthsDropdown}>
               <Dropdown
-                menu={{ items: getDropdownItems("") }}
+                menu={{ items: getDropdownItems() }}
                 trigger={["hover"]}
                 placement="bottomRight"
                 // style={{ width: "100%" }}
@@ -371,24 +469,46 @@ const EnAssist = () => {
             <div className={styles.graphDivtable}>
               <Table
                 rowSelection={rowSelection}
-                rowKey="key"
+                rowKey="_id"
                 bordered={true}
                 columns={
-                  activeFilter === "Re Questioned"
+                  selectedFilter === "Re-Questioned"
                     ? reQuestionedColumns
                     : columns
                 }
-                dataSource={filteredData}
+                dataSource={paginatedData}
+                // dataSource={enassistTableData}
+                loading={loading}
                 pagination={false}
                 className={styles.recentJoinTable}
               />
             </div>
           </div>
+          <Pagination
+            totalItems={enassistTableData.length}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
         </div>
       </div>
       {showPopup &&
         createPortal(
-          <ShowAssistDetails onClose={() => setShowPopup(false)} />,
+          <ShowAssistDetails
+            onClose={() => setShowPopup(false)}
+            refreshData={getEnAssistTableData}
+            refreshDashData={getEnAssistHeadData}
+          />,
+          document.getElementById("modals")!
+        )}
+      {showRemovePopup &&
+        createPortal(
+          <RemoveAssistPopup
+            onClose={() => setShowRemovePopup(false)}
+            refreshData={getEnAssistTableData}
+            refreshDashData={getEnAssistHeadData}
+          />,
           document.getElementById("modals")!
         )}
     </>

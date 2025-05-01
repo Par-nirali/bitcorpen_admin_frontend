@@ -9,14 +9,20 @@ import {
   YAxis,
 } from "recharts";
 import styles from "./dashboard.module.scss";
-
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-
 import * as XLSX from "xlsx";
 import RecentJoin from "./RecentJoinTable";
 import RecentSubscribed from "./RecentSubscribedTable";
 import axios from "axios";
+import {
+  selectedDetails,
+  selectedRecJoinUserDetails,
+  selectedRecSubscribedUserDetails,
+} from "../redux/actions";
+import { useDispatch } from "react-redux";
+import { Dropdown } from "antd";
+import type { MenuProps } from "antd";
 
 const CustomTooltip = ({
   active,
@@ -27,21 +33,6 @@ const CustomTooltip = ({
 }: any) => {
   if (active && payload && payload.length) {
     const selectedYear = selectedDate.getFullYear();
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
     const month = payload[0].payload.name;
 
     const thisMonthRevenue =
@@ -151,26 +142,16 @@ const CustomCursor = ({ points, payload }: any) => {
 };
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
   const [userDetail, setUserDetail] = useState<any>("");
   const [isOpen, setIsOpen] = useState(false);
-  const [departmentdata, setDepartmentData] = useState<any>([]);
   const [loading, setLoading] = useState(true);
-  const [showValue, setShowValue] = useState(false);
-  const [showRecUser, setShowRecUser] = useState([]);
+  const [adminData, setAdminData] = useState<any>("");
+  const [adminGraphData, setAdminGraphData] = useState<any[]>([]);
+  const [currentFilter, setCurrentFilter] = useState<string>("month");
+  const [dropdownLabel, setDropdownLabel] = useState<string>("Month");
   const timerRef: any = useRef(null);
   const closeDropDown = useRef<HTMLDivElement>(null);
-  const data = [
-    { month: "Mar", value: 0 },
-    { month: "Apr", value: 5 },
-    { month: "May", value: 8 },
-    { month: "Jun", value: 10 },
-    { month: "Jul", value: 15 },
-    { month: "Aug", value: 20 },
-    { month: "Sep", value: 15 },
-    { month: "Oct", value: 10 },
-    { month: "Nov", value: 20 },
-    { month: "Dec", value: 40 },
-  ];
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -185,45 +166,94 @@ const Dashboard = () => {
     fetchUserData();
   }, []);
 
-  const getRecentJoinUser = async () => {
+  const getAdminData = async () => {
     let token = localStorage.getItem("auth-token");
     try {
       const response = await axios({
         method: "get",
-        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/dashboard/recentSubscribedUser`,
-        headers: {
-          Authorization: `${token}`,
-        },
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/dashboard/admin`,
+        headers: { Authorization: `${token}` },
       });
-      console.log("Recent Subscribed User:", response.data);
-      // setShowRecUser(response.data);
-      if (
-        response.data &&
-        response.data.success &&
-        response.data.data.recentJoined
-      ) {
-        const formattedData = response.data.data.recentJoined.map(
-          (user: any, index: number) => ({
-            key: user._id || index.toString(),
-            enid: user.ENID || "ENID{NUMBER}",
-            userName: user.userName || "",
-            name: `${user.firstName || "Test"} ${
-              user.lastName || "User"
-            }`.trim(),
-            plan: user.userType || "",
-            status: user.status || "",
-            joinedDate: new Date(user.createdAt).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            }),
-            joinedThrough: user.userIS || "",
-          })
-        );
-        setShowRecUser(formattedData);
+      console.log(response.data.data);
+      setAdminData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  const getDropdownItems = (): MenuProps["items"] => [
+    {
+      key: "week",
+      label: "7 Days",
+      onClick: () => {
+        setDropdownLabel("7 Days");
+        setCurrentFilter("week");
+        getDashboradGraph("week");
+      },
+    },
+    {
+      key: "month",
+      label: "Month",
+      onClick: () => {
+        setDropdownLabel("Month");
+        setCurrentFilter("month");
+        getDashboradGraph("month");
+      },
+    },
+  ];
+
+  const getDashboradGraph = async (filter: string) => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/dashboard/graphOfUser?filter=${filter}`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(`graph response of ${filter}`, response.data.data);
+      // setAdminGraphData(response.data.data);
+
+      if (filter === "month") {
+        const transformedData = response.data.data.map((item: any) => ({
+          name: item.month.substring(0, 3),
+          value: item.count,
+        }));
+        setAdminGraphData(transformedData);
+      } else if (filter === "week") {
+        const transformedData = response.data.data.map((item: any) => ({
+          name: item.day.substring(0, 3),
+          value: item.count,
+        }));
+        setAdminGraphData(transformedData);
       }
     } catch (error) {
-      console.error("Error fetching manager notifications:", error);
+      console.error("Error fetching data:", error);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  const getRecentUser = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const joinedResponse = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/dashboard/recentJoinedUser`,
+        headers: { Authorization: `${token}` },
+      });
+      dispatch(selectedRecJoinUserDetails(joinedResponse.data.data));
+
+      const subscribedResponse = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/dashboard/recentsubscribeduser`,
+        headers: { Authorization: `${token}` },
+      });
+      dispatch(selectedRecSubscribedUserDetails(subscribedResponse.data));
+    } catch (error) {
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
@@ -252,16 +282,17 @@ const Dashboard = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   useEffect(() => {
-    getRecentJoinUser();
+    getRecentUser();
+    getAdminData();
+    getDashboradGraph("month");
+    setDropdownLabel("Month");
   }, []);
 
   return (
     <>
       <div className={styles.pSubRightDiv}>
-        {/* <NotificationHandler  /> */}
-        {/* <NotificationHandler selectedOption={selectedOption} /> */}
-
         <div className={styles.pHeadingDiv}>
           <p className={styles.tabTitle}>Dashboard</p>
         </div>
@@ -269,35 +300,10 @@ const Dashboard = () => {
         <div className={styles.dashboardScroll}>
           <div className={styles.pScoreDiv}>
             <div className={styles.pScoreLeftinnerDiv}>
-              {/* <div className={styles.pleftHead}> */}
               <h3>Total Users Joined</h3>
-              {/* </div> */}
 
               <div className={styles.leftPercentScore}>
-                {/* <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${
-                      departmentdata?.[0]?.total_target_amount?.toFixed(0) ?? 0
-                    }`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_target_amount ?? 0)
-
-                        .toFixed(0)
-                        .toString().length || 0
-                    )
-                  )}
-                </p> */}
-                <p>$000</p>
+                <p>{adminData?.totalUser}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -305,32 +311,7 @@ const Dashboard = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Active Users</h3>
               <div className={styles.leftPercentScore}>
-                <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${(
-                      (departmentdata?.[0]?.total_target_amount ?? 0) -
-                      (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                    ).toFixed(0)}`
-                  ) : (
-                    "*".repeat(
-                      (
-                        (departmentdata?.[0]?.total_target_amount ?? 0) -
-                        (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                      )
-                        .toFixed(0)
-                        .toString().length || 0
-                    )
-                  )}
-                </p>
+                <p>{adminData?.totalActiveUser}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -338,29 +319,7 @@ const Dashboard = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Inactive Users </h3>
               <div className={styles.leftPercentScore}>
-                <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${
-                      departmentdata?.[0]?.total_thisMonthRevenue.toFixed(2) ??
-                      0
-                    }`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_thisMonthRevenue ?? 0)
-                        .toFixed(2)
-                        .toString().length || 0
-                    )
-                  )}
-                </p>
+                <p>{adminData?.totalInactiveUser}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -368,28 +327,7 @@ const Dashboard = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Partners Collaborated </h3>
               <div className={styles.leftPercentScore}>
-                <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${
-                      departmentdata?.[0]?.total_preMonthRevenue.toFixed(2) ?? 0
-                    }`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_preMonthRevenue ?? 0)
-                        .toFixed(2)
-                        .toString().length || 0
-                    )
-                  )}
-                </p>
+                <p>{adminData?.totalPartnerCollaborator}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -397,104 +335,28 @@ const Dashboard = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Total sales</h3>
               <div className={styles.leftPercentScore}>
-                <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${departmentdata?.[0]?.total_Sales.toFixed(2) ?? 0}`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_Sales ?? 0)
-                        .toFixed(2)
-                        .toString().length || 0
-                    )
-                  )}
-                </p>
+                <p>${adminData?.totalSales}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Total Subscribers </h3>
               <div className={styles.leftPercentScore}>
-                <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${departmentdata?.[0]?.total_Sales.toFixed(2) ?? 0}`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_Sales ?? 0)
-                        .toFixed(2)
-                        .toString().length || 0
-                    )
-                  )}
-                </p>
+                <p>{adminData?.totalSubscribers}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Active Subscribers</h3>
               <div className={styles.leftPercentScore}>
-                <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${departmentdata?.[0]?.total_Sales.toFixed(2) ?? 0}`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_Sales ?? 0)
-                        .toFixed(2)
-                        .toString().length || 0
-                    )
-                  )}
-                </p>
+                <p>{adminData?.totalActiveSubscribers}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Affiliate Joiners</h3>
               <div className={styles.leftPercentScore}>
-                <p>
-                  $
-                  {loading ? (
-                    <>
-                      <Skeleton
-                        height={20}
-                        width={100}
-                        className={styles.skelMargin}
-                      />
-                    </>
-                  ) : showValue ? (
-                    `${departmentdata?.[0]?.total_Sales.toFixed(2) ?? 0}`
-                  ) : (
-                    "*".repeat(
-                      (departmentdata?.[0]?.total_Sales ?? 0)
-                        .toFixed(2)
-                        .toString().length || 0
-                    )
-                  )}
-                </p>
+                <p>{adminData?.totalAffilatesUser}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -502,33 +364,37 @@ const Dashboard = () => {
           <div className={styles.graphMainDiv}>
             <div className={styles.graphSectionMain}>
               <div className={styles.dropdownsSection}>
-                {/* <div className={styles.amountsDropdown}> */}
-                {/* <div className={styles.dollarsLabel}> */}
                 <p className={styles.dollarsTitle}>Users Overview</p>
-                {/* <div className={styles.dropdownArrow}>
-                    <img src="/icons/dashddarrow.svg" alt="dropdownarrow" />
-                  </div> */}
-                {/* </div> */}
-                {/* </div> */}
 
                 <div className={styles.monthsDropdown}>
-                  <div className={styles.dollarsLabel}>
-                    <p>Month</p>
-                    <div className={styles.dropdownArrow}>
-                      <img src="/icons/dashdownarrow.svg" alt="dropdownarrow" />
+                  <Dropdown
+                    menu={{ items: getDropdownItems() }}
+                    trigger={["hover"]}
+                    placement="bottomRight"
+                    // style={{ width: "100%" }}
+                  >
+                    <div className={styles.dollarsLabel}>
+                      <p>{dropdownLabel}</p>
+                      <div className={styles.dropdownArrow}>
+                        <img
+                          src="/icons/dashdownarrow.svg"
+                          alt="dropdownarrow"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  </Dropdown>
                 </div>
               </div>
 
               <div className={styles.graphDiv}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={data}>
+                  <LineChart data={adminGraphData}>
                     <CartesianGrid strokeDasharray=" 0 0" strokeWidth={1.24} />
                     <XAxis
                       axisLine={{ stroke: "#ccc" }}
                       stroke="#000"
-                      dataKey="month"
+                      // dataKey="month"
+                      dataKey="name"
                       tick={{
                         fill: "#7F7E7E",
                         fontFamily: "Inter",
@@ -543,7 +409,7 @@ const Dashboard = () => {
                     <YAxis
                       axisLine={{ stroke: "#ccc" }}
                       stroke="#000"
-                      tickFormatter={(value) => `$${value}`}
+                      // tickFormatter={(value) => `${value}`}
                       tick={{
                         fill: "#008774",
                         fontFamily: "Inter",
@@ -555,7 +421,15 @@ const Dashboard = () => {
                       tickSize={7.4}
                       tickMargin={7}
                     />
-                    <Tooltip formatter={(value) => [`$${value}`, "Value"]} />
+                    <Tooltip
+                      formatter={(value) => [
+                        `${value}`,
+                        currentFilter === "month"
+                          ? "Users per Month"
+                          : "Users per Day",
+                      ]}
+                    />
+                    {/* <Tooltip formatter={(value) => [`$${value}`, "Value"]} /> */}
                     <Line
                       type="monotone"
                       dataKey="value"
@@ -569,24 +443,22 @@ const Dashboard = () => {
               </div>
             </div>
             <div className={styles.graphMonthsDiv}>
-              <p>Jan- 400</p>
-              <p>Jan- 400</p>
-              <p>Jan- 400</p>
-              <p>Jan- 400</p>
-              <p>Jan- 400</p>
-              <p>Jan- 400</p>
-              <p>Jan- 400</p>
-              <p>Jan- 400</p>
-              <p>Jan- 400</p>
-              <p>Jan- 400</p>
-              <p>Jan- 400</p>
-              <p>Jan- 400</p>
+              {currentFilter === "month"
+                ? adminGraphData?.map((item: any, index: number) => (
+                    <p key={index}>
+                      {item.name}- {item.value}
+                    </p>
+                  ))
+                : adminGraphData?.map((item: any, index: number) => (
+                    <p key={index}>
+                      {item.name}- {item.value}
+                    </p>
+                  ))}
             </div>
           </div>
-          {/* <div className={styles.graphMainDiv}> */}
 
           <RecentJoin />
-          {/* </div> */}
+
           <RecentSubscribed />
         </div>
       </div>

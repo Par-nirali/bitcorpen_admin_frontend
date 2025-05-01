@@ -3,21 +3,42 @@ import styles from "./sendmsguser.module.scss";
 import styles1 from "./finalupdatepopup.module.scss";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 interface SendMsgUserProps {
   onClose: () => void;
 }
 
 const SendMsgUser: React.FC<SendMsgUserProps> = ({ onClose }) => {
-  const [status, setStatus] = useState<"Active" | "Deactivated">("Active");
+  const selectedUserDetails = useSelector(
+    (state: any) => state.selectedDetails
+  );
+  console.log(selectedUserDetails, selectedUserDetails);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleStatusChange = (e: any) => {
-    setStatus(e.target.value);
-  };
-
-  const handleSubmit = () => {
-    setShowSuccessPopup(true);
+  const handleSubmit = async () => {
+    let tkn = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "post",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/user/send-alert`,
+        data: {
+          userId: [selectedUserDetails?._id],
+          message: message,
+        },
+        headers: {
+          Authorization: `${tkn}`,
+        },
+      });
+      console.log("API Response:", response.data);
+      setShowSuccessPopup(true);
+      // refreshData();
+      // refreshDashData();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   if (showSuccessPopup) {
@@ -38,7 +59,8 @@ const SendMsgUser: React.FC<SendMsgUserProps> = ({ onClose }) => {
                   fontWeight: "400",
                 }}
               >
-                John#_Doe will recive this message in notifications
+                {selectedUserDetails?.firstName} {selectedUserDetails?.lastName}{" "}
+                will recive this message in notifications
               </p>
             </div>
             <button
@@ -67,9 +89,17 @@ const SendMsgUser: React.FC<SendMsgUserProps> = ({ onClose }) => {
 
           <div className={styles.connectContent}>
             <div className={styles.connectHeadDiv}>
-              <h4>Sending Message to John#_Doe</h4>
+              <h4>
+                Sending Message to {selectedUserDetails?.firstName}{" "}
+                {selectedUserDetails?.lastName}
+              </h4>
               <div className={styles.connectReqBody}>
-                <textarea rows={14} placeholder="Write message here" />
+                <textarea
+                  rows={14}
+                  placeholder="Write message here"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
               </div>
             </div>
 

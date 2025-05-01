@@ -11,19 +11,28 @@
 .headerMainDiv {
   height: auto;
   width: 100%;
-  position: fixed;
+  // position: fixed;
   top: 0;
   z-index: 11;
   background-color: #090909;
   background-color: rgba(0, 0, 0, 0);
   backdrop-filter: blur(20px);
-  animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-  animation-iteration-count: 1;
+  // animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  // animation-iteration-count: 1;
   // border-bottom: 1px solid #000;
 }
 
+.tabTitle {
+  color: #313131;
+  font-family: "SF Pro";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 590;
+  line-height: normal;
+}
+
 .headerSubDiv {
-  max-width: 1920px;
+  // max-width: 1920px;
   margin: 0 auto;
   padding: 20px 24px;
   border-bottom: 1px solid #fff;
@@ -54,7 +63,6 @@
   p {
     color: #000;
     text-align: center;
-    font-family: Poppins;
     font-size: 23px;
     font-style: normal;
     font-weight: 700;
@@ -65,7 +73,7 @@
 .headingDivImg {
   max-width: 57px;
   height: auto;
-  z-index: 3;
+  margin: 0 auto;
 
   img {
     width: 100%;
@@ -84,7 +92,6 @@
     cursor: pointer;
     color: #000;
     text-align: center;
-    font-family: Poppins;
     font-size: 18px;
     font-style: normal;
     font-weight: 500;
@@ -162,7 +169,7 @@
 
   p:nth-of-type(1) {
     color: #292933;
-    font-family: Poppins;
+
     font-size: 16px;
     font-style: normal;
     font-weight: 500;
@@ -171,7 +178,7 @@
 
   p:nth-of-type(2) {
     color: #7f7f8a;
-    font-family: Poppins;
+
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
@@ -331,7 +338,7 @@
 .headProMainDiv {
   width: 100%;
   height: 100%;
-  font-family: poppins;
+
 }
 
 .headProContainer {
@@ -370,7 +377,7 @@
 
   h2 {
     color: #000;
-    font-family: Poppins;
+
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
@@ -412,7 +419,7 @@
   p {
     color: #7f7f8a;
     text-align: center;
-    font-family: Poppins;
+
     font-size: 10px;
     font-style: normal;
     font-weight: 400;
@@ -423,7 +430,7 @@
 
 .noResults {
   color: #000;
-  font-family: Poppins;
+
   font-size: 14px;
   font-style: normal;
   font-weight: 500;

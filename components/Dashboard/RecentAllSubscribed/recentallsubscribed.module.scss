@@ -8,9 +8,35 @@
   }
 }
 
+.customPagination {
+  margin: 16px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  :global {
+    .ant-pagination-options {
+      margin-left: 16px;
+    }
+
+    .ant-select-selector {
+      border-radius: 4px;
+    }
+
+    .ant-pagination-item-active {
+      background-color: #1890ff;
+      border-color: #1890ff;
+
+      a {
+        color: white;
+      }
+    }
+  }
+}
+
 .pSubRightDiv {
   // width: 83%;
-  width: calc(100% - 355px);
+
   height: calc(100vh - 90px);
   padding: 40px 24px;
   animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -212,7 +238,7 @@
 
 .pScoreLeftinnerDiv {
   padding: 20px;
-  border-radius: 16px;
+  border-radius: 8px;
   border: 2px solid rgba(255, 255, 255, 0.9);
   background: #fff;
   backdrop-filter: blur(103px);
@@ -271,7 +297,7 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 52px;
-  border-radius: 12px;
+  border-radius: 8px;
   background: #fff;
   margin-top: 20px;
   flex: 1;
@@ -439,7 +465,7 @@
 
 @media only screen and (max-width: 1599px) {
   .pSubRightDiv {
-    width: calc(100% - 340px);
+    // width: calc(100% - 340px);
     padding: 30px 22px;
   }
 
@@ -452,7 +478,7 @@
 
 @media only screen and (max-width: 1366px) {
   .pSubRightDiv {
-    width: calc(100% - 320px);
+    // width: calc(100% - 320px);
     padding: 20px 18px;
   }
 

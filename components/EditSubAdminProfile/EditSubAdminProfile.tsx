@@ -1,10 +1,15 @@
 import { Input, Radio } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import { selectedProjects } from "../redux/actions";
 import styles from "./editsubadminprofile.module.scss";
+import axios from "axios";
+import { useToast } from "@chakra-ui/react";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
+import { useRouter } from "next/router";
 
 const addSubAdminValidationSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -17,32 +22,87 @@ const addSubAdminValidationSchema = Yup.object().shape({
     .email("Please enter a valid email")
     .required("Email is required"),
   phone: Yup.string()
-    .matches(/^[0-9]+$/, "Please enter valid phone number")
-    .min(10, "Phone number must be at least 10 digits")
+    // .matches(/^[0-9]+$/, "Please enter valid phone number")
+    // .min(10, "Phone number must be at least 10 digits")
     .required("Phone number is required"),
-  password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
-    .required("Password is required"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password")], "Passwords must match")
-    .required("Confirm password is required"),
   // roles: Yup.array()
   //   .min(1, "At least one role must be selected")
   //   .required("Role selection is required"),
-  roles: Yup.string().required("Role selection is required"),
+  // roles: Yup.string().required("Role selection is required"),
 });
 
 const EditSubAdminProfile = () => {
   const dispatch = useDispatch();
-  const selectedSubAdminDetail = useSelector(
-    (state: any) => state.selectedDetails
-  );
+  const toast = useToast();
+  const router = useRouter();
+  // const selectedSubAdminDetail = useSelector(
+  //   (state: any) => state.selectedDetails
+  // );
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  console.log(selectedSubAdminDetail, "selectedSubAdminDetail");
+  const [userDetail, setUserDetail] = useState<any>("");
+  const [subAdminData, setSubAdminData] = useState<any>("");
+  const [rolesData, setRolesData] = useState<any>("");
 
-  const roles = [
-    "Users",
-    "Credit logs, Subscribers",
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (typeof window !== "undefined") {
+        const userData = JSON.parse(
+          localStorage.getItem("bitcorpenadminData") || "{}"
+        );
+        setUserDetail(userData);
+        console.log(userDetail, "userDetail");
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const getUserDetailForEdit = async () => {
+    let tkn = localStorage.getItem("auth-token");
+
+    // if (userDetail._id) {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/admin-subadmin-profile`,
+        {
+          headers: {
+            Authorization: `${tkn}`,
+          },
+        }
+      );
+      console.log("API Response get:", response.data.data);
+      setSubAdminData(response.data.data);
+      toast({
+        title: "Success",
+        description: "admin fetched successfully",
+        status: "success",
+        position: "top-right",
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+    // }
+  };
+
+  useEffect(() => {
+    const fetchSubadminRoles = async () => {
+      if (typeof window !== "undefined") {
+        const rolesLocal = JSON.parse(
+          localStorage.getItem("subadminroles") || "{}"
+        );
+        setRolesData(rolesLocal);
+        console.log(rolesData, "rolesData");
+      }
+    };
+
+    fetchSubadminRoles();
+  }, []);
+
+  const userRole = [
+    "User",
+    "Dashboard",
+    "Credit logs",
     "Help & Support",
     "Affiliation",
     "EN Assist",
@@ -52,19 +112,37 @@ const EditSubAdminProfile = () => {
     "Flag User",
     "Content Moderation",
     "News",
-    "Articles",
   ];
+
+  const transformResourceToOriginal = (resource: string) => {
+    return (
+      userRole.find(
+        (role) => role.toLowerCase().replace(/\s/g, "") === resource
+      ) || ""
+    );
+  };
+
+  const transformedResources = rolesData
+    ? rolesData.map(transformResourceToOriginal).filter(Boolean)
+    : [];
+
   const initialValue = useMemo(() => {
-    if (selectedSubAdminDetail) {
+    if (subAdminData) {
+      if (subAdminData?.profileImage) {
+        setPreviewImage(
+          `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${subAdminData?.profileImage?.url}`
+        );
+      }
+
+      console.log(transformedResources, "transformedResources");
+
       return {
-        firstName: selectedSubAdminDetail?.firstName || "",
-        lastName: selectedSubAdminDetail?.lastName || "",
-        email: selectedSubAdminDetail?.email || "",
-        phone: selectedSubAdminDetail?.phone || "",
-        password: "",
-        confirmPassword: "",
-        roles: selectedSubAdminDetail?.roles || "",
-        profileImage: null,
+        firstName: subAdminData?.firstName || "",
+        lastName: subAdminData?.lastName || "",
+        email: subAdminData?.email || "",
+        phone: subAdminData?.phoneNumber || "",
+        // roles: transformedResources,
+        // profileImage: null,
       };
     }
     return {
@@ -72,30 +150,87 @@ const EditSubAdminProfile = () => {
       lastName: "",
       email: "",
       phone: "",
-      password: "",
-      confirmPassword: "",
-      roles: "",
-      profileImage: null,
+      // roles: "",
+      // profileImage: null,
     };
-  }, [selectedSubAdminDetail]);
-  const handleImageUpload = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    setFieldValue: (field: string, value: any) => void
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setPreviewImage(imageUrl);
-      setFieldValue("profileImage", file);
+  }, [subAdminData]);
+
+  const handleImageUpload = async (file: File) => {
+    const tkn = localStorage.getItem("auth-token");
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/admin-subadmin-profile/profile`,
+        formData,
+        {
+          headers: {
+            Authorization: `${tkn}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data.data._id;
+    } catch (error) {
+      throw new Error("Failed to upload image");
     }
   };
 
-  const handleSubmit = (values: any) => {
-    console.log("Form submitted with values:", values);
+  const handleSubmit = async (values: any, { setSubmitting }: any) => {
+    console.log("values", values);
+
+    const payload = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      phoneNumber: values.phone,
+      profileImage: values.profileImage,
+    };
+
+    console.log("payload", payload);
+
+    try {
+      setSubmitting(true);
+      let tkn = localStorage.getItem("auth-token");
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/admin-subadmin-profile/update-details`,
+        payload,
+        {
+          headers: {
+            Authorization: `${tkn}`,
+          },
+        }
+      );
+      getUserDetailForEdit();
+      router.push("/");
+      toast({
+        title: "Success",
+        description: "Admin Profile updated successfully",
+        status: "success",
+        position: "top-right",
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        status: "error",
+        position: "top-right",
+        isClosable: true,
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
-  // if (!selectedSubAdminDetail) {
-  //   return "";
-  // }
+
+  useEffect(() => {
+    // if (userDetail?._id) {
+    getUserDetailForEdit();
+    // }
+  }, []);
+
   return (
     <>
       <div className={styles.pSubRightDiv}>
@@ -114,8 +249,16 @@ const EditSubAdminProfile = () => {
               initialValues={initialValue}
               validationSchema={addSubAdminValidationSchema}
               onSubmit={handleSubmit}
+              enableReinitialize
             >
-              {({ isSubmitting, touched, errors, setFieldValue, values }) => (
+              {({
+                isSubmitting,
+                touched,
+                errors,
+                setFieldValue,
+                values,
+                setFieldTouched,
+              }) => (
                 <Form className={styles.addMemForm}>
                   <div className={styles.addMemberDiv}>
                     <div
@@ -124,7 +267,7 @@ const EditSubAdminProfile = () => {
                         document.getElementById("profile-upload")?.click()
                       }
                     >
-                      {previewImage ? (
+                      {/* {previewImage ? (
                         <img
                           src={previewImage}
                           alt="Company Logo"
@@ -135,19 +278,55 @@ const EditSubAdminProfile = () => {
                             borderRadius: "42px",
                           }}
                         />
-                      ) : (
-                        <img src="/icons/add.svg" alt="add" />
-                      )}
+                      ) : ( */}
+                      <img src="/icons/add.svg" alt="add" />
+                      {/* )} */}
+                      {/* {previewImage && (
+                        <img
+                          src={previewImage}
+                          alt="Company Logo"
+                          style={{
+                            maxWidth: "100px",
+                            maxHeight: "100px",
+                            objectFit: "cover",
+                            borderRadius: "42px",
+                          }}
+                        />
+                      )} */}
                     </div>
                     <Input
                       id="profile-upload"
                       type="file"
                       accept="image/*"
                       style={{ display: "none" }}
-                      onChange={(e) => handleImageUpload(e, setFieldValue)}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            const imageId = await handleImageUpload(file);
+                            setFieldValue("profileImage", imageId);
+                            setPreviewImage(URL.createObjectURL(file));
+                          } catch (error) {
+                            e.target.value = "";
+                            setFieldValue("profileImage", "");
+                          }
+                        }
+                      }}
                     />
                     <p>Sub Admin Profile Image</p>
                   </div>
+                  {previewImage && (
+                    <img
+                      src={previewImage}
+                      alt="Company Logo"
+                      style={{
+                        maxWidth: "100px",
+                        maxHeight: "100px",
+                        objectFit: "cover",
+                        // borderRadius: "42px",
+                      }}
+                    />
+                  )}
                   <div className={styles.addMemFieldsMain}>
                     <div className={styles.addMemLastDiv}>
                       <h4 className={styles.detailHeading}>
@@ -224,7 +403,7 @@ const EditSubAdminProfile = () => {
                           <label htmlFor="phone" className={styles.text}>
                             Phone
                           </label>
-                          <Field
+                          {/* <Field
                             type="text"
                             name="phone"
                             id="phone"
@@ -234,6 +413,25 @@ const EditSubAdminProfile = () => {
                                 ? styles.inputError
                                 : ""
                             }`}
+                          /> */}
+                          <PhoneInput
+                            defaultCountry="us"
+                            value={values.phone || ""}
+                            onChange={(value: string) => {
+                              if (
+                                !value ||
+                                value.trim() === "" ||
+                                value === "+"
+                              ) {
+                                setFieldValue("phone", "");
+                                setFieldTouched("phone", true);
+                              } else {
+                                setFieldValue("phone", value);
+                                setFieldTouched("phone", false);
+                              }
+                            }}
+                            className={styles.input}
+                            inputClassName={styles.phoneInnerInput}
                           />
                           <ErrorMessage
                             name="phone"
@@ -297,22 +495,16 @@ const EditSubAdminProfile = () => {
                       </div> */}
                       <div className={styles.roleSection}>
                         <h4 className={styles.detailHeading}>Sub Admin Role</h4>
-                        {/* <div className={styles.rolesGrid}>
-                            {roles.map((role) => (
-                              <label key={role} className={styles.roleLabel}>
-                                <Field
-                                  type="checkbox"
-                                  name="roles"
-                                  value={role}
-                                  className={styles.roleCheckbox}
-                                />
-                                {role}
-                              </label>
-                            ))}
-                          </div> */}
-                        <p className={styles.selectedRole}>
-                          {selectedSubAdminDetail?.roles}
-                        </p>
+                        <div className={styles.rolesGrid}>
+                          {transformedResources?.map((role: any) => (
+                            <p className={styles.selectedRole} key={role}>
+                              {role}
+                            </p>
+                          ))}
+                        </div>
+                        {/* <p className={styles.selectedRole}>
+                          {userDetail?.roles}
+                        </p> */}
                         {/* <Radio.Group
                           name="roles"
                           value={values.roles}
@@ -346,7 +538,7 @@ const EditSubAdminProfile = () => {
                     >
                       {isSubmitting
                         ? "Adding..."
-                        : selectedSubAdminDetail
+                        : userDetail
                         ? "Edit Sub Admin"
                         : "Add Sub Admin"}
                     </button>

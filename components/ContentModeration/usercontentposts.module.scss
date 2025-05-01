@@ -10,7 +10,7 @@
 
 .pSubRightDiv {
     // width: 83%;
-    width: calc(100% - 355px);
+
     height: calc(100vh - 90px);
     padding: 40px 24px;
     animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -168,7 +168,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 52px;
-    padding: 52px;
+    padding: 0px 52px 52px 52px;
     border-radius: 12px;
     // background: #fff;
     // margin-top: 20px;
@@ -212,7 +212,7 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    padding: 32px 32px 20px 32px;
+    padding: 20px 32px;
 }
 
 .postCommentDiv {
@@ -395,8 +395,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #b5b5b5;
+    // padding-bottom: 20px;
+    // border-bottom: 1px solid #b5b5b5;
 
     p {
         color: #313131;
@@ -796,14 +796,32 @@
     color: #968612;
 }
 
-.red {
-    background: #FFE9E9;
-    color: #FF4D4F;
+.deleteDiv {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    // background: #FFE9E9;
+    // color: #FF4D4F;
+    gap: 12px;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+
+    p {
+        color: #FF4B4E;
+        // font-family: "SF Pro";
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: normal;
+    }
 }
 
 @media only screen and (max-width: 1599px) {
     .pSubRightDiv {
-        width: calc(100% - 340px);
+        // width: calc(100% - 340px);
         padding: 30px 22px;
     }
 
@@ -860,7 +878,7 @@
 
 @media only screen and (max-width: 1366px) {
     .pSubRightDiv {
-        width: calc(100% - 320px);
+        // width: calc(100% - 320px);
         padding: 20px 18px;
     }
 

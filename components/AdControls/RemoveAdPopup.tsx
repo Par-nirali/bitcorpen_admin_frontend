@@ -4,18 +4,42 @@ import styles1 from "./finalremovepopup.module.scss";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 interface RemoveAdProps {
   onClose: () => void;
+  refreshData: () => void;
+  refreshDashData: () => void;
 }
-const RemoveAdPopup: React.FC<RemoveAdProps> = ({ onClose }) => {
+const RemoveAdPopup: React.FC<RemoveAdProps> = ({
+  onClose,
+  refreshData,
+  refreshDashData,
+}) => {
   const selectedAdDetails = useSelector((state: any) => state.selectedDetails);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
-  const handleSubmit = () => {
-    setShowSuccessPopup(true);
+  const handleSubmit = async () => {
+    let tkn = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "delete",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/adControls/delete-ad/${selectedAdDetails._id}`,
+        // data: {
+        //   enAssistId: selectedReqDetail._id,
+        // },
+        headers: {
+          Authorization: `${tkn}`,
+        },
+      });
+      console.log("API Response:", response.data);
+      setShowSuccessPopup(true);
+      refreshData();
+      refreshDashData();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
-
   if (showSuccessPopup) {
     // const statusText = isDeactivating ? "Deactivated" : "Activated";
 

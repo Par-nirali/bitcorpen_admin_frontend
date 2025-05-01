@@ -1,111 +1,68 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./team.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { selectedProjects } from "../redux/actions";
+import { selectedDetails, selectedProjects } from "../redux/actions";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
 import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import RemoveTeamMemPopup from "./RemoveTeamMemPopup";
+import axios from "axios";
+import Link from "next/link";
 // import PlanDecisionPopup from "./PlanDecisionPopup";
 
-const teamData = [
-  {
-    id: 1,
-    profileImage: "/profile.png",
-    name: "John Doe",
-    position: "CEO",
-    accountType: "Professional",
-    email: "john@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Active",
-    subscriptionDate: "Jan, 08, 2025",
-    expiryDate: "Jan, 08, 2026",
-    paymentGateway: "Paypal",
-  },
-  {
-    id: 2,
-    profileImage: "/profile.png",
-    name: "Sarah Johnson",
-    position: "Founder",
-    accountType: "Professional",
-    email: "sarah@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Deactivated",
-    subscriptionDate: "Dec, 15, 2024",
-    expiryDate: "Dec, 15, 2025",
-    paymentGateway: "Stripe",
-  },
-  {
-    id: 3,
-    profileImage: "/profile.png",
-    name: "Michael Brown",
-    position: "Product Manager",
-    accountType: "Professional",
-    email: "michel@gmail.com",
-    phone: "+1 3656 5566 55",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    platforms: ["Facebook", "Instagram", "Twitter"],
-    status: "Active",
-    subscriptionDate: "Jan, 01, 2025",
-    expiryDate: "Jan, 01, 2026",
-    paymentGateway: "Paypal",
-  },
-];
 const Team = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [activeFilter, setActiveFilter] = useState<any>("All");
-  const [teamMembers, setTeamMembers] = useState(teamData);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<
     "Active" | "Deactivated"
   >();
+  const [allTeamData, setAllTeamData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handlePlanStatusClick = (status: "Active" | "Deactivated") => {
-    setSelectedStatus(status);
-    setShowPopup(true);
+  const getAllTeamData = async () => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/team/AllMember`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data.data);
+      setAllTeamData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleFilterClick = (filter: any) => {
-    setActiveFilter(filter);
-  };
-
-  const filteredTeamMembers = teamMembers.filter((members) => {
-    if (activeFilter === "All") return true;
-    return members.status === activeFilter;
-  });
-  const getMoreItems = (userId: string): MenuProps["items"] => [
+  const getMoreItems = (member: any): MenuProps["items"] => [
     {
       key: "edit",
       label: "Edit",
       onClick: () => {
-        setShowPopup(true);
+        dispatch(selectedDetails(member));
+        dispatch(selectedProjects("addmember"));
       },
     },
     {
       key: "remove",
       label: "Remove",
       onClick: () => {
+        dispatch(selectedDetails(member));
         setShowPopup(true);
       },
     },
   ];
+
+  useEffect(() => {
+    getAllTeamData();
+  }, []);
 
   return (
     <>
@@ -117,11 +74,14 @@ const Team = () => {
         <div className={styles.dashboardScroll}>
           <div className={styles.tableFilterMainDiv}>
             <div className={styles.inputMainDiv}>
-              <p>{teamMembers.length} Subscribers</p>
+              <p>{allTeamData.length} Subscribers</p>
             </div>
             <div
               className={styles.userFilter}
-              onClick={() => dispatch(selectedProjects("addmember"))}
+              onClick={() => {
+                dispatch(selectedDetails(""));
+                dispatch(selectedProjects("addmember"));
+              }}
             >
               <p>Add Member</p>
             </div>
@@ -129,22 +89,31 @@ const Team = () => {
           <div className={styles.graphUserTableDiv}>
             <div className={styles.candMainDiv}>
               <div className={styles.cardsGrid}>
-                {filteredTeamMembers?.map((subscriber) => (
-                  <div className={styles.candCardMain} key={subscriber.id}>
+                {allTeamData?.map((member) => (
+                  <div className={styles.candCardMain} key={member.id}>
                     <div className={styles.cardContainer}>
                       <div className={styles.rankMianDiv}>
                         <div className={styles.rankBadge}>
                           <div className={styles.rankProfileImg}>
-                            <img src={subscriber.profileImage} alt="profile" />
+                            <img
+                              src={
+                                member?.profileUrl
+                                  ? `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${member?.profileUrl}`
+                                  : "/profile.svg"
+                              }
+                              alt="profile"
+                            />
                           </div>
                           <div className={styles.rankBadgeText}>
-                            <p>{subscriber.name}</p>
-                            <span>{subscriber.position}</span>
-                            {/* <span>{subscriber.accountType}</span> */}
+                            <p>
+                              {member?.firstName} {member?.lastName}
+                            </p>
+                            <span>{member?.role}</span>
+                            {/* <span>{member.accountType}</span> */}
                           </div>
                         </div>
                         <Dropdown
-                          menu={{ items: getMoreItems("") }}
+                          menu={{ items: getMoreItems(member) }}
                           trigger={["hover"]}
                           placement="bottomRight"
                           // style={{ width: "100%" }}
@@ -156,21 +125,55 @@ const Team = () => {
                       </div>
 
                       <div className={styles.profileSection}>
-                        <p>{subscriber.email}</p>
-                        <p>{subscriber.phone}</p>
+                        <p>{member?.email}</p>
+                        <p>{member?.phone}</p>
                         <div
                           className={`${styles.statusDiv} ${
-                            subscriber.status === "Active"
+                            member?.status === "active"
                               ? ""
                               : styles.deactivated
                           }
                             }`}
                         >
-                          {subscriber.status}
+                          {member.status}
                         </div>
-                        {subscriber.platforms.map((platform, index) => (
-                          <p key={index}>{platform}</p>
-                        ))}
+                        {/* {member?.socialMedia?.length > 0 ? (
+                          member?.socialMedia?.map(
+                            (platform: any, index: number) => (
+                              <p key={index}>{platform}</p>
+                            )
+                          )
+                        ) : (
+                          <p>No platforms</p>
+                        )} */}
+                        {member?.facebookUrl && (
+                          <Link href={member?.facebookUrl}>
+                            <a target="_blank">
+                              <p>{member?.facebookUrl}</p>
+                            </a>
+                          </Link>
+                        )}
+                        {member?.twitterUrl && (
+                          <Link href={member?.twitterUrl}>
+                            <a target="_blank">
+                              <p>{member?.twitterUrl}</p>
+                            </a>
+                          </Link>
+                        )}
+                        {member?.instagramUrl && (
+                          <Link href={member?.instagramUrl}>
+                            <a target="_blank">
+                              <p>{member?.instagramUrl}</p>
+                            </a>
+                          </Link>
+                        )}
+                        {member?.linkedinUrl && (
+                          <Link href={member?.linkedinUrl}>
+                            <a target="_blank">
+                              <p>{member?.linkedinUrl}</p>
+                            </a>
+                          </Link>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -182,7 +185,10 @@ const Team = () => {
       </div>
       {showPopup &&
         createPortal(
-          <RemoveTeamMemPopup onClose={() => setShowPopup(false)} />,
+          <RemoveTeamMemPopup
+            onClose={() => setShowPopup(false)}
+            refreshData={getAllTeamData}
+          />,
           document.getElementById("modals")!
         )}
     </>

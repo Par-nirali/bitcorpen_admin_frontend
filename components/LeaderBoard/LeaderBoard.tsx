@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./leaderboard.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
@@ -8,13 +8,21 @@ import { createPortal } from "react-dom";
 import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import RemoveLeaderPopup from "./RemoveLeaderPopup";
+import axios from "axios";
+import Pagination from "../Pagination/Pagination";
 // import ValidationPopup from "./ValidationPopup";
 
 const LeaderBoard = () => {
   const dispatch = useDispatch();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [showPopup, setShowPopup] = useState(false);
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [currentFilter, setCurrentFilter] = useState<string>("Month");
+  const [dropdownLabel, setDropdownLabel] = useState<string>("Month");
+  const [leaderboardData, setLeaderboardData] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
@@ -23,55 +31,33 @@ const LeaderBoard = () => {
     selectedRowKeys,
     onChange: onSelectChange,
   };
-  const handle7days = async (requestId: string) => {
-    try {
-      console.log("Connection removed:", requestId);
-      // setSelectedUserId(requestId);
-      // setShowRemovePopup(true);
-    } catch (error) {
-      console.error("Error removing connection:", error);
-    }
-  };
 
-  const handle10days = async (requestId: string) => {
-    try {
-      console.log("User blocked:", requestId);
-      // setSelectedUserId(requestId);
-      // setShowBlockPopup(true);
-    } catch (error) {
-      console.error("Error blocking user:", error);
-    }
-  };
-  const handleMonth = async (requestId: string) => {
-    try {
-      console.log("User blocked:", requestId);
-      // setSelectedUserId(requestId);
-      // setShowBlockPopup(true);
-    } catch (error) {
-      console.error("Error blocking user:", error);
-    }
-  };
-
-  const getDropdownItems = (userId: string): MenuProps["items"] => [
+  const getDropdownItems = (): MenuProps["items"] => [
     {
       key: "7days",
       label: "7 Days",
       onClick: () => {
-        handle7days(userId);
+        setDropdownLabel("7 Days");
+        setCurrentFilter("7 Days");
+        getAllLeaderBoard("7 Days");
       },
     },
     {
       key: "10days",
       label: "10 Days",
       onClick: () => {
-        handle10days(userId);
+        setDropdownLabel("10 Days");
+        setCurrentFilter("10 Days");
+        getAllLeaderBoard("10 Days");
       },
     },
     {
       key: "month",
       label: "Month",
       onClick: () => {
-        handleMonth(userId);
+        setDropdownLabel("Month");
+        setCurrentFilter("Month");
+        getAllLeaderBoard("Month");
       },
     },
   ];
@@ -80,11 +66,45 @@ const LeaderBoard = () => {
       key: "remove",
       label: "Remove",
       onClick: () => {
-        selectedDetails(record);
+        dispatch(selectedDetails(record));
         setShowPopup(true);
       },
     },
   ];
+
+  const getAllLeaderBoard = async (filterDate: string) => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/leaderBoard/get?filterDate=${filterDate}`,
+        headers: { Authorization: `${token}` },
+      });
+      const selectAllLeaderboard = response.data;
+      if (selectAllLeaderboard && selectAllLeaderboard.data) {
+        const formattedData = selectAllLeaderboard.data.map(
+          (leader: any, index: number) => ({
+            _id: leader._id,
+            rank: leader?.globalRank || "-",
+            enid: leader?.userId?.ENID || "ENID{NUMBER}",
+            userName: leader?.userId?.userName || "-",
+            name: `${leader?.userId?.firstName || "Test"} ${
+              leader?.userId?.lastName || "User"
+            }`.trim(),
+            enrpoints: leader?.points?.enrPoints || "-",
+            originalData: leader,
+          })
+        );
+        setLeaderboardData(formattedData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = [
     // {
@@ -152,77 +172,16 @@ const LeaderBoard = () => {
     },
   ];
 
-  const data = [
-    {
-      key: "1",
-      rank: "000000001",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Validated",
-      enrpoints: "50000",
-      lastrank: "000000020",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "Influencer",
-    },
-    {
-      key: "2",
-      rank: "000000002",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Invalid",
-      enrpoints: "50000",
-      lastrank: "000000020",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "recruiter",
-    },
-    {
-      key: "3",
-      rank: "000000003",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Under Validation",
-      enrpoints: "50000",
-      lastrank: "000000020",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "Influencer",
-    },
-    {
-      key: "4",
-      rank: "000000004",
-      enid: "ENID5666959",
-      referralenid: "ENID5666959",
-      userName: "John#_Doe",
-      name: "John Doe",
-      status: "Fraud",
-      enrpoints: "50000",
-      lastrank: "000000020",
-      joinedDate: "Jan, 07, 2025",
-      referrallink: "encolunyty/dummy-referral-spam.html",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      subscription: "Influencer",
-    },
-  ];
+  useEffect(() => {
+    getAllLeaderBoard("Month");
+    setDropdownLabel("Month");
+    // setCurrentFilter("Month");
+  }, []);
 
-  const filteredData = useMemo(() => {
-    if (activeFilter === "All") return data;
-    return data.filter((item) => item.status === activeFilter);
-  }, [activeFilter]);
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return leaderboardData.slice(startIndex, startIndex + itemsPerPage);
+  }, [leaderboardData, currentPage, itemsPerPage]);
 
   return (
     <>
@@ -234,18 +193,18 @@ const LeaderBoard = () => {
         <div className={styles.dashboardScroll}>
           <div className={styles.tableFilterMainDiv}>
             <div className={styles.userFilter}>
-              <p>21000 Total This Learders</p>
+              <p>{leaderboardData?.length} Total This Learders</p>
             </div>
 
             <div className={styles.monthsDropdown}>
               <Dropdown
-                menu={{ items: getDropdownItems("") }}
+                menu={{ items: getDropdownItems() }}
                 trigger={["hover"]}
                 placement="bottomRight"
                 // style={{ width: "100%" }}
               >
                 <div className={styles.dollarsLabel}>
-                  <p>Month</p>
+                  <p>{dropdownLabel}</p>
                   <div className={styles.dropdownArrow}>
                     <img src="/icons/dashdownarrow.svg" alt="dropdownarrow" />
                   </div>
@@ -260,17 +219,29 @@ const LeaderBoard = () => {
                 rowKey="key"
                 bordered={true}
                 columns={columns}
-                dataSource={filteredData}
+                dataSource={paginatedData}
+                // dataSource={leaderboardData}
+                loading={loading}
                 pagination={false}
                 className={styles.recentJoinTable}
               />
             </div>
           </div>
+          <Pagination
+            totalItems={leaderboardData.length}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
         </div>
       </div>
       {showPopup &&
         createPortal(
-          <RemoveLeaderPopup onClose={() => setShowPopup(false)} />,
+          <RemoveLeaderPopup
+            onClose={() => setShowPopup(false)}
+            refreshData={getAllLeaderBoard}
+          />,
           document.getElementById("modals")!
         )}
     </>

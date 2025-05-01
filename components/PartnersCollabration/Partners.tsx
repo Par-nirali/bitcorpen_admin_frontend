@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import styles from "./partners.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
@@ -9,6 +9,8 @@ import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import RemovePartnerPopup from "./RemovePartnerPopup";
 import StatusChangePopup from "./StatusChangePopup";
+import axios from "axios";
+import Pagination from "../Pagination/Pagination";
 
 const Partners = () => {
   const dispatch = useDispatch();
@@ -17,6 +19,57 @@ const Partners = () => {
   const [selectedStatus, setSelectedStatus] = useState<
     "Active" | "Deactivated"
   >();
+  // const [allPartnerData, setAllPartnerData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [partnerTableData, setPartnerTableData] = useState<any[]>([]);
+  const [partnerDashboard, setPartnerDashboard] = useState<any>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+
+  const getAllPartnerData = async () => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/partner-collaboration/get`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data.data);
+      const allPartnerData = response.data.data;
+      // setAllPartnerData(response.data.data);
+      if (allPartnerData) {
+        const formattedData = allPartnerData.map(
+          (partner: any, index: number) => ({
+            _id: partner._id || index.toString(),
+            // enid: partner.ENID || "ENID{NUMBER}",
+            companyName: partner?.companyName || "Company Name",
+            logo: partner?.logo
+              ? `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${partner?.logo}`
+              : "/profile.png",
+            url: partner.website || "-",
+            type: partner.partnerType || "-",
+            status: partner.status || "-",
+            joinedDate: new Date(partner.createdAt).toLocaleDateString(
+              "en-US",
+              {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              }
+            ),
+            originalData: partner,
+            // subscription: partner.userType || "-",
+          })
+        );
+        setPartnerTableData(formattedData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePartnerStatusClick = (
     currentStatus: "Active" | "Deactivated"
@@ -25,12 +78,12 @@ const Partners = () => {
     setShowStatusPopup(true);
   };
 
-  const getMoreItems = (record: any): MenuProps["items"] => [
+  const getMoreItems = (partner: any): MenuProps["items"] => [
     {
       key: "edit",
       label: "Edit",
       onClick: () => {
-        dispatch(selectedDetails(record));
+        dispatch(selectedDetails(partner));
         dispatch(selectedProjects("addpartners"));
       },
     },
@@ -38,17 +91,38 @@ const Partners = () => {
       key: "remove",
       label: "Remove",
       onClick: () => {
+        dispatch(selectedDetails(partner));
         setShowPopup(true);
       },
     },
     {
       key: "status",
-      label: record.status === "Active" ? "Deactivate" : "Activate",
+      label: partner.status === "active" ? "Inactivate" : "Activate",
       onClick: () => {
-        handlePartnerStatusClick(record.status);
+        dispatch(selectedDetails(partner));
+        setShowStatusPopup(true);
+        // handlePartnerStatusClick(partner.status);
       },
     },
   ];
+
+  const getPartnerDashboard = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/partner-collaboration/dashboard`,
+        headers: { Authorization: `${token}` },
+      });
+      setPartnerDashboard(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const columns = [
     // {
     //   title: "Nos.",
@@ -66,17 +140,14 @@ const Partners = () => {
       title: "Company Name",
       dataIndex: "companyName",
       key: "companyName",
+      render: (text: any) => <span>{text}</span>,
     },
     {
       title: "Logo",
       dataIndex: "logo",
       key: "logo",
-      render: () => (
-        <img
-          src="/profile.png"
-          alt="Profile"
-          style={{ width: "84px", height: "84px" }}
-        />
+      render: (logo: any) => (
+        <img src={logo} alt="logo" style={{ width: "84px", height: "84px" }} />
       ),
     },
     {
@@ -106,8 +177,8 @@ const Partners = () => {
           style={{
             padding: "4px 8px",
             borderRadius: "64px",
-            backgroundColor: status === "Active" ? "#E8F7F7" : "#FFE9E9",
-            color: status === "Active" ? "#00A3B1" : "#FF4D4F",
+            backgroundColor: status === "active" ? "#E8F7F7" : "#FFE9E9",
+            color: status === "active" ? "#00A3B1" : "#FF4D4F",
           }}
         >
           {status}
@@ -135,47 +206,15 @@ const Partners = () => {
     },
   ];
 
-  const data = [
-    {
-      key: "1",
-      enid: "ENID5666959",
-      companyName: "John#Dummy Name",
-      name: "John Doe",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      status: "Active",
-      joinedDate: "Jan, 07, 2025",
-      subscription: "Influencer",
-      url: "encolunyty/dummy-referral-spam.html",
-      type: "Partner",
-    },
-    {
-      key: "2",
-      enid: "ENID5666959",
-      companyName: "Dummy Name#_Doe",
-      name: "John Doe",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      status: "Active",
-      joinedDate: "Jan, 07, 2025",
-      subscription: "Influencer",
-      url: "encolunyty/dummy-referral-spam.html",
-      type: "Partner",
-    },
-    {
-      key: "3",
-      enid: "ENID5666959",
-      companyName: "John#_Doe",
-      name: "John Doe",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      status: "Deactivated",
-      joinedDate: "Jan, 07, 2025",
-      subscription: "Influencer",
-      url: "encolunyty/dummy-referral-spam.html",
-      type: "Partner",
-    },
-  ];
+  useEffect(() => {
+    getAllPartnerData();
+    getPartnerDashboard();
+  }, []);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return partnerTableData.slice(startIndex, startIndex + itemsPerPage);
+  }, [partnerTableData, currentPage, itemsPerPage]);
 
   return (
     <>
@@ -200,7 +239,7 @@ const Partners = () => {
               <h3>Total Partners</h3>
 
               <div className={styles.leftPercentScore}>
-                <p>500</p>
+                <p>{partnerDashboard?.totalPC}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -208,7 +247,7 @@ const Partners = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Active Partners</h3>
               <div className={styles.leftPercentScore}>
-                <p>7888</p>
+                <p>{partnerDashboard?.activePC}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -216,7 +255,7 @@ const Partners = () => {
             <div className={styles.pScoreLeftinnerDiv}>
               <h3>Inactive Partners</h3>
               <div className={styles.leftPercentScore}>
-                <p>756</p>
+                <p>{partnerDashboard?.inactivePC}</p>
                 <span className={styles.userTitle}>Users</span>
               </div>
             </div>
@@ -231,28 +270,43 @@ const Partners = () => {
               <Table
                 bordered={true}
                 columns={columns}
-                dataSource={data}
+                dataSource={paginatedData}
+                // dataSource={partnerTableData}
+                // dataSource={data}
                 pagination={false}
                 className={styles.recentJoinTable}
               />
             </div>
           </div>
+          <Pagination
+            totalItems={partnerTableData.length}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
         </div>
       </div>
 
       {showPopup &&
         createPortal(
-          <RemovePartnerPopup onClose={() => setShowPopup(false)} />,
+          <RemovePartnerPopup
+            onClose={() => setShowPopup(false)}
+            refreshData={getAllPartnerData}
+            refreshDashData={getPartnerDashboard}
+          />,
           document.getElementById("modals")!
         )}
       {showStatusPopup &&
         createPortal(
           <StatusChangePopup
-            currentStatus={selectedStatus!}
+            // currentStatus={selectedStatus!}
             onClose={() => {
               setShowStatusPopup(false);
-              setSelectedStatus(undefined);
+              // setSelectedStatus(undefined);
             }}
+            refreshData={getAllPartnerData}
+            refreshDashData={getPartnerDashboard}
           />,
           document.getElementById("modals")!
         )}

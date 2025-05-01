@@ -10,7 +10,7 @@
 
 .pSubRightDiv {
     // width: 83%;
-    width: calc(100% - 355px);
+
     height: calc(100vh - 90px);
     padding: 40px 24px;
     animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -214,6 +214,14 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 30px;
+
+    :global(.ql-container.ql-snow) {
+        border: none !important;
+    }
+
+    :global(.ql-editor) {
+        padding: 0px !important;
+    }
 }
 
 .newsDescText {
@@ -284,8 +292,8 @@
 }
 
 .commnetUserProfImg {
-    max-width: 37px;
-    height: auto;
+    width: 37px;
+    height: 37px;
 
     img {
         width: 100%;
@@ -419,7 +427,7 @@
 
 @media only screen and (max-width: 1599px) {
     .pSubRightDiv {
-        width: calc(100% - 340px);
+        // width: calc(100% - 340px);
         padding: 30px 22px;
     }
 
@@ -432,7 +440,7 @@
 
 @media only screen and (max-width: 1366px) {
     .pSubRightDiv {
-        width: calc(100% - 320px);
+        // width: calc(100% - 320px);
         padding: 20px 18px;
     }
 

@@ -4,21 +4,43 @@ import styles1 from "./finalremovepopup.module.scss";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 interface StatusChangeProps {
   onClose: () => void;
+  refreshData: () => void;
+  refreshDashData: () => void;
   // currentStatus: "Active" | "Deactivated";
 }
-const StatusChangePopup: React.FC<StatusChangeProps> = ({ onClose }) => {
+const StatusChangePopup: React.FC<StatusChangeProps> = ({
+  onClose,
+  refreshData,
+  refreshDashData,
+}) => {
   const selectedAdDetails = useSelector((state: any) => state.selectedDetails);
   console.log(selectedAdDetails, selectedAdDetails);
 
-  const isDeactivating = selectedAdDetails.status === "Active";
+  const isDeactivating = selectedAdDetails.adStatus === "active";
   const actionText = isDeactivating ? "Deactivate" : "Activate";
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
-  const handleSubmit = () => {
-    setShowSuccessPopup(true);
+  const handleSubmit = async () => {
+    let tkn = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "patch",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/adControls/changeStatus-ad/${selectedAdDetails._id}`,
+        headers: {
+          Authorization: `${tkn}`,
+        },
+      });
+      console.log("API Response:", response.data);
+      setShowSuccessPopup(true);
+      refreshData();
+      refreshDashData();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   if (showSuccessPopup) {
@@ -31,7 +53,7 @@ const StatusChangePopup: React.FC<StatusChangeProps> = ({ onClose }) => {
             <div className={styles1.modifyHead}>
               <h5>AD {statusText}</h5>
               <p className={styles1.modifyLinkDiv}>
-                <span className={styles1.enid}>{selectedAdDetails.enid}</span>{" "}
+                <span className={styles1.enid}>{selectedAdDetails.adID}</span>{" "}
                 AD {statusText}
               </p>
             </div>
@@ -63,7 +85,7 @@ const StatusChangePopup: React.FC<StatusChangeProps> = ({ onClose }) => {
               <h4>{actionText} AD</h4>
               <p>
                 Are you sure do you want to {actionText.toLowerCase()} of{" "}
-                <span>{selectedAdDetails.enid}</span>
+                <span>{selectedAdDetails.adID}</span>
               </p>
             </div>
             <div className={styles.connectBtns}>

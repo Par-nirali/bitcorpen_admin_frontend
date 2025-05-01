@@ -3,23 +3,55 @@ import styles from "./validationpopup.module.scss";
 import styles1 from "./finalvalidationpopup.module.scss";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Radio } from "antd";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 interface ValidationPopupProps {
   onClose: () => void;
+  refreshData?: any;
+  refreshDashData?: any;
 }
 
-const ValidationPopup: React.FC<ValidationPopupProps> = ({ onClose }) => {
-  const [status, setStatus] = useState<
-    "Validate" | "Invalid" | "Invalide & Fraud"
-  >("Validate");
+const ValidationPopup: React.FC<ValidationPopupProps> = ({
+  onClose,
+  refreshData,
+  refreshDashData,
+}) => {
+  const [status, setStatus] = useState<any>("validated");
+  const selectedAffiliateDetails = useSelector(
+    (state: any) => state.selectedDetails
+  );
+  console.log(selectedAffiliateDetails, selectedAffiliateDetails);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const handleStatusChange = (e: any) => {
     setStatus(e.target.value);
   };
 
-  const handleSubmit = () => {
-    setShowSuccessPopup(true);
+  const handleSubmit = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      // const payload = {
+      //   userId: selectedAffiliateDetails._id,
+      //   status: status.toLocaleLowerCase(),
+      // };
+      const payload = {
+        affiliateId: selectedAffiliateDetails._id,
+        validation: status.toLocaleLowerCase(),
+      };
+      const joinedResponse = await axios({
+        method: "patch",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/affiliate/update-status`,
+        data: payload,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(joinedResponse, "joinedResponse");
+      setShowSuccessPopup(true);
+      refreshData();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   if (showSuccessPopup) {
@@ -31,7 +63,11 @@ const ValidationPopup: React.FC<ValidationPopupProps> = ({ onClose }) => {
               <h5>Validation Submited </h5>
               <p className={styles1.modifyLinkDiv}>
                 {/* <span className={styles1.enid}>ENID5666959</span> User Account */}
-                {/* {status === "Validate" ? " Activated" : " Invalid"} */}
+                {status === "validated"
+                  ? "Validated"
+                  : status === "under_validation"
+                  ? "Under Validation"
+                  : "Invalid"}{" "}
                 user will receive this message in notification
               </p>
             </div>
@@ -68,13 +104,15 @@ const ValidationPopup: React.FC<ValidationPopupProps> = ({ onClose }) => {
                       <button
                         type="button"
                         className={`${styles.activeBtn} ${
-                          status === "Validate" ? styles.active : ""
+                          status === "validated" ? styles.active : ""
                         }`}
-                        onClick={() => setStatus("Validate")}
+                        onClick={() => setStatus("validated")}
                       >
                         <Radio
-                          value="Validate"
-                          className={status === "Validate" ? "valid-radio" : ""}
+                          value="validated"
+                          className={
+                            status === "validated" ? "valid-radio" : ""
+                          }
                         >
                           <span
                             style={{
@@ -88,14 +126,14 @@ const ValidationPopup: React.FC<ValidationPopupProps> = ({ onClose }) => {
                       <button
                         type="button"
                         className={`${styles.deactiveBtn} ${
-                          status === "Invalid" ? styles.deactivated : ""
+                          status === "invalid" ? styles.deactivated : ""
                         }`}
-                        onClick={() => setStatus("Invalid")}
+                        onClick={() => setStatus("invalid")}
                       >
                         <Radio
-                          value="Invalid"
+                          value="invalid"
                           className={
-                            status === "Invalid" ? "invalid-radio" : ""
+                            status === "invalid" ? "invalid-radio" : ""
                           }
                         >
                           <span
@@ -110,16 +148,14 @@ const ValidationPopup: React.FC<ValidationPopupProps> = ({ onClose }) => {
                       <button
                         type="button"
                         className={`${styles.deactiveBtn} ${
-                          status === "Invalide & Fraud"
-                            ? styles.deactivated
-                            : ""
+                          status === "invalid & fraud" ? styles.deactivated : ""
                         }`}
-                        onClick={() => setStatus("Invalide & Fraud")}
+                        onClick={() => setStatus("invalid & fraud")}
                       >
                         <Radio
-                          value="Invalid & Fraud"
+                          value="invalid & fraud"
                           className={
-                            status === "Invalide & Fraud"
+                            status === "invalid & fraud"
                               ? "invalidandfraud-radio"
                               : ""
                           }

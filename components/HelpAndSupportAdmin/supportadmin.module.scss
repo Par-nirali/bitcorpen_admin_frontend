@@ -9,7 +9,7 @@
 }
 
 .pSubRightDiv {
-    width: calc(100% - 355px);
+
     height: calc(100vh - 90px);
     padding: 40px 24px;
     animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -39,7 +39,7 @@
 
     h3 {
         color: #292933;
-        font-family: Poppins;
+
         font-size: 24px;
         font-style: normal;
         font-weight: 700;
@@ -50,7 +50,7 @@
     h2 {
         margin-top: 8px;
         color: #292933;
-        font-family: Poppins;
+
         font-size: 22px;
         font-style: normal;
         font-weight: 600;
@@ -125,7 +125,7 @@
 
 .pScoreLeftinnerDiv {
     padding: 20px;
-    border-radius: 16px;
+    border-radius: 8px;
     border: 2px solid rgba(255, 255, 255, 0.9);
     background: #fff;
     backdrop-filter: blur(103px);
@@ -329,7 +329,7 @@
     align-self: stretch;
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .questionItem {
@@ -426,7 +426,7 @@
     }
 
     .pSubRightDiv {
-        width: calc(100% - 340px);
+        // width: calc(100% - 340px);
         padding: 30px 22px;
     }
 
@@ -447,7 +447,7 @@
     }
 
     .pSubRightDiv {
-        width: calc(100% - 320px);
+        // width: calc(100% - 320px);
         padding: 20px 22px;
     }
 
@@ -459,8 +459,6 @@
 
     .graphMainDiv {
         padding: 40px;
-        border-radius: 12px;
-        background: #fff;
     }
 
     .graphDiv {

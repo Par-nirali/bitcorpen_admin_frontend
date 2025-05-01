@@ -6,9 +6,15 @@ import { useSelector } from "react-redux";
 
 interface ValidationPopupProps {
   onClose: () => void;
+  refreshData?: any;
+  refreshDashData?: any;
 }
 
-const ShowAssistDetails: React.FC<ValidationPopupProps> = ({ onClose }) => {
+const ShowAssistDetails: React.FC<ValidationPopupProps> = ({
+  onClose,
+  refreshData,
+  refreshDashData,
+}) => {
   const selectedAssistDetail = useSelector(
     (state: any) => state.selectedDetails
   );
@@ -31,7 +37,9 @@ const ShowAssistDetails: React.FC<ValidationPopupProps> = ({ onClose }) => {
                 <textarea
                   rows={10}
                   placeholder="Enter answer"
-                  value={selectedAssistDetail?.answer}
+                  value={
+                    selectedAssistDetail?.originalData?.answere[0]?.answere
+                  }
                   className={styles.AssistInputAnswer}
                   readOnly
                 />

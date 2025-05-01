@@ -9,11 +9,11 @@
 }
 
 .pSubRightDiv {
-  width: calc(100% - 355px);
-  height: calc(100vh - 90px);
+  //  
+  height: calc(100vh);
   padding: 40px 24px;
-  animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-  animation-iteration-count: 1;
+  // animation: fadeInAnimation 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  // animation-iteration-count: 1;
 }
 
 .excelDownload {
@@ -68,7 +68,6 @@
 
   h3 {
     color: #292933;
-    font-family: Poppins;
     font-size: 24px;
     font-style: normal;
     font-weight: 700;
@@ -79,7 +78,6 @@
   h2 {
     margin-top: 8px;
     color: #292933;
-    font-family: Poppins;
     font-size: 22px;
     font-style: normal;
     font-weight: 600;
@@ -226,7 +224,7 @@
 
 .pScoreLeftinnerDiv {
   padding: 20px;
-  border-radius: 16px;
+  border-radius: 8px;
   border: 2px solid rgba(255, 255, 255, 0.9);
   background: #fff;
   backdrop-filter: blur(103px);
@@ -239,7 +237,6 @@
 
 .pScoreLeftinnerDiv h3 {
   color: #313131;
-  font-family: Poppins;
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
@@ -285,7 +282,7 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 52px;
-  border-radius: 12px;
+  border-radius: 8px;
   background: #fff;
   margin-top: 20px;
   flex: 1;
@@ -495,7 +492,7 @@
   }
 
   .pSubRightDiv {
-    width: calc(100% - 340px);
+    // width: calc(100% - 340px);
     padding: 30px 22px;
   }
 
@@ -581,6 +578,7 @@
 }
 
 @media only screen and (max-width: 1366px) {
+
   // .pScoreDiv {
   //   grid-template-columns: repeat(2, 45%);
   //   // justify-content: space-around;
@@ -591,7 +589,7 @@
   }
 
   .pSubRightDiv {
-    width: calc(100% - 320px);
+    // width: calc(100% - 320px);
     padding: 20px 22px;
   }
 
@@ -610,8 +608,6 @@
 
   .graphMainDiv {
     padding: 40px;
-    border-radius: 12px;
-    background: #fff;
   }
 
   .graphDiv {
@@ -695,6 +691,7 @@
 }
 
 @media only screen and (max-width: 1111px) {
+
   .pListHeadassigned h3,
   .pListDataDivassigned h3 {
     padding: 17px 0px;

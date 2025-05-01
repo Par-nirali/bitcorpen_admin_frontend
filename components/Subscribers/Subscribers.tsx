@@ -1,84 +1,62 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./subscribers.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { selectedProjects } from "../redux/actions";
+import { selectedDetails, selectedProjects } from "../redux/actions";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
 import PlanDecisionPopup from "./PlanDecisionPopup";
-
-const subscribersData = [
-  {
-    id: 1,
-    profileImage: "/profile.png",
-    name: "John Doe",
-    username: "John_Doe",
-    accountType: "Professional",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    status: "Active",
-    subscriptionDate: "Jan, 08, 2025",
-    expiryDate: "Jan, 08, 2026",
-    paymentGateway: "Paypal",
-  },
-  {
-    id: 2,
-    profileImage: "/profile.png",
-    name: "Sarah Johnson",
-    username: "Sarah_J",
-    accountType: "Professional",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    status: "Deactivated",
-    subscriptionDate: "Dec, 15, 2024",
-    expiryDate: "Dec, 15, 2025",
-    paymentGateway: "Stripe",
-  },
-  {
-    id: 3,
-    profileImage: "/profile.png",
-    name: "Michael Brown",
-    username: "Mike_Brown",
-    accountType: "Professional",
-    plan: {
-      name: "Professional Plan",
-      price: "$24.99 / Month",
-    },
-    status: "Active",
-    subscriptionDate: "Jan, 01, 2025",
-    expiryDate: "Jan, 01, 2026",
-    paymentGateway: "Paypal",
-  },
-];
+import axios from "axios";
 
 const Subscribers = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [activeFilter, setActiveFilter] = useState<any>("All");
-  const [subscribers, setSubscribers] = useState(subscribersData);
+  const [subscribers, setSubscribers] = useState<any>([]);
   const [showPopup, setShowPopup] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<
-    "Active" | "Deactivated"
-  >();
+  const [selectedFilter, setSelectedFilter] = useState("all");
 
-  const handlePlanStatusClick = (status: "Active" | "Deactivated") => {
-    setSelectedStatus(status);
+  const handleFilterSelect = (filter: string) => {
+    setSelectedFilter(filter);
+  };
+
+  const handlePlanStatusClick = (subscriber: any) => {
+    // setSelectedStatus(status);
+    dispatch(selectedDetails(subscriber));
     setShowPopup(true);
   };
 
-  const handleFilterClick = (filter: any) => {
-    setActiveFilter(filter);
+  const [loading, setLoading] = useState(true);
+
+  const getAllSubscribers = async () => {
+    let token = localStorage.getItem("auth-token");
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/subscription/All?filter=${selectedFilter}`,
+        headers: { Authorization: `${token}` },
+      });
+      console.log(response.data.data);
+      setSubscribers(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredSubscribers = subscribers.filter((subscriber) => {
-    if (activeFilter === "All") return true;
-    return subscriber.status === activeFilter;
-  });
+  const formatDate = (isoDate: string) => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  useEffect(() => {
+    getAllSubscribers();
+  }, [selectedFilter]);
 
   return (
     <>
@@ -90,7 +68,7 @@ const Subscribers = () => {
         <div className={styles.dashboardScroll}>
           <div className={styles.tableFilterMainDiv}>
             <div className={styles.userFilter}>
-              {["All", "Active", "Deactivated"].map((filter) => (
+              {/* {["All", "Active", "Deactivated"].map((filter) => (
                 <p
                   key={filter}
                   className={activeFilter === filter ? styles.selected : ""}
@@ -98,78 +76,115 @@ const Subscribers = () => {
                 >
                   {filter}
                 </p>
-              ))}
+              ))} */}
+              <p
+                className={selectedFilter === "all" ? styles.selected : ""}
+                onClick={() => handleFilterSelect("all")}
+              >
+                All
+              </p>
+              <p
+                className={selectedFilter === "active" ? styles.selected : ""}
+                onClick={() => handleFilterSelect("active")}
+              >
+                Active
+              </p>
+              <p
+                className={selectedFilter === "inactive" ? styles.selected : ""}
+                onClick={() => handleFilterSelect("inactive")}
+              >
+                Inactivated
+              </p>
             </div>
             <div className={styles.inputMainDiv}>
               <p>{subscribers.length} Subscribers</p>
             </div>
           </div>
-          <div className={styles.graphUserTableDiv}>
-            <div className={styles.candMainDiv}>
-              <div className={styles.cardsGrid}>
-                {filteredSubscribers?.map((subscriber) => (
-                  <div className={styles.candCardMain} key={subscriber.id}>
-                    <div className={styles.cardContainer}>
-                      <div className={styles.rankBadge}>
-                        <div className={styles.rankProfileImg}>
-                          <img src={subscriber.profileImage} alt="profile" />
-                        </div>
-                        <div className={styles.rankBadgeText}>
-                          <p>{subscriber.name}</p>
-                          <span>{subscriber.username}</span>
-                          <span>{subscriber.accountType}</span>
-                        </div>
-                      </div>
+          {loading ? (
+            <div className={styles.loadingContainer}>
+              Loading subscribers...
+            </div>
+          ) : (
+            <div className={styles.graphUserTableDiv}>
+              <div className={styles.candMainDiv}>
+                <div className={styles.cardsGrid}>
+                  {subscribers.length > 0 ? (
+                    subscribers?.map((subscriber: any) => (
+                      <div className={styles.candCardMain} key={subscriber._id}>
+                        <div className={styles.cardContainer}>
+                          <div className={styles.rankBadge}>
+                            <div className={styles.rankProfileImg}>
+                              <img
+                                src={
+                                  subscriber?.userId?.profileImage
+                                    ? `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${subscriber?.userId?.profileImage?.url}`
+                                    : "/profile.png"
+                                }
+                                alt="profile"
+                              />
+                            </div>
+                            <div className={styles.rankBadgeText}>
+                              <p>
+                                {subscriber?.userId?.firstName}{" "}
+                                {subscriber?.userId?.lastName}
+                              </p>
+                              <span>{subscriber?.userId?.userName}</span>
+                              <span>{subscriber?.subscriptionType}</span>
+                            </div>
+                          </div>
 
-                      <div className={styles.profileSection}>
-                        <p>{subscriber.plan.name}</p>
-                        <p>{subscriber.plan.price}</p>
-                        <div
-                          className={`${styles.statusDiv} ${
-                            subscriber.status === "Active"
-                              ? ""
-                              : styles.deactivated
-                          }
+                          <div className={styles.profileSection}>
+                            <p>{subscriber?.subscriptionType} plan</p>
+                            <p>{subscriber?.price}</p>
+                            <div
+                              className={`${styles.statusDiv} ${
+                                subscriber?.isDeactive ? styles.deactivated : ""
+                              }
                           }`}
-                        >
-                          {subscriber.status}
+                            >
+                              {subscriber?.isDeactive
+                                ? "Deactivated"
+                                : "Active"}
+                            </div>
+                            <p>
+                              Plan Subscribed on (
+                              {formatDate(subscriber?.updatedAt)})
+                            </p>
+                            <p>
+                              Plan Expire Date (
+                              {formatDate(subscriber?.expiredTime)})
+                            </p>
+                            <p>
+                              Payment Gateway: <span>stripe</span>
+                              {/* <span>{subscriber?.paymentGateway}</span> */}
+                            </p>
+                          </div>
+                          <button
+                            className={styles.cardBtn}
+                            onClick={() => handlePlanStatusClick(subscriber)}
+                          >
+                            {subscriber?.isDeactive ? "Activate" : "Inactivate"}
+                          </button>
                         </div>
-                        <p>
-                          Plan Subscribed on ({subscriber.subscriptionDate})
-                        </p>
-                        <p>Plan Expire Date ({subscriber.expiryDate})</p>
-                        <p>
-                          Payment Gateway:{" "}
-                          <span>{subscriber.paymentGateway}</span>
-                        </p>
                       </div>
-                      <button
-                        className={styles.cardBtn}
-                        onClick={() =>
-                          handlePlanStatusClick(
-                            subscriber.status as "Active" | "Deactivated"
-                          )
-                        }
-                      >
-                        {subscriber.status === "Active"
-                          ? "Deactivate"
-                          : "Activate"}
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                    ))
+                  ) : (
+                    <p className={styles.noSubscribersMessage}>
+                      No subscribers found for the selected filter.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
       {showPopup &&
         createPortal(
           <PlanDecisionPopup
-            currentStatus={selectedStatus!}
+            refreshData={getAllSubscribers}
             onClose={() => {
               setShowPopup(false);
-              setSelectedStatus(undefined);
             }}
           />,
           document.getElementById("modals")!

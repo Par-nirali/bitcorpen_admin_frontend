@@ -1,40 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./subadmins.module.scss";
 import { Table } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { selectedProjects, selectedDetails } from "../redux/actions";
-import { createPortal } from "react-dom";
+import { createPortal, render } from "react-dom";
 import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import RemoveSubAdminPopup from "./RemoveSubAdminPopup";
-// import RemovePartnerPopup from "./RemovePartnerPopup";
-// import StatusChangePopup from "./StatusChangePopup";
+import axios from "axios";
+import Pagination from "../Pagination/Pagination";
 
 const SubAdmins = () => {
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
-  const [showStatusPopup, setShowStatusPopup] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<
-    "Active" | "Deactivated"
-  >();
-
-  const handlePartnerStatusClick = (
-    currentStatus: "Active" | "Deactivated"
-  ) => {
-    setSelectedStatus(currentStatus);
-    setShowStatusPopup(true);
-  };
+  const [loading, setLoading] = useState(true);
+  const [subAdminData, setSubAdminData] = useState<any>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const getMoreItems = (record: any): MenuProps["items"] => [
-    // {
-    //   key: "edit",
-    //   label: "Edit",
-    // onClick: () => {
-    //   dispatch(selectedDetails(record));
-    //   dispatch(selectedProjects("addaubadmins"));
-    // },
-    // },
     {
       key: "remove",
       label: "Remove",
@@ -45,6 +30,55 @@ const SubAdmins = () => {
     },
   ];
 
+  const getAllSubAdmins = async () => {
+    let token = localStorage.getItem("auth-token");
+
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}/admin/subAdmin/get`,
+        headers: { Authorization: `${token}` },
+      });
+
+      const selectAllSubAdminData = response.data;
+      console.log("selectAllSubAdminData", selectAllSubAdminData);
+
+      if (selectAllSubAdminData && selectAllSubAdminData.data) {
+        const formattedData = selectAllSubAdminData.data.map(
+          (admin: any, index: number) => {
+            const resources =
+              admin.permission?.flatMap(
+                (perm: any) =>
+                  perm.permits?.map((permit: any) => permit.resource) || []
+              ) || [];
+
+            return {
+              _id: admin._id || index.toString(),
+              name: `${admin.firstName || "Test"} ${
+                admin.lastName || "User"
+              }`.trim(),
+              profileImage: admin?.profileImage
+                ? `${process.env.NEXT_PUBLIC_REACT_APP_IMAGE_URL}/${admin?.profileImage?.url}`
+                : "/profile.png",
+              email: admin.email || "-",
+              password: admin.password || "-",
+              phoneNumber: admin.phoneNumber || "-",
+              status: admin.status || "-",
+              resources: resources,
+              originalData: admin,
+            };
+          }
+        );
+        setSubAdminData(formattedData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
       title: "Name",
@@ -53,11 +87,11 @@ const SubAdmins = () => {
     },
     {
       title: "Profile Image",
-      dataIndex: "logo",
-      key: "logo",
-      render: () => (
+      dataIndex: "profileImage",
+      key: "profileImage",
+      render: (profileImage: any) => (
         <img
-          src="/profile.png"
+          src={profileImage}
           alt="Profile"
           style={{ width: "84px", height: "84px" }}
         />
@@ -67,9 +101,6 @@ const SubAdmins = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      //   render: (url: any) => (
-      //     <a style={{ color: "#009883", textDecoration: "underline" }}>{url}</a>
-      //   ),
     },
     {
       title: "Password",
@@ -78,8 +109,12 @@ const SubAdmins = () => {
     },
     {
       title: "Phone",
-      dataIndex: "phone",
-      key: "phone",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+      // render: (phoneNumber: any) => (
+      //   <span>{phoneNumber.replace(/\d(?=\d{4})/g, "x")}</span>
+      //   // <span>{phoneNumber.replace(/^(\d{4})\d*(\d{4})$/, "$1xxxx$2")}</span>
+      // ),
     },
     {
       title: "Status",
@@ -90,8 +125,8 @@ const SubAdmins = () => {
           style={{
             padding: "4px 8px",
             borderRadius: "64px",
-            backgroundColor: status === "Active" ? "#E8F7F7" : "#FFE9E9",
-            color: status === "Active" ? "#00A3B1" : "#FF4D4F",
+            backgroundColor: status === "active" ? "#E8F7F7" : "#FFE9E9",
+            color: status === "active" ? "#00A3B1" : "#FF4D4F",
           }}
         >
           {status}
@@ -100,8 +135,21 @@ const SubAdmins = () => {
     },
     {
       title: "Roles",
-      dataIndex: "roles",
-      key: "roles",
+      dataIndex: "resources",
+      key: "resources",
+      render: (resources: any) => (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+          {Array.isArray(resources) && resources.length > 0 ? (
+            resources.map((resource, index) => (
+              <span key={index} className={styles.rolesName}>
+                {resource}
+              </span>
+            ))
+          ) : (
+            <span>-</span>
+          )}
+        </div>
+      ),
     },
     {
       title: "Operate",
@@ -122,7 +170,6 @@ const SubAdmins = () => {
             menu={{ items: getMoreItems(record) }}
             trigger={["hover"]}
             placement="bottomRight"
-            // style={{ width: "100%" }}
           >
             <a style={{ width: "24px", height: "24px" }}>
               <img src="/icons/more.svg" alt="more" />
@@ -133,53 +180,14 @@ const SubAdmins = () => {
     },
   ];
 
-  const data = [
-    {
-      key: "1",
-      enid: "ENID5666959",
-      companyName: "John#Dummy Name",
-      name: "John Doe",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      status: "Active",
-      joinedDate: "Jan, 07, 2025",
-      subscription: "Influencer",
-      url: "encolunyty/dummy-referral-spam.html",
-      type: "Partner",
-      password: "gy******",
-      roles: "Content Moderation",
-    },
-    {
-      key: "2",
-      enid: "ENID5666959",
-      companyName: "Dummy Name#_Doe",
-      name: "John Doe",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      status: "Active",
-      joinedDate: "Jan, 07, 2025",
-      subscription: "Influencer",
-      url: "encolunyty/dummy-referral-spam.html",
-      type: "Partner",
-      password: "gy******",
-      roles: "Help & Support",
-    },
-    {
-      key: "3",
-      enid: "ENID5666959",
-      companyName: "John#_Doe",
-      name: "John Doe",
-      email: "dummyemail@email.com",
-      phone: "+1 3656 5566 55",
-      status: "Deactivated",
-      joinedDate: "Jan, 07, 2025",
-      subscription: "Influencer",
-      url: "encolunyty/dummy-referral-spam.html",
-      type: "Partner",
-      password: "gy******",
-      roles: "Content Moderation",
-    },
-  ];
+  useEffect(() => {
+    getAllSubAdmins();
+  }, []);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return subAdminData.slice(startIndex, startIndex + itemsPerPage);
+  }, [subAdminData, currentPage, itemsPerPage]);
 
   return (
     <>
@@ -199,67 +207,37 @@ const SubAdmins = () => {
         </div>
 
         <div className={styles.dashboardScroll}>
-          {/* <div className={styles.pScoreDiv}>
-            <div className={styles.pScoreLeftinnerDiv}>
-              <h3>Total Partners</h3>
-
-              <div className={styles.leftPercentScore}>
-                <p>500</p>
-                <span className={styles.userTitle}>Users</span>
-              </div>
-            </div>
-
-            <div className={styles.pScoreLeftinnerDiv}>
-              <h3>Active Partners</h3>
-              <div className={styles.leftPercentScore}>
-                <p>7888</p>
-                <span className={styles.userTitle}>Users</span>
-              </div>
-            </div>
-
-            <div className={styles.pScoreLeftinnerDiv}>
-              <h3>Inactive Partners</h3>
-              <div className={styles.leftPercentScore}>
-                <p>756</p>
-                <span className={styles.userTitle}>Users</span>
-              </div>
-            </div>
-          </div> */}
-
           <div className={styles.graphUserTableDiv}>
-            {/* <div className={styles.dropdownsSection}>
-              <p className={styles.dollarsTitle}>Partners Details</p>
-            </div> */}
-
             <div className={styles.graphDivtable}>
               <Table
                 bordered={true}
                 columns={columns}
-                dataSource={data}
+                dataSource={paginatedData}
+                // dataSource={subAdminData}
+                loading={loading}
                 pagination={false}
                 className={styles.recentJoinTable}
               />
             </div>
           </div>
+          <Pagination
+            totalItems={subAdminData.length}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
         </div>
       </div>
 
       {showPopup &&
         createPortal(
-          <RemoveSubAdminPopup onClose={() => setShowPopup(false)} />,
+          <RemoveSubAdminPopup
+            onClose={() => setShowPopup(false)}
+            refreshData={getAllSubAdmins}
+          />,
           document.getElementById("modals")!
         )}
-      {/*{showStatusPopup &&
-          createPortal(
-            <StatusChangePopup
-              currentStatus={selectedStatus!}
-              onClose={() => {
-                setShowStatusPopup(false);
-                setSelectedStatus(undefined);
-              }}
-            />,
-            document.getElementById("modals")!
-          )} */}
     </>
   );
 };
