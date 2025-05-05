@@ -44,8 +44,11 @@ const DeleteArticlePopup: React.FC<DeleteArticleProps> = ({
       setShowSuccessPopup(true);
       refreshData();
       refreshDashboardData();
-      dispatch(selectedProjects("articles"));
-      router.push("/articles");
+      onClose();
+      if (response.data.success === true) {
+        dispatch(selectedProjects("articles"));
+        router.push("/articles");
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -83,6 +86,8 @@ const DeleteArticlePopup: React.FC<DeleteArticleProps> = ({
               className={styles1.closeButton}
               onClick={() => {
                 setShowSuccessPopup(false);
+                dispatch(selectedProjects("articles"));
+                router.push("/articles");
                 onClose();
               }}
             >
