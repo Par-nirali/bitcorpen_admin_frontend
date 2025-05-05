@@ -147,7 +147,7 @@ const Performance = () => {
             ) : selectedproject === "articles" ? (
               <Articles />
             ) : selectedproject === "article_details" ? (
-              <ShowArticleDetail />
+              <ShowArticleDetail articleId={""} />
             ) : selectedproject === "edit_profile" ? (
               <AdminEditProfile />
             ) : selectedproject === "header_notification" ? (

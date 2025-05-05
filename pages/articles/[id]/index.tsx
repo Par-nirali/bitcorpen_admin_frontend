@@ -1,23 +1,72 @@
+// import type { NextPage } from "next";
+// import Articles from "../../../components/Articles/Articles";
+// import Header3 from "../../../components/Header/Header";
+// import Slidebar from "../../../components/Slidebar/Slidebar";
+// import { useRouter } from "next/router";
+// import Cookies from "js-cookie";
+// import { useEffect, useState } from "react";
+// import ShowArticleDetail from "../../../components/Articles/ShowArticleDetail";
+
+// const Articledetails: NextPage = () => {
+//   // const [cookie, setCookie] = useState<any>("");
+//   // const router = useRouter();
+
+//   // useEffect(() => {
+//   //   const temp = Cookies.get("isLoggedIn");
+//   //   setCookie(temp);
+//   //   if (temp === "false" || !temp) {
+//   //     router.push("/login");
+//   //   }
+//   // }, []);
+
+//   return (
+//     <>
+//       <div className="mainCon">
+//         <Slidebar />
+//         <div className="subCon">
+//           <Header3 />
+//           <div className="scrollDiv">
+//             {/* {cookie === "true" &&  */}
+//             <ShowArticleDetail />
+//             {/* } */}
+//           </div>
+//         </div>
+//       </div>
+//     </>
+//   );
+// };
+
+// export default Articledetails;
+
 import type { NextPage } from "next";
-import Articles from "../../../components/Articles/Articles";
-import Header3 from "../../../components/Header/Header";
-import Slidebar from "../../../components/Slidebar/Slidebar";
 import { useRouter } from "next/router";
-import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
-import ShowArticleDetail from "../../../components/Articles/ShowArticleDetail";
+// import ShowArticleDetail from "../../../components/Articles/ShowArticleDetail";
+import Header3 from "../../../components/Header/Header";
+// import Sidebar from "../../../components/Sidebar/Sidebar";
+import Slidebar from "../../../components/Slidebar/Slidebar";
+import dynamic from "next/dynamic";
+
+const ShowArticleDetail = dynamic(
+  () => {
+    return import("../../../components/Articles/ShowArticleDetail");
+  },
+  { ssr: false }
+);
 
 const Articledetails: NextPage = () => {
-  // const [cookie, setCookie] = useState<any>("");
-  // const router = useRouter();
+  const router = useRouter();
+  const { id } = router.query;
+  const [isLoading, setIsLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const temp = Cookies.get("isLoggedIn");
-  //   setCookie(temp);
-  //   if (temp === "false" || !temp) {
-  //     router.push("/login");
-  //   }
-  // }, []);
+  useEffect(() => {
+    // Wait until the router is ready and id is available
+    if (!router.isReady) return;
+
+    setIsLoading(false);
+  }, [router.isReady, id]);
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <>
@@ -26,9 +75,7 @@ const Articledetails: NextPage = () => {
         <div className="subCon">
           <Header3 />
           <div className="scrollDiv">
-            {/* {cookie === "true" &&  */}
-            <ShowArticleDetail />
-            {/* } */}
+            {id && <ShowArticleDetail articleId={id} />}
           </div>
         </div>
       </div>
